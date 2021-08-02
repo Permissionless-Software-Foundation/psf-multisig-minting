@@ -23,14 +23,14 @@ const WalletUtil = require('../lib/wallet-util')
 //   apiToken: globalConfig.JWT,
 // })
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 const fs = require('fs')
 
 // let _this
 
 class WalletCreate extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
     // _this = this
 
@@ -42,9 +42,9 @@ class WalletCreate extends Command {
     // this.localConfig = globalConfig
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(WalletCreate)
+      const { flags } = this.parse(WalletCreate)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -72,7 +72,7 @@ class WalletCreate extends Command {
   }
 
   // Create a new wallet file.
-  async createWallet(filename, desc) {
+  async createWallet (filename, desc) {
     try {
       // Input validation.
       if (!filename || filename === '') throw new Error('filename required.')
@@ -87,7 +87,7 @@ class WalletCreate extends Command {
       // create 128 bit (12 word) BIP39 mnemonic
       const mnemonic = this.bchjs.Mnemonic.generate(
         128,
-        this.bchjs.Mnemonic.wordLists().english,
+        this.bchjs.Mnemonic.wordLists().english
       )
       walletData.mnemonic = mnemonic
 
@@ -103,7 +103,7 @@ class WalletCreate extends Command {
       // HDNode of BIP44 account
       const account = this.bchjs.HDNode.derivePath(
         masterHDNode,
-        `m/44'/${walletData.derivation}'/0'`,
+        `m/44'/${walletData.derivation}'/0'`
       )
 
       // derive the first external change address HDNode which is going to spend utxo
@@ -131,7 +131,7 @@ class WalletCreate extends Command {
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -145,11 +145,11 @@ class WalletCreate extends Command {
 WalletCreate.description = 'Generate a new HD Wallet.'
 
 WalletCreate.flags = {
-  name: flags.string({char: 'n', description: 'Name of wallet'}),
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
   description: flags.string({
     char: 'd',
-    description: 'Description of the wallet',
-  }),
+    description: 'Description of the wallet'
+  })
 }
 
 module.exports = WalletCreate
