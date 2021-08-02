@@ -5,4 +5,5 @@
 /tmp
 /yarn.lock
 /orbitdb
+/ipfsdata
 node_modules
