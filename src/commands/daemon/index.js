@@ -1,7 +1,5 @@
 // Public npm libraries
 const BCHJS = require('@psf/bch-js')
-// const IpfsCoord = require('ipfs-coord')
-// const IPFS = require('ipfs')
 const { Command, flags } = require('@oclif/command')
 
 // Local libraries.
@@ -57,7 +55,7 @@ class Daemon extends Command {
 
       // _this.eventEmitter.emit('rpcData', jsonData)
     } catch (err) {
-      console.error('Error in rpcHandler: ', err)
+      console.error('Error in rpcHandler()')
       // Do not throw an error. This is a top-level function.
     }
   }
@@ -67,6 +65,10 @@ class Daemon extends Command {
     const name = flags.name || 'world'
     this.log(`hello ${name} from ./src/commands/hello.js`)
 
+    await this.startDaemon()
+  }
+
+  async startDaemon () {
     // Connect to the IPFS network.
     await this.start()
 

@@ -11,13 +11,15 @@ const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
 
 class RestApi {
-  // constructor () {}
+  constructor () {
+    this.bodyParser = bodyParser
+  }
 
   async startRestApi () {
     try {
       // Create a Koa instance.
       const app = new Koa()
-      app.use(bodyParser())
+      app.use(this.bodyParser())
 
       this.router = new Router({ prefix: '/' })
       this.router.post('/', this.apiHandler)
@@ -30,7 +32,7 @@ class RestApi {
 
       return app
     } catch (err) {
-      console.error('Error in startRestApi(): ', err)
+      console.error('Error in startRestApi()')
       throw err
     }
   }

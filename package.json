@@ -68,7 +68,8 @@
     "test": "nyc mocha --exit --timeout 15000 --recursive test/commands/",
     "version": "oclif-dev readme && git add README.md",
     "pkg": "pkg --out-path dist/ .",
-    "lint": "standard --env mocha --fix"
+    "lint": "standard --env mocha --fix",
+    "coverage:report": "nyc --reporter=html mocha --exit --timeout 15000 --recursive test/commands/"
   },
   "pkg": {
     "scripts": "src/commands/**/*.js"
