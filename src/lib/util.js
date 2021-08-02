@@ -9,7 +9,7 @@ const fs = require('fs')
 
 // const config = require('../config')
 
-const bchjs = new config.BCHLIB({restURL: config.MAINNET_REST})
+// const bchjs = new config.BCHLIB({restURL: config.MAINNET_REST})
 
 class AppUtils {
   constructor(config) {

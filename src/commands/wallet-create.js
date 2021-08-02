@@ -6,16 +6,22 @@
 
 'use strict'
 
-const AppUtils = require('../util')
-const appUtils = new AppUtils()
+// Public NPM libraries
+const BCHJS = require('@psf/bch-js')
 
-const globalConfig = require('../../config')
+// Local libraries
+const WalletUtil = require('../lib/wallet-util')
+
+// const AppUtils = require('../util')
+// const appUtils = new AppUtils()
+
+// const globalConfig = require('../../config')
 
 // Mainnet by default
-const bchjs = new globalConfig.BCHLIB({
-  restURL: globalConfig.MAINNET_REST,
-  apiToken: globalConfig.JWT,
-})
+// const bchjs = new globalConfig.BCHLIB({
+//   restURL: globalConfig.MAINNET_REST,
+//   apiToken: globalConfig.JWT,
+// })
 
 const {Command, flags} = require('@oclif/command')
 
@@ -28,32 +34,35 @@ class WalletCreate extends Command {
     super(argv, config)
     // _this = this
 
-    this.bchjs = bchjs
+    // Encapsulate dependencies.
+    this.bchjs = new BCHJS()
     this.fs = fs
-    this.localConfig = globalConfig
+    this.walletUtil = new WalletUtil()
+
+    // this.localConfig = globalConfig
   }
 
   async run() {
     try {
-      const {flags} = this.parse(CreateWallet)
+      const {flags} = this.parse(WalletCreate)
 
       // Validate input flags
       this.validateFlags(flags)
 
       // Determine if this is a testnet wallet or a mainnet wallet.
-      if (flags.testnet) {
-        this.bchjs = new this.localConfig.BCHLIB({
-          restURL: this.localConfig.TESTNET_REST,
-        })
-      }
+      // if (flags.testnet) {
+      //   this.bchjs = new this.localConfig.BCHLIB({
+      //     restURL: this.localConfig.TESTNET_REST,
+      //   })
+      // }
 
-      const filename = `${__dirname.toString()}/../../wallets/${
+      const filename = `${__dirname.toString()}/../../.wallets/${
         flags.name
       }.json`
 
       if (!flags.description) flags.description = ''
 
-      return this.createWallet(filename, flags.testnet, flags.description)
+      return this.createWallet(filename, flags.description)
     } catch (err) {
       if (err.message) console.log(err.message)
       else console.log('Error in create-wallet.js/run(): ', err)
@@ -62,19 +71,18 @@ class WalletCreate extends Command {
     }
   }
 
-  // testnet is a boolean.
-  async createWallet(filename, testnet, desc) {
+  // Create a new wallet file.
+  async createWallet(filename, desc) {
     try {
+      // Input validation.
       if (!filename || filename === '') throw new Error('filename required.')
       if (this.fs.existsSync(filename)) {
         throw new Error('filename already exist')
       }
-
       // console.log(filename)
+
       // Initialize the wallet data object that will be saved to a file.
       const walletData = {}
-      if (testnet) walletData.network = 'testnet'
-      else walletData.network = 'mainnet'
 
       // create 128 bit (12 word) BIP39 mnemonic
       const mnemonic = this.bchjs.Mnemonic.generate(
@@ -87,10 +95,7 @@ class WalletCreate extends Command {
       const rootSeed = await this.bchjs.Mnemonic.toSeed(mnemonic)
 
       // master HDNode
-      let masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed)
-      if (testnet) {
-        masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed, 'testnet')
-      }
+      const masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed)
 
       // Use the 245 derivation path by default.
       walletData.derivation = 245
@@ -116,7 +121,7 @@ class WalletCreate extends Command {
 
       // Write out the basic information into a json file for other apps to use.
       // const filename = `${__dirname.toString()}/../../wallets/${name}.json`
-      await appUtils.saveWallet(filename, walletData)
+      await this.walletUtil.saveWallet(filename, walletData)
 
       return walletData
     } catch (err) {
@@ -140,7 +145,6 @@ class WalletCreate extends Command {
 WalletCreate.description = 'Generate a new HD Wallet.'
 
 WalletCreate.flags = {
-  testnet: flags.boolean({char: 't', description: 'Create a testnet wallet'}),
   name: flags.string({char: 'n', description: 'Name of wallet'}),
   description: flags.string({
     char: 'd',
