@@ -1,0 +1,52 @@
+{
+  "name": "bin-cli-boilerplate",
+  "description": "A boilerplate for buliding a CLI app deployed as a binary program for different OSs.",
+  "version": "v1.0.0",
+  "author": "Chris Troutner @christroutner",
+  "bin": {
+    "bin-cli-boilerplate": "./bin/run"
+  },
+  "bugs": "https://github.com/christroutner/bin-cli-boilerplate/issues",
+  "dependencies": {
+    "@oclif/command": "^1.8.0",
+    "@oclif/config": "^1.17.0",
+    "@oclif/plugin-help": "^3.2.2"
+  },
+  "devDependencies": {
+    "pkg": "4.4.9"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json",
+    "/src"
+  ],
+  "homepage": "https://github.com/christroutner/bin-cli-boilerplate",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "bin-cli-boilerplate",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "christroutner/bin-cli-boilerplate",
+  "scripts": {
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint .",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
+    "version": "oclif-dev readme && git add README.md",
+    "pkg": "pkg --out-path dist/ ."
+  },
+  "pkg": {
+    "scripts": "src/commands/**/*.js"
+  }
+}
