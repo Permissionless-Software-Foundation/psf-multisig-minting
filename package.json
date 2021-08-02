@@ -1,27 +1,35 @@
 {
-  "name": "bin-cli-boilerplate",
+  "name": "psf-bch-wallet",
   "description": "A boilerplate for buliding a CLI app deployed as a binary program for different OSs.",
   "version": "v1.0.0",
   "author": "Chris Troutner @christroutner",
   "bin": {
     "bin-cli-boilerplate": "./bin/run"
   },
-  "bugs": "https://github.com/christroutner/bin-cli-boilerplate/issues",
+  "bugs": "https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/issues",
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.2",
-    "chai": "^4.3.4",
-    "eslint": "^7.32.0"
+    "@oclif/plugin-help": "^3.2.2"
   },
   "devDependencies": {
+    "@oclif/dev-cli": "^1.26.0",
     "@oclif/test": "^1.2.8",
+    "chai": "^4.3.4",
+    "eslint": "^7.32.0",
     "eslint-config-oclif": "^3.1.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-standard": "^4.0.0",
     "husky": "^7.0.1",
+    "lodash.clonedeep": "^4.5.0",
     "mocha": "^9.0.3",
     "nyc": "^15.1.0",
     "pkg": "4.4.9",
     "semantic-release": "^17.4.4",
+    "sinon": "^9.2.2",
     "standard": "^16.0.3"
   },
   "engines": {
@@ -33,7 +41,7 @@
     "/oclif.manifest.json",
     "/src"
   ],
-  "homepage": "https://github.com/christroutner/bin-cli-boilerplate",
+  "homepage": "https://github.com/Permissionless-Software-Foundation/psf-bch-wallet",
   "keywords": [
     "oclif"
   ],
@@ -41,12 +49,12 @@
   "main": "src/index.js",
   "oclif": {
     "commands": "./src/commands",
-    "bin": "bin-cli-boilerplate",
+    "bin": "psf-bch-wallet",
     "plugins": [
       "@oclif/plugin-help"
     ]
   },
-  "repository": "christroutner/bin-cli-boilerplate",
+  "repository": "Permissionless-Software-Foundation/psf-bch-wallet",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint .",
