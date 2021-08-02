@@ -9,15 +9,23 @@ This is a command-line (CLI) app for working with the Bitcoin Cash (BCH) blockch
 
 This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-service) over [IPFS](https://ipfs.io), using the [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) library. This app uses the [oclif CLI framework](https://oclif.io/) compiled to a binary file using [pkg](https://github.com/vercel/pkg).
 
+## Credit
+
+[oclif](https://oclif.io/) - CLI framework.
+[pkg](https://github.com/vercel/pkg) - binary compiler.
+[conf-cli](https://github.com/natzcam/conf-cli) - oclif config plugin.
+
 <!-- toc -->
-* [psf-bch-wallet](#psf-bch-wallet)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [psf-bch-wallet](#psf-bch-wallet)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g psf-bch-wallet
 $ psf-bch-wallet COMMAND
@@ -29,13 +37,15 @@ USAGE
   $ psf-bch-wallet COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`psf-bch-wallet hello`](#psf-bch-wallet-hello)
-* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+
+- [`psf-bch-wallet hello`](#psf-bch-wallet-hello)
+- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
 
 ## `psf-bch-wallet hello`
 
@@ -71,4 +81,5 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
+
 <!-- commandsstop -->

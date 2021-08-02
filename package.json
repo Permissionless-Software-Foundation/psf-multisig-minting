@@ -12,6 +12,7 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "@psf/bch-js": "^4.20.2",
+    "conf-cli": "^0.1.9",
     "ipfs": "0.55.4",
     "ipfs-coord": "^4.0.1",
     "koa": "^2.13.1",
@@ -57,7 +58,8 @@
     "commands": "./src/commands",
     "bin": "psf-bch-wallet",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "conf-cli"
     ]
   },
   "repository": "Permissionless-Software-Foundation/psf-bch-wallet",
