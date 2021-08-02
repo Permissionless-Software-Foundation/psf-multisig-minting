@@ -10,9 +10,15 @@
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.2"
+    "@oclif/plugin-help": "^3.2.2",
+    "chai": "^4.3.4",
+    "eslint": "^7.32.0"
   },
   "devDependencies": {
+    "@oclif/test": "^1.2.8",
+    "eslint-config-oclif": "^3.1.0",
+    "mocha": "^9.0.3",
+    "nyc": "^15.1.0",
     "pkg": "4.4.9"
   },
   "engines": {
