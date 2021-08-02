@@ -1,56 +1,54 @@
 // Public npm libraries
 const BCHJS = require('@psf/bch-js')
-const IpfsCoord = require('ipfs-coord')
-const IPFS = require('ipfs')
-const {Command, flags} = require('@oclif/command')
+// const IpfsCoord = require('ipfs-coord')
+// const IPFS = require('ipfs')
+const { Command, flags } = require('@oclif/command')
 
 // Local libraries.
 const RestApi = require('./rest-api')
+const IpfsAdapter = require('./ipfs')
+const IpfsCoordAdapter = require('./ipfs-coord')
 
 class Daemon extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
     // _this = this
 
     // Encapsulate dependencies.
     this.bchjs = new BCHJS()
     this.restApi = new RestApi()
+    this.ipfsAdapter = new IpfsAdapter()
+    this.IpfsCoordAdapter = IpfsCoordAdapter
+    this.ipfsCoordAdapter = {} // placeholder
+    this.ipfs = {} // placeholder
   }
 
-  async startIpfs() {
+  async start () {
     try {
-      // Start the IPFS node.
-      this.ipfs = await IPFS.create()
+      // Start IPFS
+      await this.ipfsAdapter.start()
+      console.log('IPFS is ready.')
 
-      // Prevent scanning of local network.
-      await this.ipfs.config.profiles.apply('server')
+      // this.ipfs is a Promise that will resolve into an instance of an IPFS node.
+      this.ipfs = this.ipfsAdapter.ipfs
 
-      // Start ipfs-coord.
-      this.ipfsCoord = new IpfsCoord({
+      // Start ipfs-coord
+      this.ipfsCoordAdapter = new this.IpfsCoordAdapter({
         ipfs: this.ipfs,
-        type: 'node.js',
-        // type: 'browser',
-        bchjs: this.bchjs,
-        privateLog: this.rpcHandler, // Default to console.log
-        isCircuitRelay: false,
-        apiInfo: 'none',
-        announceJsonLd: announceJsonLd,
+        bchjs: this.bchjs
       })
-      await this.ipfsCoord.ipfs.start()
-      await this.ipfsCoord.isReady()
+      await this.ipfsCoordAdapter.start()
+      console.log('ipfs-coord is ready.')
 
-      // Wait to let ipfs-coord connect to subnet peers.
-      // await this.bchjs.Util.sleep(30000)
-
-      await this.restApi.startRestApi()
+      return true
     } catch (err) {
-      console.error('Error in startIpfs().')
+      console.error('Error in start()')
       throw err
     }
   }
 
   // This handler function recieves data from other ipfs-coord peers.
-  rpcHandler(inData) {
+  rpcHandler (inData) {
     try {
       console.log('Data recieved by rpcHandler: ', inData)
 
@@ -64,25 +62,16 @@ class Daemon extends Command {
     }
   }
 
-  // async startRestApi() {
-  //   try {
-  //
-  //   } catch (err) {
-  //     console.error('Error in startRestApi(): ', err)
-  //     throw err
-  //   }
-  // }
-
-  async run() {
-    const {flags} = this.parse(Daemon)
+  async run () {
+    const { flags } = this.parse(Daemon)
     const name = flags.name || 'world'
     this.log(`hello ${name} from ./src/commands/hello.js`)
 
     // Connect to the IPFS network.
-    await this.startIpfs()
+    await this.start()
 
     // Create a REST endpoint to accept input from the other commands in this app.
-    // await this.startRestApi()
+    await this.restApi.startRestApi()
   }
 }
 
@@ -94,17 +83,7 @@ service.
 `
 
 Daemon.flags = {
-  name: flags.string({char: 'n', description: 'name to print'}),
-}
-
-// Create a random number to use in the name of this IPFS n ode.
-const randNum = Math.floor(Math.random() * 10000)
-
-const announceJsonLd = {
-  '@context': 'https://schema.org/',
-  '@type': 'Person',
-  name: `wallet-consumer-${randNum}`,
-  description: 'A consumer of BCH wallet services',
+  name: flags.string({ char: 'n', description: 'name to print' })
 }
 
 module.exports = Daemon

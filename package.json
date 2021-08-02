@@ -35,7 +35,7 @@
     "nyc": "^15.1.0",
     "pkg": "4.4.9",
     "semantic-release": "^17.4.4",
-    "sinon": "^9.2.2",
+    "sinon": "^9.2.4",
     "standard": "^16.0.3"
   },
   "engines": {
@@ -65,7 +65,7 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "npm run lint",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
+    "test": "nyc mocha --exit --timeout 15000 --recursive test/commands/",
     "version": "oclif-dev readme && git add README.md",
     "pkg": "pkg --out-path dist/ .",
     "lint": "standard --env mocha --fix"

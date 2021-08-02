@@ -11,22 +11,22 @@ const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
 
 class RestApi {
-  constructor() {}
+  // constructor () {}
 
-  async startRestApi() {
+  async startRestApi () {
     try {
       // Create a Koa instance.
       const app = new Koa()
       app.use(bodyParser())
 
-      this.router = new Router({prefix: '/'})
+      this.router = new Router({ prefix: '/' })
       this.router.post('/', this.apiHandler)
       app.use(this.router.routes())
       app.use(this.router.allowedMethods())
 
       const port = 5000
       await app.listen(port)
-      console.log(`REST API started on ${port}`)
+      console.log(`REST API started on port ${port}`)
 
       return app
     } catch (err) {
@@ -35,12 +35,12 @@ class RestApi {
     }
   }
 
-  async apiHandler(ctx, next) {
+  async apiHandler (ctx, next) {
     const body = ctx.request.body
     console.log('Input: ', body)
 
     ctx.body = {
-      success: true,
+      success: true
     }
   }
 }
