@@ -65,11 +65,11 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "npm run lint",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc mocha --exit --timeout 15000 --recursive test/commands/",
+    "test": "nyc mocha --exit --timeout 15000 --recursive test/unit/",
     "version": "oclif-dev readme && git add README.md",
     "pkg": "pkg --out-path dist/ .",
     "lint": "standard --env mocha --fix",
-    "coverage:report": "nyc --reporter=html mocha --exit --timeout 15000 --recursive test/commands/"
+    "coverage:report": "nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/"
   },
   "pkg": {
     "scripts": "src/commands/**/*.js"

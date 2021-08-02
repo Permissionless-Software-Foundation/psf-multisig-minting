@@ -54,12 +54,9 @@ class IpfsCoordAdapter {
       announceJsonLd: announceJsonLd
     })
 
-    // Skip connecting ipfs-coord to the network if this is an E2E test.
-    if (!process.env.E2ETEST) {
-      // Wait for the ipfs-coord library to signal that it is ready.
-      await this.ipfsCoord.ipfs.start()
-      await this.ipfsCoord.isReady()
-    }
+    // Wait for the ipfs-coord library to signal that it is ready.
+    await this.ipfsCoord.ipfs.start()
+    await this.ipfsCoord.isReady()
 
     // Signal that this adapter is ready.
     this.isReady = true

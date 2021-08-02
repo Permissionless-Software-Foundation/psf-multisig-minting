@@ -8,8 +8,8 @@ const sinon = require('sinon')
 const cloneDeep = require('lodash.clonedeep')
 
 // Local libraries
-const RestApi = require('../../../src/commands/daemon/rest-api')
-const { context } = require('../../mocks/ctx-mock')
+const RestApi = require('../../../../src/lib/adapters/rest-api')
+const { context } = require('../../../mocks/ctx-mock')
 
 describe('#REST-API', () => {
   let sandbox

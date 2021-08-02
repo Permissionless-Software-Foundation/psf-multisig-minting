@@ -3,9 +3,9 @@ const BCHJS = require('@psf/bch-js')
 const { Command, flags } = require('@oclif/command')
 
 // Local libraries.
-const RestApi = require('./rest-api')
-const IpfsAdapter = require('./ipfs')
-const IpfsCoordAdapter = require('./ipfs-coord')
+const RestApi = require('../lib/adapters/rest-api')
+const IpfsAdapter = require('../lib/adapters/ipfs')
+const IpfsCoordAdapter = require('../lib/adapters/ipfs-coord')
 
 class Daemon extends Command {
   constructor (argv, config) {

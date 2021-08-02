@@ -5,9 +5,9 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 
-const IPFSCoordAdapter = require('../../../src/commands/daemon/ipfs-coord')
-const IPFSMock = require('../../mocks/ipfs-mock')
-const IPFSCoordMock = require('../../mocks/ipfs-coord-mock')
+const IPFSCoordAdapter = require('../../../../src/lib/adapters/ipfs-coord')
+const IPFSMock = require('../../../mocks/ipfs-mock')
+const IPFSCoordMock = require('../../../mocks/ipfs-coord-mock')
 
 describe('#IPFS', () => {
   let uut
