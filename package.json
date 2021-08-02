@@ -10,7 +10,13 @@
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.2"
+    "@oclif/plugin-help": "^3.2.2",
+    "@psf/bch-js": "^4.20.2",
+    "ipfs": "0.55.4",
+    "ipfs-coord": "^4.0.1",
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^10.0.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
@@ -29,7 +35,7 @@
     "nyc": "^15.1.0",
     "pkg": "4.4.9",
     "semantic-release": "^17.4.4",
-    "sinon": "^9.2.2",
+    "sinon": "^9.2.4",
     "standard": "^16.0.3"
   },
   "engines": {
@@ -59,10 +65,11 @@
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "npm run lint",
     "prepack": "oclif-dev manifest && oclif-dev readme",
-    "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
+    "test": "nyc mocha --exit --timeout 15000 --recursive test/commands/",
     "version": "oclif-dev readme && git add README.md",
     "pkg": "pkg --out-path dist/ .",
-    "lint": "standard --env mocha --fix"
+    "lint": "standard --env mocha --fix",
+    "coverage:report": "nyc --reporter=html mocha --exit --timeout 15000 --recursive test/commands/"
   },
   "pkg": {
     "scripts": "src/commands/**/*.js"

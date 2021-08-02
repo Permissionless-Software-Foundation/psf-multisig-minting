@@ -4,4 +4,7 @@
 /dist
 /tmp
 /yarn.lock
+/orbitdb
+/ipfsdata
+/coverage
 node_modules
