@@ -17,9 +17,12 @@
   "devDependencies": {
     "@oclif/test": "^1.2.8",
     "eslint-config-oclif": "^3.1.0",
+    "husky": "^7.0.1",
     "mocha": "^9.0.3",
     "nyc": "^15.1.0",
-    "pkg": "4.4.9"
+    "pkg": "4.4.9",
+    "semantic-release": "^17.4.4",
+    "standard": "^16.0.3"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -50,9 +53,23 @@
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "nyc mocha --forbid-only \"test/**/*.test.js\"",
     "version": "oclif-dev readme && git add README.md",
-    "pkg": "pkg --out-path dist/ ."
+    "pkg": "pkg --out-path dist/ .",
+    "lint": "standard --env mocha --fix"
   },
   "pkg": {
     "scripts": "src/commands/**/*.js"
+  },
+  "release": {
+    "publish": [
+      {
+        "path": "@semantic-release/npm",
+        "npmPublish": false
+      }
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }
