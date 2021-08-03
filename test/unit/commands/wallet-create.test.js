@@ -6,23 +6,11 @@
 
 const assert = require('chai').assert
 const sinon = require('sinon')
-const fs = require('fs')
+const fs = require('fs').promises
 const WalletCreate = require('../../../src/commands/wallet-create')
 
 // const { bitboxMock } = require('../mocks/bitbox')
 const filename = `${__dirname.toString()}/../../../.wallets/test123.json`
-
-// Used to delete testing wallet files.
-const deleteFile = () => {
-  const prom = new Promise((resolve, reject) => {
-    // fs.unlink(filename, () => {
-    //   resolve(true)
-    // }) // Delete wallets file
-
-    fs.rmSync(filename)
-  })
-  return prom
-}
 
 describe('wallet-create', () => {
   let uut
@@ -32,11 +20,6 @@ describe('wallet-create', () => {
     sandbox = sinon.createSandbox()
 
     uut = new WalletCreate()
-
-    // By default, use the mocking library instead of live calls.
-    // createWallet.bchjs = bitboxMock
-
-    // await deleteFile()
   })
 
   afterEach(() => {
@@ -92,7 +75,7 @@ describe('wallet-create', () => {
       assert.isArray(walletData.hasBalance)
 
       // Clean up.
-      deleteFile()
+      await fs.rm(filename)
     })
   })
 
@@ -134,7 +117,7 @@ describe('wallet-create', () => {
       // console.log(`data: ${util.inspect(walletData)}`)
 
       // Clean up.
-      deleteFile()
+      await fs.rm(filename)
     })
 
     it('should return 0 and display error.message on empty flags', async () => {
