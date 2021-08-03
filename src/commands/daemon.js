@@ -1,6 +1,6 @@
 // Public npm libraries
 const BCHJS = require('@psf/bch-js')
-const { Command, flags } = require('@oclif/command')
+const {Command, flags} = require('@oclif/command')
 
 // Local libraries.
 const RestApi = require('../lib/adapters/rest-api')
@@ -8,7 +8,7 @@ const IpfsAdapter = require('../lib/adapters/ipfs')
 const IpfsCoordAdapter = require('../lib/adapters/ipfs-coord')
 
 class Daemon extends Command {
-  constructor (argv, config) {
+  constructor(argv, config) {
     super(argv, config)
     // _this = this
 
@@ -21,7 +21,7 @@ class Daemon extends Command {
     this.ipfs = {} // placeholder
   }
 
-  async start () {
+  async start() {
     try {
       // Start IPFS
       await this.ipfsAdapter.start()
@@ -33,7 +33,7 @@ class Daemon extends Command {
       // Start ipfs-coord
       this.ipfsCoordAdapter = new this.IpfsCoordAdapter({
         ipfs: this.ipfs,
-        bchjs: this.bchjs
+        bchjs: this.bchjs,
       })
       await this.ipfsCoordAdapter.start()
       console.log('ipfs-coord is ready.')
@@ -46,7 +46,7 @@ class Daemon extends Command {
   }
 
   // This handler function recieves data from other ipfs-coord peers.
-  rpcHandler (inData) {
+  rpcHandler(inData) {
     try {
       console.log('Data recieved by rpcHandler: ', inData)
 
@@ -60,15 +60,15 @@ class Daemon extends Command {
     }
   }
 
-  async run () {
-    const { flags } = this.parse(Daemon)
+  async run() {
+    const {flags} = this.parse(Daemon)
     const name = flags.name || 'world'
     this.log(`hello ${name} from ./src/commands/hello.js`)
 
     await this.startDaemon()
   }
 
-  async startDaemon () {
+  async startDaemon() {
     // Connect to the IPFS network.
     await this.start()
 
@@ -79,13 +79,13 @@ class Daemon extends Command {
 
 Daemon.description = `Start a daemon connection to the wallet service.
 This command will start a 'daemon' service, which is a IPFS node that will
-connect to a BCH wallet service over IPFS. It will also start a REST API server,
-which is how the other commands in this app will communicate with the BCH wallet
-service.
+connect to a BCH wallet service over IPFS. It will also start a REST API
+server, which is how the other commands in this app will communicate with
+the BCH wallet service.
 `
 
 Daemon.flags = {
-  name: flags.string({ char: 'n', description: 'name to print' })
+  name: flags.string({char: 'n', description: 'name to print'}),
 }
 
 module.exports = Daemon
