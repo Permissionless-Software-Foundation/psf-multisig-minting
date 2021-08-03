@@ -11,19 +11,23 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 
 ## Credit
 
-[oclif](https://oclif.io/) - CLI framework.
-[pkg](https://github.com/vercel/pkg) - binary compiler.
-[conf-cli](https://github.com/natzcam/conf-cli) - oclif config plugin.
+- [oclif](https://oclif.io/) - CLI framework.
+- [pkg](https://github.com/vercel/pkg) - binary compiler.
+- [conf-cli](https://github.com/natzcam/conf-cli) - oclif config plugin.
+
+## Table of Contents
 
 <!-- toc -->
-* [psf-bch-wallet](#psf-bch-wallet)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [psf-bch-wallet](#psf-bch-wallet)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g psf-bch-wallet
 $ psf-bch-wallet COMMAND
@@ -35,17 +39,19 @@ USAGE
   $ psf-bch-wallet COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
-* [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
-* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
-* [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
-* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
-* [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+
+- [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
+- [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
+- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+- [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+- [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
+- [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -147,4 +153,5 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv1.0.0/src/commands/wallet-remove.js)_
+
 <!-- commandsstop -->
