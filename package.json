@@ -36,7 +36,6 @@
     "lodash.clonedeep": "^4.5.0",
     "mocha": "^9.0.3",
     "nyc": "^15.1.0",
-    "pkg": "4.4.9",
     "semantic-release": "^17.4.4",
     "sinon": "^9.2.4",
     "standard": "^16.0.3"
@@ -71,12 +70,8 @@
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "nyc mocha --exit --timeout 15000 --recursive test/unit/",
     "version": "oclif-dev readme && git add README.md",
-    "pkg": "pkg --out-path dist/ .",
     "lint": "standard --env mocha --fix",
     "coverage:report": "nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/"
-  },
-  "pkg": {
-    "scripts": "src/commands/**/*.js"
   },
   "release": {
     "publish": [
