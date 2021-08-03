@@ -1,6 +1,6 @@
 {
   "name": "psf-bch-wallet",
-  "description": "A boilerplate for buliding a CLI app deployed as a binary program for different OSs.",
+  "description": "A command line (CLI) wallet app for working with Bitcoin Cash and SLP tokens. Uses services over IPFS.",
   "version": "v2.0.0",
   "author": "Chris Troutner @christroutner",
   "bin": {
@@ -19,6 +19,7 @@
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
+    "semver": "^7.3.5",
     "shelljs": "^0.8.4"
   },
   "devDependencies": {
