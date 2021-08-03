@@ -7,4 +7,5 @@
 /orbitdb
 /ipfsdata
 /coverage
+/.wallets
 node_modules
