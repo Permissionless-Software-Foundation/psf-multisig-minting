@@ -135,5 +135,28 @@ describe('wallet-create', () => {
 
       assert.equal(result, 0)
     })
+
+    it('should add a description when provided', async () => {
+      const flags = {
+        name: 'test123',
+        description: 'test'
+      }
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
+
+      const walletData = await uut.run()
+
+      assert.property(walletData, 'mnemonic')
+      assert.property(walletData, 'derivation')
+      assert.property(walletData, 'rootAddress')
+      assert.property(walletData, 'balance')
+      assert.property(walletData, 'nextAddress')
+      assert.property(walletData, 'hasBalance')
+      assert.property(walletData, 'addresses')
+      // console.log(`data: ${util.inspect(walletData)}`)
+
+      // Clean up.
+      await fs.rm(filename)
+    })
   })
 })

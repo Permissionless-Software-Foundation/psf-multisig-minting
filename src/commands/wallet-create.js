@@ -12,34 +12,18 @@ const BCHJS = require('@psf/bch-js')
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
 
-// const AppUtils = require('../util')
-// const appUtils = new AppUtils()
-
-// const globalConfig = require('../../config')
-
-// Mainnet by default
-// const bchjs = new globalConfig.BCHLIB({
-//   restURL: globalConfig.MAINNET_REST,
-//   apiToken: globalConfig.JWT,
-// })
-
 const { Command, flags } = require('@oclif/command')
 
 const fs = require('fs')
 
-// let _this
-
 class WalletCreate extends Command {
   constructor (argv, config) {
     super(argv, config)
-    // _this = this
 
     // Encapsulate dependencies.
     this.bchjs = new BCHJS()
     this.fs = fs
     this.walletUtil = new WalletUtil()
-
-    // this.localConfig = globalConfig
   }
 
   async run () {
@@ -48,13 +32,6 @@ class WalletCreate extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-
-      // Determine if this is a testnet wallet or a mainnet wallet.
-      // if (flags.testnet) {
-      //   this.bchjs = new this.localConfig.BCHLIB({
-      //     restURL: this.localConfig.TESTNET_REST,
-      //   })
-      // }
 
       const filename = `${__dirname.toString()}/../../.wallets/${
         flags.name
