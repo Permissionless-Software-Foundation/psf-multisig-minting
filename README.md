@@ -44,6 +44,7 @@ USAGE
 * [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
 * [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
 * [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
 * [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
@@ -121,6 +122,17 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-create.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv1.0.0/src/commands/wallet-create.js)_
+
+## `psf-bch-wallet wallet-list`
+
+List existing wallets.
+
+```
+USAGE
+  $ psf-bch-wallet wallet-list
+```
+
+_See code: [src/commands/wallet-list.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv1.0.0/src/commands/wallet-list.js)_
 
 ## `psf-bch-wallet wallet-remove`
 
