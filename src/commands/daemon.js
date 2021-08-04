@@ -1,6 +1,7 @@
 // Public npm libraries
 const BCHJS = require('@psf/bch-js')
-const { Command, flags } = require('@oclif/command')
+const {Command, flags} = require('@oclif/command')
+const EventEmitter = require('events')
 
 // Local libraries.
 const RestApi = require('../lib/adapters/rest-api')
@@ -8,20 +9,25 @@ const IpfsAdapter = require('../lib/adapters/ipfs')
 const IpfsCoordAdapter = require('../lib/adapters/ipfs-coord')
 
 class Daemon extends Command {
-  constructor (argv, config) {
+  constructor(argv, config) {
     super(argv, config)
     // _this = this
 
     // Encapsulate dependencies.
+    this.eventEmitter = new EventEmitter()
     this.bchjs = new BCHJS()
-    this.restApi = new RestApi()
+    this.ipfsCoordAdapter = {} // placeholder
+    this.restApi = new RestApi({
+      eventEmitter: this.eventEmitter,
+      ipfsCoordAdapter: this.ipfsCoordAdapter,
+    })
     this.ipfsAdapter = new IpfsAdapter()
     this.IpfsCoordAdapter = IpfsCoordAdapter
-    this.ipfsCoordAdapter = {} // placeholder
+
     this.ipfs = {} // placeholder
   }
 
-  async start () {
+  async start() {
     try {
       // Start IPFS
       await this.ipfsAdapter.start()
@@ -33,10 +39,14 @@ class Daemon extends Command {
       // Start ipfs-coord
       this.ipfsCoordAdapter = new this.IpfsCoordAdapter({
         ipfs: this.ipfs,
-        bchjs: this.bchjs
+        bchjs: this.bchjs,
+        eventEmitter: this.eventEmitter,
       })
       await this.ipfsCoordAdapter.start()
       console.log('ipfs-coord is ready.')
+
+      // Pass the ipfsCoordAdapter instance to the REST API library.
+      this.restApi.updateIpfsCoord(this.ipfsCoordAdapter)
 
       return true
     } catch (err) {
@@ -46,7 +56,7 @@ class Daemon extends Command {
   }
 
   // This handler function recieves data from other ipfs-coord peers.
-  rpcHandler (inData) {
+  rpcHandler(inData) {
     try {
       console.log('Data recieved by rpcHandler: ', inData)
 
@@ -60,15 +70,15 @@ class Daemon extends Command {
     }
   }
 
-  async run () {
-    const { flags } = this.parse(Daemon)
-    const name = flags.name || 'world'
-    this.log(`hello ${name} from ./src/commands/hello.js`)
+  async run() {
+    // const {flags} = this.parse(Daemon)
+    // const name = flags.name || 'world'
+    // this.log(`hello ${name} from ./src/commands/hello.js`)
 
     await this.startDaemon()
   }
 
-  async startDaemon () {
+  async startDaemon() {
     // Connect to the IPFS network.
     await this.start()
 
@@ -85,7 +95,7 @@ the BCH wallet service.
 `
 
 Daemon.flags = {
-  name: flags.string({ char: 'n', description: 'name to print' })
+  // name: flags.string({ char: 'n', description: 'name to print' })
 }
 
 module.exports = Daemon

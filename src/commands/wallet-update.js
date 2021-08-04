@@ -7,16 +7,17 @@
 // Public NPM libraries
 // const BCHJS = require('@psf/bch-js')
 const Conf = require('conf')
+const axios = require('axios')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
 
-const { Command, flags } = require('@oclif/command')
+const {Command, flags} = require('@oclif/command')
 
 const fs = require('fs')
 
 class WalletUpdate extends Command {
-  constructor (argv, config) {
+  constructor(argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
@@ -24,11 +25,12 @@ class WalletUpdate extends Command {
     this.fs = fs
     this.walletUtil = new WalletUtil()
     this.conf = new Conf()
+    this.axios = axios
   }
 
-  async run () {
+  async run() {
     try {
-      const { flags } = this.parse(WalletUpdate)
+      const {flags} = this.parse(WalletUpdate)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -46,10 +48,17 @@ class WalletUpdate extends Command {
     }
   }
 
-  async updateWallet (filename) {
+  async updateWallet(filename) {
     try {
       const serviceId = this.conf.get('selectedService')
       console.log(`serviceId: ${serviceId}`)
+
+      const result = await this.axios.post('http://localhost:5000/', {
+        sendTo: serviceId,
+        addr: 'fakeAddr',
+      })
+      // console.log('result.data: ', result.data)
+      console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
     } catch (err) {
       console.error('Error in updateWallet()')
       throw err
@@ -57,7 +66,7 @@ class WalletUpdate extends Command {
   }
 
   // Validate the proper flags are passed in.
-  validateFlags (flags) {
+  validateFlags(flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -71,7 +80,7 @@ class WalletUpdate extends Command {
 WalletUpdate.description = 'Generate a new HD Wallet.'
 
 WalletUpdate.flags = {
-  name: flags.string({ char: 'n', description: 'Name of wallet' })
+  name: flags.string({char: 'n', description: 'Name of wallet'}),
 }
 
 module.exports = WalletUpdate

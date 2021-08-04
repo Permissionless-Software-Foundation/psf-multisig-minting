@@ -12,15 +12,18 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "@psf/bch-js": "^4.20.2",
+    "axios": "^0.21.1",
     "cli-table": "^0.3.6",
     "conf-cli": "^0.1.9",
     "ipfs": "0.55.4",
     "ipfs-coord": "^4.0.1",
+    "jsonrpc-lite": "^2.2.0",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^10.0.0",
     "semver": "^7.3.5",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.4",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
