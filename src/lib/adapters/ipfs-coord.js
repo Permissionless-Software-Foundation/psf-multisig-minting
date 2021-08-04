@@ -53,7 +53,7 @@ class IpfsCoordAdapter {
     this.isReady = false
 
     // Periodically poll services for available wallet service providers.
-    setInterval(this.pollForServices, 30000)
+    setInterval(this.pollForServices, 10000)
 
     // State object. TODO: Make this more robust.
     this.state = {

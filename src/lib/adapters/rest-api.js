@@ -93,26 +93,28 @@ class RestApi {
   }
 
   async apiHandler(ctx, next) {
-    const body = ctx.request.body
+    // const body = ctx.request.body
     // console.log('Input: ', body)
 
-    const ipfsId = ctx.request.body.sendTo
-    // console.log('ipfsId: ', ipfsId)
+    // Input Validation
+    const sendTo = ctx.request.body.sendTo
+    if (!sendTo) throw new Error('sendTo property must include an IPFS ID.')
+
+    const rpcData = ctx.request.body.rpcData
+    if (!rpcData) throw new Error('rpcData property required')
 
     // Generate a UUID to uniquly identify the response comming back from
     // the IPFS peer.
     const rpcId = _this.uid()
     // console.log('rpcId: ', rpcId)
 
-    const cmd = _this.jsonrpc.request(rpcId, 'bch', {
-      endpoint: 'balance',
-      addresses: ['bitcoincash:qrl2nlsaayk6ekxn80pq0ks32dya8xfclyktem2mqj'],
-    })
+    // Generate a JSON RPC command.
+    const cmd = _this.jsonrpc.request(rpcId, 'bch', rpcData)
     const cmdStr = JSON.stringify(cmd)
     // console.log('cmdStr: ', cmdStr)
 
     // Send the RPC command to selected wallet service.
-    await _this.ipfsCoordAdapter.ipfsCoord.ipfs.orbitdb.sendToDb(ipfsId, cmdStr)
+    await _this.ipfsCoordAdapter.ipfsCoord.ipfs.orbitdb.sendToDb(sendTo, cmdStr)
 
     // Wait for data to come back from the wallet service.
     const data = await _this.waitForRPCResponse(rpcId)

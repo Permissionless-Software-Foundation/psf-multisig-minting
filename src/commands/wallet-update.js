@@ -55,7 +55,10 @@ class WalletUpdate extends Command {
 
       const result = await this.axios.post('http://localhost:5000/', {
         sendTo: serviceId,
-        addr: 'fakeAddr',
+        rpcData: {
+          endpoint: 'balance',
+          addresses: ['bitcoincash:qrl2nlsaayk6ekxn80pq0ks32dya8xfclyktem2mqj'],
+        },
       })
       // console.log('result.data: ', result.data)
       console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
