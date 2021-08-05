@@ -67,67 +67,85 @@ class WalletUpdate extends Command {
   async getAllAddressData(walletData) {
     try {
       let addressData = [] // Accumulates address data.
-      let slpUtxoData = [] // Accumulates SLP token UTXOs.
-      let bchUtxoData = [] // Accumulates BCH (non-SLP) UTXOs.
+      // let slpUtxoData = [] // Accumulates SLP token UTXOs.
+      // let bchUtxoData = [] // Accumulates BCH (non-SLP) UTXOs.
       let currentIndex = 0 // tracks the current HD index.
       let batchHasBalance = true // Flag to signal when last address found.
 
-      const thisDataBatch = await this.getAddressData(
-        walletData,
-        currentIndex,
-        20,
-      )
-      console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
+      // const thisDataBatch = await this.getAddressData(
+      //   walletData,
+      //   currentIndex,
+      //   20,
+      // )
+      // console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
 
-      //
-      // // Scan the derivation path of addresses until a block of 20 is found that
-      // // contains no balance. This follows the standard BIP45 specification.
-      // while (batchHasBalance || currentIndex < walletData.nextAddress) {
-      //   // while (batchHasBalance || currentIndex < 60) {
-      //   // Get a 20-address batch of data.
-      //   const thisDataBatch = await this.getAddressData(
-      //     walletData,
-      //     currentIndex,
-      //     20,
-      //   )
-      //   // console.log(`thisDataBatch: ${util.inspect(thisDataBatch)}`)
-      //   // console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
-      //
-      //   // Increment the index by 20 (addresses).
-      //   currentIndex += 20
-      //
-      //   // console.log(
-      //   //   `thisDataBatch.balances: ${JSON.stringify(
-      //   //     thisDataBatch.balances,
-      //   //     null,
-      //   //     2
-      //   //   )}`
-      //   // )
-      //
-      //   // Check if data has no balance. no balance == last address.
-      //   batchHasBalance = this.detectBalance(thisDataBatch.balances)
-      //   // console.log(`batchHasBalance: ${batchHasBalance}`)
-      //
-      //   // Add data to the array, unless this last batch has no balances.
-      //   if (batchHasBalance) {
-      //     addressData = addressData.concat(thisDataBatch.balances)
-      //     slpUtxoData = slpUtxoData.concat(thisDataBatch.slpUtxos)
-      //     bchUtxoData = bchUtxoData.concat(thisDataBatch.bchUtxos)
-      //   }
-      //   // console.log(`addressData: ${util.inspect(addressData)}`)
-      //   // console.log(`slpUtxoData: ${JSON.stringify(slpUtxoData, null, 2)}`)
-      //
-      //   // Protect against run-away while loop.
-      //   if (currentIndex > 10000) break
-      // }
-      //
-      // // Add the HD index to the SLP UTXO data, so the wallet knows which HD
-      // // address the SLP UTXO belongs to.
-      // // slpUtxoData = this.addSLPIndex(addressData, slpUtxoData)
-      //
-      // return {addressData, slpUtxoData, bchUtxoData}
+      // Scan the derivation path of addresses until a block of 20 is found that
+      // contains no balance. This follows the standard BIP45 specification.
+      while (batchHasBalance || currentIndex < walletData.nextAddress) {
+        // while (batchHasBalance || currentIndex < 60) {
+        // Get a 20-address batch of data.
+        const thisDataBatch = await this.getAddressData(
+          walletData,
+          currentIndex,
+          20,
+        )
+        // console.log(`thisDataBatch: ${util.inspect(thisDataBatch)}`)
+        // console.log(`thisDataBatch: ${JSON.stringify(thisDataBatch, null, 2)}`)
+
+        // Increment the index by 20 (addresses).
+        currentIndex += 20
+
+        // console.log(
+        //   `thisDataBatch.balances: ${JSON.stringify(
+        //     thisDataBatch.balances,
+        //     null,
+        //     2
+        //   )}`
+        // )
+
+        // Check if data has no balance. no balance == last address.
+        batchHasBalance = this.detectBalance(thisDataBatch)
+        // console.log(`batchHasBalance: ${batchHasBalance}`)
+
+        // Add data to the array, unless this last batch has no balances.
+        if (batchHasBalance) {
+          addressData = addressData.concat(thisDataBatch)
+          // slpUtxoData = slpUtxoData.concat(thisDataBatch.slpUtxos)
+          // bchUtxoData = bchUtxoData.concat(thisDataBatch.bchUtxos)
+        }
+        // console.log(`addressData: ${util.inspect(addressData)}`)
+        // console.log(`slpUtxoData: ${JSON.stringify(slpUtxoData, null, 2)}`)
+
+        // Protect against run-away while loop.
+        if (currentIndex > 1000) break
+      }
+
+      // Add the HD index to the SLP UTXO data, so the wallet knows which HD
+      // address the SLP UTXO belongs to.
+      // slpUtxoData = this.addSLPIndex(addressData, slpUtxoData)
+
+      return addressData
     } catch (err) {
       console.log('Error in update-balances.js/getAllAddressData()')
+      throw err
+    }
+  }
+
+  // Returns true if any of the address data has a balance.
+  // dataBatch is expected to be an array of address data.
+  detectBalance(dataBatch) {
+    try {
+      // Loop through the address data in the dataBatch array.
+      for (let i = 0; i < dataBatch.length; i++) {
+        const thisAddr = dataBatch[i]
+
+        if (thisAddr.balance.total > 0) return true
+      }
+
+      // If the loop completes without finding a balance, return false.
+      return false
+    } catch (err) {
+      console.log('Error in wallet-update.js/detectBalance()')
       throw err
     }
   }
@@ -163,7 +181,7 @@ class WalletUpdate extends Command {
       // get BCH balance and details for each address.
       // const balances = await this.bchjs.Electrumx.balance(addresses)
       const balances = await this.walletService.getBalances(addresses)
-      console.log(`balances: ${JSON.stringify(balances, null, 2)}`)
+      // console.log(`balances: ${JSON.stringify(balances, null, 2)}`)
 
       // Add the HD Index and UTXO data to each address.
       for (let i = 0; i < balances.balances.length; i++) {
@@ -184,47 +202,13 @@ class WalletUpdate extends Command {
         // there is no reason to make the UTXO call.
         if (total > 0) {
           const utxos = await this.walletService.getUtxos(thisAddr.address)
-          console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+          // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
 
           thisAddr.utxos = utxos[0]
         }
       }
       // console.log(`balances: ${JSON.stringify(balances, null, 2)}`)
 
-      // Get UTXO data.
-      // const utxos = await this.bchjs.Electrumx.utxo(addresses)
-      // console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
-
-      // Hydrate UTXO data with SLP info.
-      // const hydratedUtxos = await this.bchjs.SLP.Utils.hydrateUtxos(utxos.utxos)
-      // console.log(`hydratedUtxos: ${JSON.stringify(hydratedUtxos, null, 2)}`)
-
-      // Add the hdIndex and address to each UTXO.
-      // Loop through each address.
-      // for (let i = 0; i < hydratedUtxos.slpUtxos.length; i++) {
-      //   const thisAddr = hydratedUtxos.slpUtxos[i].address
-      //   const theseUtxos = hydratedUtxos.slpUtxos[i].utxos
-      //
-      //   // Look up the HD Index for this address.
-      //   const hdIndex = balances.balances.filter(x => x.address === thisAddr)
-      //   // console.log(`hdIndex: ${JSON.stringify(hdIndex, null, 2)}`)
-      //
-      //   // Loop through each UTXO in the address.
-      //   for (let j = 0; j < theseUtxos.length; j++) {
-      //     const thisUtxo = theseUtxos[j]
-      //
-      //     thisUtxo.address = thisAddr
-      //     thisUtxo.hdIndex = hdIndex[0].hdIndex
-      //   }
-      // }
-      // console.log(`hydratedUtxos: ${JSON.stringify(hydratedUtxos, null, 2)}`)
-
-      // Filter out the SLP and BCH UTXOs.
-      // const {bchUtxos, slpUtxos} = await this.filterUtxos(
-      //   hydratedUtxos.slpUtxos,
-      // )
-      //
-      // return {balances: balances.balances, bchUtxos, slpUtxos}
       return balances.balances
     } catch (err) {
       // console.log('Error: ', err)
