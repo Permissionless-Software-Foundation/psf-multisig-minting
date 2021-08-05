@@ -2,21 +2,31 @@
   Unit tests for the IPFS Adapter.
 */
 
+// Public npm libraries.
 const assert = require('chai').assert
 const sinon = require('sinon')
+const cloneDeep = require('lodash.clonedeep')
+const EventEmitter = require('events')
+const BCHJS = require('@psf/bch-js')
 
+// Local libraries
 const IPFSCoordAdapter = require('../../../../src/lib/adapters/ipfs-coord')
 const IPFSMock = require('../../../mocks/ipfs-mock')
 const IPFSCoordMock = require('../../../mocks/ipfs-coord-mock')
+const mockDataLib = require('../../../mocks/ipfs-coord-mocks')
 
-describe('#IPFS', () => {
+describe('#ipfs-coord', () => {
   let uut
   let sandbox
+  let mockData
 
   beforeEach(() => {
     const ipfs = IPFSMock.create()
-    const bchjs = {}
-    uut = new IPFSCoordAdapter({ ipfs, bchjs })
+    const bchjs = new BCHJS()
+    const eventEmitter = new EventEmitter()
+    uut = new IPFSCoordAdapter({ ipfs, bchjs, eventEmitter })
+
+    mockData = cloneDeep(mockDataLib)
 
     sandbox = sinon.createSandbox()
   })
@@ -32,7 +42,7 @@ describe('#IPFS', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'Instance of IPFS must be passed when instantiating ipfs-coord.'
+          'Instance of IPFS must be passed when instantiating ipfs-coord adapter.'
         )
       }
     })
@@ -46,7 +56,22 @@ describe('#IPFS', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'Instance of bch-js must be passed when instantiating ipfs-coord.'
+          'Instance of bch-js must be passed when instantiating ipfs-coord adapter.'
+        )
+      }
+    })
+
+    it('should throw an error if EventEmitter instance is not included', () => {
+      try {
+        const ipfs = IPFSMock.create()
+        const bchjs = new BCHJS()
+        uut = new IPFSCoordAdapter({ ipfs, bchjs })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.'
         )
       }
     })
@@ -91,6 +116,54 @@ describe('#IPFS', () => {
       } catch (err) {
         assert.include(err.message, 'Cannot read property')
       }
+    })
+  })
+
+  describe('#pollForServices', () => {
+    it('should find and select the wallet service', () => {
+      uut.ipfsCoord = {
+        ipfs: {
+          peers: {
+            state: {
+              peerList: mockData.peers,
+              peers: mockData.peerData
+            }
+          }
+        }
+      }
+
+      uut.pollForServices()
+
+      // It should fine the service in the mocked data.
+      assert.equal(
+        uut.state.selectedServiceProvider,
+        'QmZSyLnRQWMBknVNjUroLQnrcmDnUVAUU4pMQ2LGhh6b9v'
+      )
+    })
+
+    it('should catch and report errors', () => {
+      uut.pollForServices()
+
+      assert.isOk(true, 'Not throwing an error is a success.')
+    })
+  })
+
+  describe('#peerInputHandler', () => {
+    it('should emit an event trigger', () => {
+      const data = 'some data'
+
+      uut.peerInputHandler(data)
+
+      assert.isOk(true, 'Not throwing an error is a success')
+    })
+
+    it('should catch and report errors', () => {
+      // Force an error
+      sandbox.stub(uut.eventEmitter, 'emit').throws(new Error('test error'))
+
+      uut.peerInputHandler()
+
+      assert.isOk(true, 'Not throwing an error is a success.')
     })
   })
 })

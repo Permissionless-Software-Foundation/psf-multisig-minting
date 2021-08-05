@@ -45,7 +45,7 @@ class WalletList extends Command {
 
       const lastPart = thisFile.indexOf('.json')
 
-      const lastSlash = thisFile.indexOf('.wallets/')
+      const lastSlash = thisFile.indexOf('.wallets/') + 1
       // console.log(`lastSlash: ${lastSlash}`)
 
       let name = thisFile.slice(8, lastPart)
