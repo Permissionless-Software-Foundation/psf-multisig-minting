@@ -12,8 +12,8 @@ const mockSpentUtxo = [
     height: 1332533,
     confirmations: 32,
     satoshis: 1000,
-    hdIndex: 1,
-  },
+    hdIndex: 1
+  }
 ]
 
 const mockUnspentUtxo = [
@@ -23,8 +23,8 @@ const mockUnspentUtxo = [
     amount: 0.00006,
     satoshis: 6000,
     height: 603562,
-    confirmations: 10,
-  },
+    confirmations: 10
+  }
 ]
 
 const mockWallet = {
@@ -41,7 +41,7 @@ const mockWallet = {
       balanceSat: 0,
       unconfirmedBalance: 0.0000909,
       unconfirmedBalanceSat: 9090,
-      cashAddress: 'bitcoincash:qquwktj59rv6feg7kmaa9ynkpgeqhcledynsa6ycxh',
+      cashAddress: 'bitcoincash:qquwktj59rv6feg7kmaa9ynkpgeqhcledynsa6ycxh'
     },
     {
       index: 2,
@@ -49,13 +49,13 @@ const mockWallet = {
       balanceSat: 0,
       unconfirmedBalance: 0.00000546,
       unconfirmedBalanceSat: 546,
-      cashAddress: 'bitcoincash:qr7ku4y5hy92sfsq9le0ula3rx5n33l8u5qz8mmy55',
-    },
+      cashAddress: 'bitcoincash:qr7ku4y5hy92sfsq9le0ula3rx5n33l8u5qz8mmy55'
+    }
   ],
   addresses: [
     [0, 'bitcoincash:qrqug96lmh6mvd43gzld0vgz6mkk3vktgvpfzdrqkm'],
     [1, 'bitcoincash:qquwktj59rv6feg7kmaa9ynkpgeqhcledynsa6ycxh'],
-    [2, 'bitcoincash:qr7ku4y5hy92sfsq9le0ula3rx5n33l8u5qz8mmy55'],
+    [2, 'bitcoincash:qr7ku4y5hy92sfsq9le0ula3rx5n33l8u5qz8mmy55']
   ],
   description: '',
   name: 'temp',
@@ -86,10 +86,10 @@ const mockWallet = {
           isValid: true,
           tokenQty: '1.2',
           address: 'bitcoincash:qr7ku4y5hy92sfsq9le0ula3rx5n33l8u5qz8mmy55',
-          hdIndex: 2,
-        },
-      ],
-    },
+          hdIndex: 2
+        }
+      ]
+    }
   ],
   BCHUtxos: [
     {
@@ -105,11 +105,11 @@ const mockWallet = {
           vout: 0,
           isValid: false,
           address: 'bitcoincash:qquwktj59rv6feg7kmaa9ynkpgeqhcledynsa6ycxh',
-          hdIndex: 1,
-        },
-      ],
-    },
-  ],
+          hdIndex: 1
+        }
+      ]
+    }
+  ]
 }
 
 const mockTxOut = {
@@ -121,14 +121,14 @@ const mockTxOut = {
     hex: '76a914d19fae66b685f5c3633c0db0600313918347225f88ac',
     reqSigs: 1,
     type: 'pubkeyhash',
-    addresses: ['bitcoincash:qrgeltnxk6zltsmr8sxmqcqrzwgcx3eztusrwgf0x3'],
+    addresses: ['bitcoincash:qrgeltnxk6zltsmr8sxmqcqrzwgcx3eztusrwgf0x3']
   },
-  coinbase: false,
+  coinbase: false
 }
 
 module.exports = {
   mockSpentUtxo,
   mockUnspentUtxo,
   mockWallet,
-  mockTxOut,
+  mockTxOut
 }

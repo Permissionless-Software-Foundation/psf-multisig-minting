@@ -8,11 +8,6 @@
 const IpfsCoord = require('ipfs-coord')
 const semver = require('semver')
 const Conf = require('conf')
-// const BCHJS = require('@psf/bch-js')
-
-// Local libraries
-// const config = require('../../../config')
-// const JSONRPC = require('../../controllers/json-rpc/')
 
 // The minimum version of ipfs-bch-wallet-service that this wallet can work with.
 const MIN_BCH_WALLET_VERSION = '1.8.0'
@@ -20,24 +15,24 @@ const MIN_BCH_WALLET_VERSION = '1.8.0'
 let _this
 
 class IpfsCoordAdapter {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     // Dependency injection.
     this.ipfs = localConfig.ipfs
     if (!this.ipfs) {
       throw new Error(
-        'Instance of IPFS must be passed when instantiating ipfs-coord.',
+        'Instance of IPFS must be passed when instantiating ipfs-coord adapter.'
       )
     }
     this.bchjs = localConfig.bchjs
     if (!this.bchjs) {
       throw new Error(
-        'Instance of bch-js must be passed when instantiating ipfs-coord.',
+        'Instance of bch-js must be passed when instantiating ipfs-coord adapter.'
       )
     }
     this.eventEmitter = localConfig.eventEmitter
     if (!this.eventEmitter) {
       throw new Error(
-        'An instance of an EventEmitter must be passed when instantiating the RestApi library.',
+        'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.'
       )
     }
 
@@ -58,14 +53,14 @@ class IpfsCoordAdapter {
     // State object. TODO: Make this more robust.
     this.state = {
       serviceProviders: [],
-      selectedServiceProvider: '',
+      selectedServiceProvider: ''
     }
 
     _this = this
   }
 
   // Poll the ipfs-coord coordination channel for available service providers.
-  async pollForServices() {
+  async pollForServices () {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
       const peers = _this.ipfsCoord.ipfs.peers.state.peerList
@@ -116,7 +111,7 @@ class IpfsCoordAdapter {
     }
   }
 
-  async start(localConfig = {}) {
+  async start (localConfig = {}) {
     this.ipfsCoord = new this.IpfsCoord({
       ipfs: this.ipfs,
       type: 'node.js',
@@ -125,7 +120,7 @@ class IpfsCoordAdapter {
       privateLog: this.peerInputHandler, // Default to console.log
       isCircuitRelay: false,
       apiInfo: '',
-      announceJsonLd: announceJsonLd,
+      announceJsonLd: announceJsonLd
     })
 
     // Wait for the ipfs-coord library to signal that it is ready.
@@ -140,7 +135,7 @@ class IpfsCoordAdapter {
 
   // This method handles input coming in from other IPFS peers.
   // It passes the data on to the REST API library by emitting an event.
-  async peerInputHandler(data) {
+  async peerInputHandler (data) {
     try {
       // console.log('peerInputHandler triggered with this data: ', data)
 
@@ -153,7 +148,7 @@ class IpfsCoordAdapter {
 
   // Expects router to be a function, which handles the input data from the
   // pubsub channel. It's expected to be capable of routing JSON RPC commands.
-  attachRPCRouter(router) {
+  attachRPCRouter (router) {
     try {
       _this.ipfsCoord.privateLog = router
       _this.ipfsCoord.ipfs.orbitdb.privateLog = router
@@ -171,7 +166,7 @@ const announceJsonLd = {
   '@context': 'https://schema.org/',
   '@type': 'Person',
   name: `wallet-consumer-${randNum}`,
-  description: 'A consumer of BCH wallet services',
+  description: 'A consumer of BCH wallet services'
 }
 
 module.exports = IpfsCoordAdapter

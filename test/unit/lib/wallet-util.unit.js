@@ -53,7 +53,7 @@ describe('#Wallet-Util', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'The "path" argument must be of type string',
+          'The "path" argument must be of type string'
         )
       }
     })
@@ -68,7 +68,7 @@ describe('#Wallet-Util', () => {
       assert.equal(addr.length, 1)
       assert.equal(
         addr[0],
-        'bitcoincash:qqd84rlkya6ktfc9cuxjgqsmnwxuam4wnsf6kdxmzn',
+        'bitcoincash:qqd84rlkya6ktfc9cuxjgqsmnwxuam4wnsf6kdxmzn'
       )
     })
 

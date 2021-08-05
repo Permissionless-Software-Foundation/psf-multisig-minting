@@ -8,15 +8,18 @@ const sinon = require('sinon')
 const IPFSCoordAdapter = require('../../../../src/lib/adapters/ipfs-coord')
 const IPFSMock = require('../../../mocks/ipfs-mock')
 const IPFSCoordMock = require('../../../mocks/ipfs-coord-mock')
+const EventEmitter = require('events')
+const BCHJS = require('@psf/bch-js')
 
-describe('#IPFS', () => {
+describe('#ipfs-coord', () => {
   let uut
   let sandbox
 
   beforeEach(() => {
     const ipfs = IPFSMock.create()
-    const bchjs = {}
-    uut = new IPFSCoordAdapter({ ipfs, bchjs })
+    const bchjs = new BCHJS()
+    const eventEmitter = new EventEmitter()
+    uut = new IPFSCoordAdapter({ ipfs, bchjs, eventEmitter })
 
     sandbox = sinon.createSandbox()
   })
@@ -32,7 +35,7 @@ describe('#IPFS', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'Instance of IPFS must be passed when instantiating ipfs-coord.'
+          'Instance of IPFS must be passed when instantiating ipfs-coord adapter.'
         )
       }
     })
@@ -46,7 +49,22 @@ describe('#IPFS', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'Instance of bch-js must be passed when instantiating ipfs-coord.'
+          'Instance of bch-js must be passed when instantiating ipfs-coord adapter.'
+        )
+      }
+    })
+
+    it('should throw an error if EventEmitter instance is not included', () => {
+      try {
+        const ipfs = IPFSMock.create()
+        const bchjs = new BCHJS()
+        uut = new IPFSCoordAdapter({ ipfs, bchjs })
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.'
         )
       }
     })
