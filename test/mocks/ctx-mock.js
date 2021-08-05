@@ -19,14 +19,14 @@ const context = (req, res, app) => {
   const socket = new Stream.Duplex()
 
   req = Object.assign(
-    {headers: {}, socket},
+    { headers: {}, socket },
     Stream.Readable.prototype,
-    req || {},
+    req || {}
   )
   res = Object.assign(
-    {_headers: {}, socket},
+    { _headers: {}, socket },
     Stream.Writable.prototype,
-    res || {},
+    res || {}
   )
   req.socket.remoteAddress = req.socket.remoteAddress || '127.0.0.1'
   app = app || new Koa()
@@ -46,5 +46,5 @@ const response = (req, res, app) => context(req, res, app).response
 module.exports = {
   context,
   request,
-  response,
+  response
 }

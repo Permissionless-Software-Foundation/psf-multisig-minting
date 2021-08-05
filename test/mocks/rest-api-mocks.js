@@ -10,13 +10,13 @@ const rpcData = {
       balances: [
         {
           balance: {},
-          address: 'addressString',
-        },
-      ],
-    },
-  },
+          address: 'addressString'
+        }
+      ]
+    }
+  }
 }
 
 module.exports = {
-  rpcData,
+  rpcData
 }

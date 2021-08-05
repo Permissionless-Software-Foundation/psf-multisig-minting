@@ -59,8 +59,43 @@ class IpfsCoordAdapter {
     _this = this
   }
 
+  // Start the IPFS node.
+  async start (localConfig = {}) {
+    this.ipfsCoord = new this.IpfsCoord({
+      ipfs: this.ipfs,
+      type: 'node.js',
+      // type: 'browser',
+      bchjs: this.bchjs,
+      privateLog: this.peerInputHandler, // Default to console.log
+      isCircuitRelay: false,
+      apiInfo: '',
+      announceJsonLd: announceJsonLd
+    })
+
+    // Wait for the ipfs-coord library to signal that it is ready.
+    await this.ipfsCoord.ipfs.start()
+    await this.ipfsCoord.isReady()
+
+    // Signal that this adapter is ready.
+    this.isReady = true
+
+    return this.isReady
+  }
+
+  // Expects router to be a function, which handles the input data from the
+  // pubsub channel. It's expected to be capable of routing JSON RPC commands.
+  attachRPCRouter (router) {
+    try {
+      _this.ipfsCoord.privateLog = router
+      _this.ipfsCoord.ipfs.orbitdb.privateLog = router
+    } catch (err) {
+      console.error('Error in attachRPCRouter()')
+      throw err
+    }
+  }
+
   // Poll the ipfs-coord coordination channel for available service providers.
-  async pollForServices () {
+  pollForServices () {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
       const peers = _this.ipfsCoord.ipfs.peers.state.peerList
@@ -85,6 +120,8 @@ class IpfsCoordAdapter {
           versionMatches = _this.semver.gt(version, MIN_BCH_WALLET_VERSION)
         }
 
+        // Ignore any peers that don't match the fingerprint for a BCH wallet
+        // service.
         if (
           documentation.includes('ipfs-bch-wallet-service') &&
           versionMatches
@@ -111,31 +148,9 @@ class IpfsCoordAdapter {
     }
   }
 
-  async start (localConfig = {}) {
-    this.ipfsCoord = new this.IpfsCoord({
-      ipfs: this.ipfs,
-      type: 'node.js',
-      // type: 'browser',
-      bchjs: this.bchjs,
-      privateLog: this.peerInputHandler, // Default to console.log
-      isCircuitRelay: false,
-      apiInfo: '',
-      announceJsonLd: announceJsonLd
-    })
-
-    // Wait for the ipfs-coord library to signal that it is ready.
-    await this.ipfsCoord.ipfs.start()
-    await this.ipfsCoord.isReady()
-
-    // Signal that this adapter is ready.
-    this.isReady = true
-
-    return this.isReady
-  }
-
   // This method handles input coming in from other IPFS peers.
   // It passes the data on to the REST API library by emitting an event.
-  async peerInputHandler (data) {
+  peerInputHandler (data) {
     try {
       // console.log('peerInputHandler triggered with this data: ', data)
 
@@ -143,18 +158,6 @@ class IpfsCoordAdapter {
     } catch (err) {
       console.error('Error in ipfs-coord.js/peerInputHandler(): ', err)
       // Do not throw error. This is a top-level function.
-    }
-  }
-
-  // Expects router to be a function, which handles the input data from the
-  // pubsub channel. It's expected to be capable of routing JSON RPC commands.
-  attachRPCRouter (router) {
-    try {
-      _this.ipfsCoord.privateLog = router
-      _this.ipfsCoord.ipfs.orbitdb.privateLog = router
-    } catch (err) {
-      console.error('Error in attachRPCRouter()')
-      throw err
     }
   }
 }
