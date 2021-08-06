@@ -67,28 +67,29 @@ const peerData = {
       '/ip4/192.168.0.2/tcp/5702/ws/p2p/QmZSyLnRQWMBknVNjUroLQnrcmDnUVAUU4pMQ2LGhh6b9v'
     ],
     orbitdb:
-      '/orbitdb/zdpuAucJCFCeYPB1TBGq7pVEZFktfpNjJWfVCrKCLcieHEvdK/QmZSyLnRQWMBknVNjUroLQnrcmDnUVAUU4pMQ2LGhh6b9v21080513',
+      '/orbitdb/zdpuB3YnmmspCrmwNtHnNiPvhwma1raz7iWXFG2uXUzSfPfps/QmZSyLnRQWMBknVNjUroLQnrcmDnUVAUU4pMQ2LGhh6b9v21080518',
     circuitRelays: [],
     isCircuitRelay: false,
     cryptoAddresses: [
       {
         blockchain: 'BCH',
         type: 'cashAddr',
-        address: 'bitcoincash:qztu3dh9f0a0j477fx6tawpwm29yp4vatv4jm56t3d'
+        address: 'bitcoincash:qpvphp48um3t0vjft59z3n2cdwal52vfauvpwtxqe4'
       },
       {
         blockchain: 'BCH',
         type: 'slpAddr',
-        address: 'simpleledger:qztu3dh9f0a0j477fx6tawpwm29yp4vatvefs00t0n'
+        address: 'simpleledger:qpvphp48um3t0vjft59z3n2cdwal52vfauq69snq8t'
       }
     ],
     encryptPubKey:
-      '035fc984caa60ed8bd0bbe2d1aa0024fb18fce1b6ffd13323856fd16df551dd6d1',
+      '031658369d6eb6f7e83682f6434a349cfa1799836fd967f348da612ad49948dcd5',
     jsonLd: {
       '@context': 'https://schema.org/',
       '@type': 'WebAPI',
       name: 'trout-bch-wallet-service-dev',
-      version: '1.9.0',
+      version: '1.9.1',
+      protocol: 'bch-wallet',
       description:
         'IPFS service providing BCH blockchain access needed by a wallet.',
       documentation: 'https://ipfs-bch-wallet-service.fullstack.cash/',
@@ -99,7 +100,7 @@ const peerData = {
       },
       identifier: 'QmZSyLnRQWMBknVNjUroLQnrcmDnUVAUU4pMQ2LGhh6b9v'
     },
-    updatedAt: '2021-08-05T22:20:13.764Z'
+    updatedAt: '2021-08-06T00:30:39.495Z'
   }
 }
 
