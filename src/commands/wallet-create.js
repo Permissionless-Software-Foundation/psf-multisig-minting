@@ -57,6 +57,8 @@ class WalletCreate extends Command {
         throw new Error('filename required.')
       }
 
+      if (!desc) desc = ''
+
       // Configure the minimal-slp-wallet library to use the JSON RPC over IPFS.
       const walletService = new WalletService()
       const advancedConfig = {

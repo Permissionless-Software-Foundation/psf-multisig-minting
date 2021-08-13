@@ -60,7 +60,7 @@ describe('#wallet-list', () => {
   describe('#run', () => {
     it('should display wallets table', async () => {
       const createWallet = new WalletCreate()
-      await createWallet.createWallet(filename)
+      await createWallet.createWallet(filename, 'test wallet')
 
       Promise.resolve(uut.run()).then(function (table) {
         assert.include(table, 'Name')
@@ -69,6 +69,19 @@ describe('#wallet-list', () => {
 
       // Clean up
       await fs.rm(filename)
+    })
+
+    it('should report stack trace on error', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut, 'parseWallets').throws(new Error('test error'))
+
+        await uut.run()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'test error')
+      }
     })
   })
 })
