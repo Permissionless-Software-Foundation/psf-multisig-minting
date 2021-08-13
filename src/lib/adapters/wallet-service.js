@@ -11,27 +11,31 @@ const axios = require('axios')
 const Conf = require('conf')
 
 class WalletService {
-  constructor (localConfig = {}) {
+  constructor(localConfig = {}) {
     // Encapsulate dependencies
     this.axios = axios
     this.conf = new Conf()
   }
 
-  checkServiceId () {
+  checkServiceId() {
+    // this.conf = new Conf()
+
     const serviceId = this.conf.get('selectedService')
 
-    if (!serviceId) { throw new Error('Wallet service ID does not exist in config.') }
+    if (!serviceId) {
+      throw new Error('Wallet service ID does not exist in config.')
+    }
 
     return serviceId
   }
 
   // Get up to 20 addresses.
-  async getBalances (addrs) {
+  async getBalances(addrs) {
     try {
       // Input validation.
-      if (!Array.isArray(addrs)) {
-        throw new TypeError(
-          'addrs input to getBalance() must be an array, of up to 20 addresses.'
+      if (!addrs || !Array.isArray(addrs)) {
+        throw new Error(
+          'addrs input to getBalance() must be an array, of up to 20 addresses.',
         )
       }
 
@@ -42,8 +46,8 @@ class WalletService {
         sendTo: serviceId,
         rpcData: {
           endpoint: 'balance',
-          addresses: addrs
-        }
+          addresses: addrs,
+        },
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
@@ -55,10 +59,12 @@ class WalletService {
   }
 
   // Get hydrated UTXOs for an address
-  async getUtxos (addr) {
+  async getUtxos(addr) {
     try {
       // Input validation
-      if (typeof addr !== 'string') { throw new Error('getUtxos() input address must be a string.') }
+      if (!addr || typeof addr !== 'string') {
+        throw new Error('getUtxos() input address must be a string.')
+      }
 
       const serviceId = this.checkServiceId()
       // console.log(`serviceId: ${serviceId}`)
@@ -67,14 +73,40 @@ class WalletService {
         sendTo: serviceId,
         rpcData: {
           endpoint: 'utxos',
-          address: addr
-        }
+          address: addr,
+        },
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
       return result.data
     } catch (err) {
       console.error('Error in getUtxos()')
+      throw err
+    }
+  }
+
+  // Broadcast a transaction to the network.
+  async sendTx(hex) {
+    try {
+      // Input validation
+      if (!hex || typeof hex !== 'string') {
+        throw new Error('sendTx() input hex must be a string.')
+      }
+
+      const serviceId = this.checkServiceId()
+      // console.log(`serviceId: ${serviceId}`)
+
+      const result = await this.axios.post(LOCAL_REST_API, {
+        sendTo: serviceId,
+        rpcData: {
+          endpoint: 'broadcast',
+          hex,
+        },
+      }) // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
+
+      return result.data
+    } catch (err) {
+      console.error('Error in sendTx()')
       throw err
     }
   }

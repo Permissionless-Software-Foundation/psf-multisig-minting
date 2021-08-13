@@ -75,7 +75,7 @@ class IpfsCoordAdapter {
 
     // Wait for the ipfs-coord library to signal that it is ready.
     await this.ipfsCoord.ipfs.start()
-    await this.ipfsCoord.isReady()
+    // await this.ipfsCoord.isReady()
 
     // Signal that this adapter is ready.
     this.isReady = true

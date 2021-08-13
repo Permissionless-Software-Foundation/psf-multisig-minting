@@ -18,10 +18,15 @@ class WalletList extends Command {
   }
 
   async run () {
-    const walletData = this.parseWallets()
-    // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
+    try {
+      const walletData = this.parseWallets()
+      // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
 
-    return this.displayTable(walletData)
+      return this.displayTable(walletData)
+    } catch (err) {
+      console.log(err)
+      throw err
+    }
   }
 
   // Parse data from the wallets directory into a formatted array.
@@ -58,7 +63,7 @@ class WalletList extends Command {
 
       const walletInfo = require(`${thisFile}`)
 
-      retData.push([name, walletInfo.balance])
+      retData.push([name, walletInfo.wallet.description])
     }
 
     return retData
@@ -67,7 +72,7 @@ class WalletList extends Command {
   // Display table in a table on the command line using cli-table.
   displayTable (data) {
     const table = new Table({
-      head: ['Name', 'Balance (BCH)'],
+      head: ['Name', 'Description'],
       colWidths: [25, 15]
     })
 
