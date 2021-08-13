@@ -7,17 +7,17 @@
 const shelljs = require('shelljs')
 const Table = require('cli-table')
 
-const {Command} = require('@oclif/command')
+const { Command } = require('@oclif/command')
 
 class WalletList extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
     this.shelljs = shelljs
   }
 
-  async run() {
+  async run () {
     try {
       const walletData = this.parseWallets()
       // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
@@ -30,9 +30,9 @@ class WalletList extends Command {
   }
 
   // Parse data from the wallets directory into a formatted array.
-  parseWallets() {
+  parseWallets () {
     const fileList = this.shelljs.ls(
-      `${__dirname.toString()}/../../.wallets/*.json`,
+      `${__dirname.toString()}/../../.wallets/*.json`
     )
     // console.log('fileList: ', fileList)
 
@@ -70,10 +70,10 @@ class WalletList extends Command {
   }
 
   // Display table in a table on the command line using cli-table.
-  displayTable(data) {
+  displayTable (data) {
     const table = new Table({
       head: ['Name', 'Description'],
-      colWidths: [25, 15],
+      colWidths: [25, 15]
     })
 
     for (let i = 0; i < data.length; i++) table.push(data[i])
