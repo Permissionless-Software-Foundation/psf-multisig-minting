@@ -3,7 +3,7 @@
 */
 
 class BchWallet {
-  constructor() {
+  constructor () {
     this.walletInfoPromise = true
     this.walletInfo = {
       mnemonic:
@@ -16,7 +16,7 @@ class BchWallet {
       slpAddress: 'simpleledger:qp65erjld4jetgzwgvh6sxkyay97cl6gfy28jw0u86',
       legacyAddress: '1BhDmfBRALFVZ4zryxDXNz8xJMxadyZD7k',
       hdPath: "m/44'/245'/0'/0/0",
-      description: '',
+      description: ''
     }
   }
 }

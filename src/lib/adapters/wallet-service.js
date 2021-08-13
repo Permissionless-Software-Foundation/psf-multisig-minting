@@ -11,13 +11,13 @@ const axios = require('axios')
 const Conf = require('conf')
 
 class WalletService {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.axios = axios
     this.conf = new Conf()
   }
 
-  checkServiceId() {
+  checkServiceId () {
     const serviceId = this.conf.get('selectedService')
 
     if (!serviceId) {
@@ -28,12 +28,12 @@ class WalletService {
   }
 
   // Get up to 20 addresses.
-  async getBalances(addrs) {
+  async getBalances (addrs) {
     try {
       // Input validation.
       if (!Array.isArray(addrs)) {
         throw new TypeError(
-          'addrs input to getBalance() must be an array, of up to 20 addresses.',
+          'addrs input to getBalance() must be an array, of up to 20 addresses.'
         )
       }
 
@@ -44,8 +44,8 @@ class WalletService {
         sendTo: serviceId,
         rpcData: {
           endpoint: 'balance',
-          addresses: addrs,
-        },
+          addresses: addrs
+        }
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
@@ -57,7 +57,7 @@ class WalletService {
   }
 
   // Get hydrated UTXOs for an address
-  async getUtxos(addr) {
+  async getUtxos (addr) {
     try {
       // Input validation
       if (typeof addr !== 'string') {
@@ -71,8 +71,8 @@ class WalletService {
         sendTo: serviceId,
         rpcData: {
           endpoint: 'utxos',
-          address: addr,
-        },
+          address: addr
+        }
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
@@ -84,7 +84,7 @@ class WalletService {
   }
 
   // Broadcast a transaction to the network.
-  async sendTx(hex) {
+  async sendTx (hex) {
     try {
       // Input validation
       if (typeof hex !== 'string') {
@@ -98,10 +98,10 @@ class WalletService {
         sendTo: serviceId,
         rpcData: {
           endpoint: 'broadcast',
-          hex,
-        },
-      })// console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
-      ``
+          hex
+        }
+      }) // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
+
       return result.data
     } catch (err) {
       console.error('Error in sendTx()')

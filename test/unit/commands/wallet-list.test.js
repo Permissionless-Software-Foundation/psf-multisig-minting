@@ -38,9 +38,6 @@ describe('#wallet-list', () => {
 
       assert.include(testWallet[0], 'test123')
 
-      const balance = testWallet[1]
-      assert.equal(balance, 0, 'Should have a zero balance')
-
       // Clean up
       await fs.rm(filename)
     })

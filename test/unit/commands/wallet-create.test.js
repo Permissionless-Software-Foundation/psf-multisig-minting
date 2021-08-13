@@ -37,7 +37,7 @@ describe('wallet-create', () => {
         assert.equal(
           err.message,
           'filename required.',
-          'Should throw expected error.',
+          'Should throw expected error.'
         )
       }
     })
@@ -83,7 +83,7 @@ describe('wallet-create', () => {
 
   describe('#validateFlags()', () => {
     it('validateFlags() should return true if name is supplied.', () => {
-      assert.equal(uut.validateFlags({name: 'test'}), true, 'return true')
+      assert.equal(uut.validateFlags({ name: 'test' }), true, 'return true')
     })
 
     it('validateFlags() should throw error if name is not supplied.', () => {
@@ -93,7 +93,7 @@ describe('wallet-create', () => {
         assert.include(
           err.message,
           'You must specify a wallet with the -n flag',
-          'Expected error message.',
+          'Expected error message.'
         )
       }
     })
@@ -105,10 +105,10 @@ describe('wallet-create', () => {
       uut.BchWallet = BchWalletMock
 
       const flags = {
-        name: 'test123',
+        name: 'test123'
       }
       // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({flags: flags})
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
 
       const walletData = await uut.run()
       // console.log('walletData: ', walletData)
@@ -128,7 +128,7 @@ describe('wallet-create', () => {
     })
 
     it('should return 0 and display error.message on empty flags', async () => {
-      sandbox.stub(uut, 'parse').returns({flags: {}})
+      sandbox.stub(uut, 'parse').returns({ flags: {} })
 
       const result = await uut.run()
 
@@ -149,10 +149,10 @@ describe('wallet-create', () => {
 
       const flags = {
         name: 'test123',
-        description: 'test',
+        description: 'test'
       }
       // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({flags: flags})
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
 
       const walletData = await uut.run()
 
