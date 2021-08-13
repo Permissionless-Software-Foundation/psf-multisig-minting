@@ -1,5 +1,5 @@
 /*
-  Create wallet
+  Unit tests for the wallet-create command.
 */
 
 'use strict'
@@ -7,9 +7,10 @@
 const assert = require('chai').assert
 const sinon = require('sinon')
 const fs = require('fs').promises
-const WalletCreate = require('../../../src/commands/wallet-create')
 
-// const { bitboxMock } = require('../mocks/bitbox')
+const WalletCreate = require('../../../src/commands/wallet-create')
+const BchWalletMock = require('../../mocks/msw-mock')
+
 const filename = `${__dirname.toString()}/../../../.wallets/test123.json`
 
 describe('wallet-create', () => {
@@ -36,43 +37,44 @@ describe('wallet-create', () => {
         assert.equal(
           err.message,
           'filename required.',
-          'Should throw expected error.'
+          'Should throw expected error.',
         )
       }
     })
 
-    it('Should exit with error status if called with a filename that already exists.', async () => {
-      try {
-        // Force the error for testing purposes.
-        sandbox.stub(uut.fs, 'existsSync').returns(true)
-
-        await uut.createWallet(filename, 'testnet')
-
-        assert.fail('Unexpected result')
-      } catch (err) {
-        assert.equal(
-          err.message,
-          'filename already exist',
-          'Should throw expected error.'
-        )
-      }
-    })
+    // it('Should exit with error status if called with a filename that already exists.', async () => {
+    //   try {
+    //     // Force the error for testing purposes.
+    //     sandbox.stub(uut.fs, 'existsSync').returns(true)
+    //
+    //     await uut.createWallet(filename, 'testnet')
+    //
+    //     assert.fail('Unexpected result')
+    //   } catch (err) {
+    //     assert.equal(
+    //       err.message,
+    //       'filename already exist',
+    //       'Should throw expected error.',
+    //     )
+    //   }
+    // })
 
     it('should create a mainnet wallet file with the given name', async () => {
-      const walletData = await uut.createWallet(filename, undefined)
+      // Mock dependencies
+      uut.BchWallet = BchWalletMock
+
+      const walletData = await uut.createWallet(filename)
       // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
 
       assert.property(walletData, 'mnemonic')
-      assert.property(walletData, 'derivation')
-      assert.property(walletData, 'rootAddress')
-      assert.property(walletData, 'balance')
-      assert.property(walletData, 'nextAddress')
-      assert.property(walletData, 'hasBalance')
-      assert.property(walletData, 'addresses')
-
-      // hasBalance is an array of objects. Each object represents an address with
-      // a balance.
-      assert.isArray(walletData.hasBalance)
+      assert.property(walletData, 'privateKey')
+      assert.property(walletData, 'publicKey')
+      assert.property(walletData, 'address')
+      assert.property(walletData, 'cashAddress')
+      assert.property(walletData, 'slpAddress')
+      assert.property(walletData, 'legacyAddress')
+      assert.property(walletData, 'hdPath')
+      assert.property(walletData, 'description')
 
       // Clean up.
       await fs.rm(filename)
@@ -81,7 +83,7 @@ describe('wallet-create', () => {
 
   describe('#validateFlags()', () => {
     it('validateFlags() should return true if name is supplied.', () => {
-      assert.equal(uut.validateFlags({ name: 'test' }), true, 'return true')
+      assert.equal(uut.validateFlags({name: 'test'}), true, 'return true')
     })
 
     it('validateFlags() should throw error if name is not supplied.', () => {
@@ -91,7 +93,7 @@ describe('wallet-create', () => {
         assert.include(
           err.message,
           'You must specify a wallet with the -n flag',
-          'Expected error message.'
+          'Expected error message.',
         )
       }
     })
@@ -99,29 +101,34 @@ describe('wallet-create', () => {
 
   describe('#run()', () => {
     it('should run the run() function', async () => {
+      // Mock dependencies
+      uut.BchWallet = BchWalletMock
+
       const flags = {
-        name: 'test123'
+        name: 'test123',
       }
       // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({ flags: flags })
+      sandbox.stub(uut, 'parse').returns({flags: flags})
 
       const walletData = await uut.run()
+      // console.log('walletData: ', walletData)
 
       assert.property(walletData, 'mnemonic')
-      assert.property(walletData, 'derivation')
-      assert.property(walletData, 'rootAddress')
-      assert.property(walletData, 'balance')
-      assert.property(walletData, 'nextAddress')
-      assert.property(walletData, 'hasBalance')
-      assert.property(walletData, 'addresses')
-      // console.log(`data: ${util.inspect(walletData)}`)
+      assert.property(walletData, 'privateKey')
+      assert.property(walletData, 'publicKey')
+      assert.property(walletData, 'address')
+      assert.property(walletData, 'cashAddress')
+      assert.property(walletData, 'slpAddress')
+      assert.property(walletData, 'legacyAddress')
+      assert.property(walletData, 'hdPath')
+      assert.property(walletData, 'description')
 
       // Clean up.
       await fs.rm(filename)
     })
 
     it('should return 0 and display error.message on empty flags', async () => {
-      sandbox.stub(uut, 'parse').returns({ flags: {} })
+      sandbox.stub(uut, 'parse').returns({flags: {}})
 
       const result = await uut.run()
 
@@ -137,23 +144,27 @@ describe('wallet-create', () => {
     })
 
     it('should add a description when provided', async () => {
+      // Mock dependencies
+      uut.BchWallet = BchWalletMock
+
       const flags = {
         name: 'test123',
-        description: 'test'
+        description: 'test',
       }
       // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({ flags: flags })
+      sandbox.stub(uut, 'parse').returns({flags: flags})
 
       const walletData = await uut.run()
 
       assert.property(walletData, 'mnemonic')
-      assert.property(walletData, 'derivation')
-      assert.property(walletData, 'rootAddress')
-      assert.property(walletData, 'balance')
-      assert.property(walletData, 'nextAddress')
-      assert.property(walletData, 'hasBalance')
-      assert.property(walletData, 'addresses')
-      // console.log(`data: ${util.inspect(walletData)}`)
+      assert.property(walletData, 'privateKey')
+      assert.property(walletData, 'publicKey')
+      assert.property(walletData, 'address')
+      assert.property(walletData, 'cashAddress')
+      assert.property(walletData, 'slpAddress')
+      assert.property(walletData, 'legacyAddress')
+      assert.property(walletData, 'hdPath')
+      assert.property(walletData, 'description')
 
       // Clean up.
       await fs.rm(filename)

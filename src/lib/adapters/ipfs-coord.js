@@ -16,24 +16,24 @@ const WALLET_PROTOCOL = 'bch-wallet'
 let _this
 
 class IpfsCoordAdapter {
-  constructor (localConfig = {}) {
+  constructor(localConfig = {}) {
     // Dependency injection.
     this.ipfs = localConfig.ipfs
     if (!this.ipfs) {
       throw new Error(
-        'Instance of IPFS must be passed when instantiating ipfs-coord adapter.'
+        'Instance of IPFS must be passed when instantiating ipfs-coord adapter.',
       )
     }
     this.bchjs = localConfig.bchjs
     if (!this.bchjs) {
       throw new Error(
-        'Instance of bch-js must be passed when instantiating ipfs-coord adapter.'
+        'Instance of bch-js must be passed when instantiating ipfs-coord adapter.',
       )
     }
     this.eventEmitter = localConfig.eventEmitter
     if (!this.eventEmitter) {
       throw new Error(
-        'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.'
+        'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.',
       )
     }
 
@@ -54,14 +54,14 @@ class IpfsCoordAdapter {
     // State object. TODO: Make this more robust.
     this.state = {
       serviceProviders: [],
-      selectedServiceProvider: ''
+      selectedServiceProvider: '',
     }
 
     _this = this
   }
 
   // Start the IPFS node.
-  async start (localConfig = {}) {
+  async start(localConfig = {}) {
     this.ipfsCoord = new this.IpfsCoord({
       ipfs: this.ipfs,
       type: 'node.js',
@@ -70,12 +70,12 @@ class IpfsCoordAdapter {
       privateLog: this.peerInputHandler, // Default to console.log
       isCircuitRelay: false,
       apiInfo: '',
-      announceJsonLd: announceJsonLd
+      announceJsonLd: announceJsonLd,
     })
 
     // Wait for the ipfs-coord library to signal that it is ready.
     await this.ipfsCoord.ipfs.start()
-    await this.ipfsCoord.isReady()
+    // await this.ipfsCoord.isReady()
 
     // Signal that this adapter is ready.
     this.isReady = true
@@ -85,7 +85,7 @@ class IpfsCoordAdapter {
 
   // Expects router to be a function, which handles the input data from the
   // pubsub channel. It's expected to be capable of routing JSON RPC commands.
-  attachRPCRouter (router) {
+  attachRPCRouter(router) {
     try {
       _this.ipfsCoord.privateLog = router
       _this.ipfsCoord.ipfs.orbitdb.privateLog = router
@@ -96,7 +96,7 @@ class IpfsCoordAdapter {
   }
 
   // Poll the ipfs-coord coordination channel for available service providers.
-  pollForServices () {
+  pollForServices() {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
       const peers = _this.ipfsCoord.ipfs.peers.state.peerList
@@ -147,7 +147,7 @@ class IpfsCoordAdapter {
 
   // This method handles input coming in from other IPFS peers.
   // It passes the data on to the REST API library by emitting an event.
-  peerInputHandler (data) {
+  peerInputHandler(data) {
     try {
       // console.log('peerInputHandler triggered with this data: ', data)
 
@@ -166,7 +166,7 @@ const announceJsonLd = {
   '@context': 'https://schema.org/',
   '@type': 'Person',
   name: `wallet-consumer-${randNum}`,
-  description: 'A consumer of BCH wallet services'
+  description: 'A consumer of BCH wallet services',
 }
 
 module.exports = IpfsCoordAdapter
