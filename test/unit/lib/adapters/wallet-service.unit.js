@@ -46,14 +46,14 @@ describe('#WalletService', () => {
         const mockService = ''
         conf.set('selectedService', mockService)
 
-        const result = uut.checkServiceId()
+        uut.checkServiceId()
         // console.log('result: ', result)
 
         assert.fail('Unexpected code path')
       } catch (err) {
         assert.include(
           err.message,
-          'Wallet service ID does not exist in config.',
+          'Wallet service ID does not exist in config.'
         )
       }
 
@@ -71,14 +71,14 @@ describe('#WalletService', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'addrs input to getBalance() must be an array, of up to 20 addresses.',
+          'addrs input to getBalance() must be an array, of up to 20 addresses.'
         )
       }
     })
 
     it('should return address balances', async () => {
       // Mock dependencies
-      sandbox.stub(uut.axios, 'post').resolves({data: 'test-data'})
+      sandbox.stub(uut.axios, 'post').resolves({ data: 'test-data' })
 
       const addr = ['test-address']
 
@@ -98,14 +98,14 @@ describe('#WalletService', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'getUtxos() input address must be a string.',
+          'getUtxos() input address must be a string.'
         )
       }
     })
 
     it('should return utxo data', async () => {
       // Mock dependencies
-      sandbox.stub(uut.axios, 'post').resolves({data: 'test-data'})
+      sandbox.stub(uut.axios, 'post').resolves({ data: 'test-data' })
 
       const addr = 'test-address'
 
@@ -129,7 +129,7 @@ describe('#WalletService', () => {
 
     it('should broadcast TX and return a txid', async () => {
       // Mock dependencies
-      sandbox.stub(uut.axios, 'post').resolves({data: 'test-data'})
+      sandbox.stub(uut.axios, 'post').resolves({ data: 'test-data' })
 
       const hex = 'test-address'
 
