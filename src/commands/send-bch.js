@@ -11,10 +11,10 @@ const BchWallet = require('minimal-slp-wallet/index')
 const WalletUtil = require('../lib/wallet-util')
 const WalletService = require('../lib/adapters/wallet-service')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 class SendBch extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
@@ -22,9 +22,9 @@ class SendBch extends Command {
     this.BchWallet = BchWallet
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(SendBch)
+      const { flags } = this.parse(SendBch)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -58,7 +58,7 @@ class SendBch extends Command {
 
   // Send BCH from the wallet implied by filename, and with the settings saved
   // in the flags object.
-  async sendBch(filename, flags) {
+  async sendBch (filename, flags) {
     try {
       // Input validation
       if (!filename || typeof filename !== 'string') {
@@ -73,7 +73,7 @@ class SendBch extends Command {
       const walletService = new WalletService()
       const advancedConfig = {
         interface: 'json-rpc',
-        jsonRpcWalletService: walletService,
+        jsonRpcWalletService: walletService
       }
 
       // Wait for the wallet to be created.
@@ -91,16 +91,17 @@ class SendBch extends Command {
         this.bchWallet.bchjs.BitcoinCash.toBitcoinCash(bchBalance)
       // console.log(`BCH balance: ${bchBalance} satoshis or ${coinBalance} BCH`)
 
-      if (coinBalance < flags.qty)
+      if (coinBalance < flags.qty) {
         throw new Error(
-          `Insufficient funds. You are trying to send ${flags.qty} BCH, but the wallet only has ${coinBalance} BCH`,
+          `Insufficient funds. You are trying to send ${flags.qty} BCH, but the wallet only has ${coinBalance} BCH`
         )
+      }
 
       const receivers = [
         {
           address: flags.sendAddr,
-          amountSat: this.bchWallet.bchjs.BitcoinCash.toSatoshi(flags.qty),
-        },
+          amountSat: this.bchWallet.bchjs.BitcoinCash.toSatoshi(flags.qty)
+        }
       ]
 
       const txid = await this.bchWallet.send(receivers)
@@ -151,7 +152,7 @@ class SendBch extends Command {
   // }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -161,7 +162,7 @@ class SendBch extends Command {
     const qty = flags.qty
     if (isNaN(Number(qty))) {
       throw new TypeError(
-        'You must specify a quantity in BCH with the -q flag.',
+        'You must specify a quantity in BCH with the -q flag.'
       )
     }
 
@@ -177,9 +178,9 @@ class SendBch extends Command {
 SendBch.description = 'Send BCH'
 
 SendBch.flags = {
-  name: flags.string({char: 'n', description: 'Name of wallet'}),
-  qty: flags.string({char: 'q', description: 'Quantity in BCH'}),
-  sendAddr: flags.string({char: 'a', description: 'Cash address to send to'}),
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
+  qty: flags.string({ char: 'q', description: 'Quantity in BCH' }),
+  sendAddr: flags.string({ char: 'a', description: 'Cash address to send to' })
 }
 
 module.exports = SendBch

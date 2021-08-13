@@ -9,23 +9,23 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
-const {v4: uid} = require('uuid')
+const { v4: uid } = require('uuid')
 const jsonrpc = require('jsonrpc-lite')
 
 let _this
 
 class RestApi {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     this.eventEmitter = localConfig.eventEmitter
     if (!this.eventEmitter) {
       throw new Error(
-        'An instance of an EventEmitter must be passed when instantiating the RestApi library.',
+        'An instance of an EventEmitter must be passed when instantiating the RestApi library.'
       )
     }
     this.ipfsCoordAdapter = localConfig.ipfsCoordAdapter
     if (!this.ipfsCoordAdapter) {
       throw new Error(
-        'An instance of ipfsCoordAdapter must be passed when instantiating the RestApi library.',
+        'An instance of ipfsCoordAdapter must be passed when instantiating the RestApi library.'
       )
     }
 
@@ -45,7 +45,7 @@ class RestApi {
 
   // This handler is triggered when RPC data comes in over IPFS.
   // Handle RPC input, and match the input to the RPC queue.
-  rpcHandler(data) {
+  rpcHandler (data) {
     try {
       // console.log('rest-api.js/rpcHandler() data: ', data)
 
@@ -61,14 +61,14 @@ class RestApi {
 
   // Launch the single REST API endpoint that the other app commands use to
   // broadcast JSON RPC commands to other IPFS peers.
-  async startRestApi() {
+  async startRestApi () {
     try {
       // Create a Koa instance.
       const app = new Koa()
       app.use(this.bodyParser())
 
       // Attach a router for the single POST endpoint.
-      this.router = new Router({prefix: '/'})
+      this.router = new Router({ prefix: '/' })
       this.router.post('/', this.apiHandler)
       app.use(this.router.routes())
       app.use(this.router.allowedMethods())
@@ -87,13 +87,13 @@ class RestApi {
 
   // Update the pointer to the ipfs-coord adapter.
   // This allows the REST API to communicate over IPFS.
-  async updateIpfsCoord(adapter) {
+  async updateIpfsCoord (adapter) {
     this.ipfsCoordAdapter = adapter
     console.log('ipfsCoordAdapter updated in rest-api.js')
   }
 
   // This function handles incoming REST API calls.
-  async apiHandler(ctx, next) {
+  async apiHandler (ctx, next) {
     try {
       // const body = ctx.request.body
       // console.log('Input: ', body)
@@ -118,7 +118,7 @@ class RestApi {
       // Send the RPC command to selected wallet service.
       await _this.ipfsCoordAdapter.ipfsCoord.ipfs.orbitdb.sendToDb(
         sendTo,
-        cmdStr,
+        cmdStr
       )
 
       // Wait for data to come back from the wallet service.
@@ -132,7 +132,7 @@ class RestApi {
   }
 
   // Returns a promise that resolves to data when the RPC response is recieved.
-  async waitForRPCResponse(rpcId) {
+  async waitForRPCResponse (rpcId) {
     try {
       // Initialize variables for tracking the return data.
       let dataFound = false
@@ -140,7 +140,7 @@ class RestApi {
       let data = {
         success: false,
         message: 'request timed out',
-        data: '',
+        data: ''
       }
 
       // Loop that waits for a response from the service provider.

@@ -5,21 +5,21 @@
 'use strict'
 
 const shelljs = require('shelljs')
-const Table = require('cli-table')
+// const Table = require('cli-table')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 class WalletAddrs extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
     this.shelljs = shelljs
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(WalletAddrs)
+      const { flags } = this.parse(WalletAddrs)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -35,7 +35,7 @@ class WalletAddrs extends Command {
     }
   }
 
-  getAddrs(filename) {
+  getAddrs (filename) {
     try {
       // Load the wallet file.
       const walletJSON = require(filename)
@@ -54,7 +54,7 @@ class WalletAddrs extends Command {
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -68,7 +68,7 @@ class WalletAddrs extends Command {
 WalletAddrs.description = 'List the different addresses for a wallet.'
 
 WalletAddrs.flags = {
-  name: flags.string({char: 'n', description: 'Name of wallet'}),
+  name: flags.string({ char: 'n', description: 'Name of wallet' })
 }
 
 module.exports = WalletAddrs

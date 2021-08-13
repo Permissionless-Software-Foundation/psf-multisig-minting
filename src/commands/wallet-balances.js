@@ -13,12 +13,12 @@ const collect = require('collect.js')
 const WalletUtil = require('../lib/wallet-util')
 const WalletService = require('../lib/adapters/wallet-service')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 const fs = require('fs')
 
 class WalletBalances extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
@@ -26,9 +26,9 @@ class WalletBalances extends Command {
     this.walletUtil = new WalletUtil()
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(WalletBalances)
+      const { flags } = this.parse(WalletBalances)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -47,7 +47,7 @@ class WalletBalances extends Command {
   }
 
   // Create a new wallet file.
-  async getBalances(filename, flags) {
+  async getBalances (filename, flags) {
     try {
       // Load the wallet file.
       const walletJSON = require(filename)
@@ -57,7 +57,7 @@ class WalletBalances extends Command {
       const walletService = new WalletService()
       const advancedConfig = {
         interface: 'json-rpc',
-        jsonRpcWalletService: walletService,
+        jsonRpcWalletService: walletService
       }
 
       this.bchWallet = new BchWallet(walletData.mnemonic, advancedConfig)
@@ -83,7 +83,7 @@ class WalletBalances extends Command {
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
       const tokens = this.getTokenBalances(
-        this.bchWallet.utxos.utxoStore.slpUtxos.type1.tokens,
+        this.bchWallet.utxos.utxoStore.slpUtxos.type1.tokens
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]
@@ -95,8 +95,8 @@ class WalletBalances extends Command {
           `\nUTXO information:\n${JSON.stringify(
             this.bchWallet.utxos.utxoStore,
             null,
-            2,
-          )}`,
+            2
+          )}`
         )
       }
     } catch (err) {
@@ -107,7 +107,7 @@ class WalletBalances extends Command {
 
   // Add up the token balances.
   // At the moment, minting batons, NFTs, and group tokens are not suported.
-  getTokenBalances(tokenUtxos) {
+  getTokenBalances (tokenUtxos) {
     try {
       // console.log('tokenUtxos: ', tokenUtxos)
 
@@ -121,7 +121,7 @@ class WalletBalances extends Command {
         const thisToken = {
           ticker: thisUtxo.tokenTicker,
           tokenId: thisUtxo.tokenId,
-          qty: parseFloat(thisUtxo.tokenQty),
+          qty: parseFloat(thisUtxo.tokenQty)
         }
 
         tokens.push(thisToken)
@@ -143,7 +143,7 @@ class WalletBalances extends Command {
 
         const thisTokenData = {
           tokenId: thisTokenId,
-          qty: 0,
+          qty: 0
         }
 
         // Add up the UTXO quantities for the current token ID.
@@ -167,7 +167,7 @@ class WalletBalances extends Command {
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -181,11 +181,11 @@ class WalletBalances extends Command {
 WalletBalances.description = 'Display the balances of the wallet'
 
 WalletBalances.flags = {
-  name: flags.string({char: 'n', description: 'Name of wallet'}),
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
   verbose: flags.boolean({
     char: 'v',
-    description: 'Show verbose UTXO information',
-  }),
+    description: 'Show verbose UTXO information'
+  })
 }
 
 module.exports = WalletBalances
