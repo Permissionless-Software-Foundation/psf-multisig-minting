@@ -7,7 +7,7 @@
 const IPFS = require('ipfs')
 
 class IpfsAdapter {
-  constructor (localConfig = {}) {
+  constructor(localConfig = {}) {
     // Encapsulate dependencies
     this.IPFS = IPFS
 
@@ -17,33 +17,33 @@ class IpfsAdapter {
   }
 
   // Start an IPFS node.
-  async start () {
+  async start() {
     try {
       // Ipfs Options
       const ipfsOptions = {
-        repo: './ipfsdata',
+        repo: './.ipfsdata',
         start: true,
         config: {
           relay: {
             enabled: false, // enable circuit relay dialer and listener
             hop: {
-              enabled: false // enable circuit relay HOP (make this node a relay)
-            }
+              enabled: false, // enable circuit relay HOP (make this node a relay)
+            },
           },
           pubsub: true, // enable pubsub
           Swarm: {
             ConnMgr: {
               HighWater: 30,
-              LowWater: 10
-            }
-          }
+              LowWater: 10,
+            },
+          },
           // Addresses: {
           //   Swarm: [
           //     `/ip4/0.0.0.0/tcp/${this.config.ipfsTcpPort}`,
           //     `/ip4/0.0.0.0/tcp/${this.config.ipfsWsPort}/ws`
           //   ]
           // }
-        }
+        },
       }
 
       // Create a new IPFS node.
