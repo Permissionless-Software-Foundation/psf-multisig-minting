@@ -51,7 +51,8 @@ class WalletBalances extends Command {
   // Create a new wallet file.
   async getBalances (filename, desc) {
     try {
-      const walletData = require(filename)
+      const walletJSON = require(filename)
+      const walletData = walletJSON.wallet
 
       // Configure the minimal-slp-wallet library.
       const walletService = new WalletService()
