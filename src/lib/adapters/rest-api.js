@@ -94,33 +94,41 @@ class RestApi {
 
   // This function handles incoming REST API calls.
   async apiHandler (ctx, next) {
-    // const body = ctx.request.body
-    // console.log('Input: ', body)
+    try {
+      // const body = ctx.request.body
+      // console.log('Input: ', body)
 
-    // Input Validation
-    const sendTo = ctx.request.body.sendTo
-    if (!sendTo) throw new Error('sendTo property must include an IPFS ID.')
+      // Input Validation
+      const sendTo = ctx.request.body.sendTo
+      if (!sendTo) throw new Error('sendTo property must include an IPFS ID.')
 
-    const rpcData = ctx.request.body.rpcData
-    if (!rpcData) throw new Error('rpcData property required')
+      const rpcData = ctx.request.body.rpcData
+      if (!rpcData) throw new Error('rpcData property required')
 
-    // Generate a UUID to uniquly identify the response comming back from
-    // the IPFS peer.
-    const rpcId = _this.uid()
-    // console.log('rpcId: ', rpcId)
+      // Generate a UUID to uniquly identify the response comming back from
+      // the IPFS peer.
+      const rpcId = _this.uid()
+      // console.log('rpcId: ', rpcId)
 
-    // Generate a JSON RPC command.
-    const cmd = _this.jsonrpc.request(rpcId, 'bch', rpcData)
-    const cmdStr = JSON.stringify(cmd)
-    // console.log('cmdStr: ', cmdStr)
+      // Generate a JSON RPC command.
+      const cmd = _this.jsonrpc.request(rpcId, 'bch', rpcData)
+      const cmdStr = JSON.stringify(cmd)
+      // console.log('cmdStr: ', cmdStr)
 
-    // Send the RPC command to selected wallet service.
-    await _this.ipfsCoordAdapter.ipfsCoord.ipfs.orbitdb.sendToDb(sendTo, cmdStr)
+      // Send the RPC command to selected wallet service.
+      await _this.ipfsCoordAdapter.ipfsCoord.ipfs.orbitdb.sendToDb(
+        sendTo,
+        cmdStr
+      )
 
-    // Wait for data to come back from the wallet service.
-    const data = await _this.waitForRPCResponse(rpcId)
+      // Wait for data to come back from the wallet service.
+      const data = await _this.waitForRPCResponse(rpcId)
 
-    ctx.body = data
+      ctx.body = data
+    } catch (err) {
+      console.error('Error in apiHandler()')
+      throw err
+    }
   }
 
   // Returns a promise that resolves to data when the RPC response is recieved.

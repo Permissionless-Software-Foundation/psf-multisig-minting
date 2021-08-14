@@ -87,6 +87,23 @@ describe('#WalletService', () => {
 
       assert.equal(result, 'test-data')
     })
+
+    it('should throw an error if network timeout', async () => {
+      try {
+        // Force network timeout
+        sandbox
+          .stub(uut.axios, 'post')
+          .resolves({ data: { success: false, message: 'request timed out' } })
+
+        const addr = ['test-address']
+
+        await uut.getBalances(addr)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'request timed out')
+      }
+    })
   })
 
   describe('#getUtxos', () => {
@@ -114,6 +131,23 @@ describe('#WalletService', () => {
 
       assert.equal(result, 'test-data')
     })
+
+    it('should throw an error if network timeout', async () => {
+      try {
+        // Force network timeout
+        sandbox
+          .stub(uut.axios, 'post')
+          .resolves({ data: { success: false, message: 'request timed out' } })
+
+        const addr = 'test-address'
+
+        await uut.getUtxos(addr)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'request timed out')
+      }
+    })
   })
 
   describe('#sendTx', () => {
@@ -137,6 +171,23 @@ describe('#WalletService', () => {
       // console.log('result: ', result)
 
       assert.equal(result, 'test-data')
+    })
+
+    it('should throw an error if network timeout', async () => {
+      try {
+        // Force network timeout
+        sandbox
+          .stub(uut.axios, 'post')
+          .resolves({ data: { success: false, message: 'request timed out' } })
+
+        const hex = 'test-address'
+
+        await uut.sendTx(hex)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'request timed out')
+      }
     })
   })
 })
