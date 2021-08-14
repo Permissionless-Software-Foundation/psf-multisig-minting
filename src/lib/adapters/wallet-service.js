@@ -51,6 +51,9 @@ class WalletService {
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
+      // If there is a timeout or other network failure.
+      if (result.data.success === false) throw new Error(result.data.message)
+
       return result.data
     } catch (err) {
       console.error('Error in getBalance()')
@@ -78,6 +81,9 @@ class WalletService {
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
+      // If there is a timeout or other network failure.
+      if (result.data.success === false) throw new Error(result.data.message)
+
       return result.data
     } catch (err) {
       console.error('Error in getUtxos()')
@@ -104,6 +110,9 @@ class WalletService {
         }
       })
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
+
+      // If there is a timeout or other network failure.
+      if (result.data.success === false) throw new Error(result.data.message)
 
       return result.data
     } catch (err) {

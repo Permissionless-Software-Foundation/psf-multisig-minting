@@ -37,12 +37,17 @@ class WalletBalances extends Command {
         flags.name
       }.json`
 
-      return this.getBalances(filename, flags)
-    } catch (err) {
-      if (err.message) console.log(err.message)
-      else console.log('Error in create-wallet.js/run(): ', err)
+      // Get the wallet with updated UTXO data.
+      const walletData = await this.getBalances(filename, flags)
 
-      return 0
+      // Display wallet balances on the screen.
+      this.displayBalance(walletData)
+
+      return true
+    } catch (err) {
+      console.log('Error in run(): ', err)
+
+      return false
     }
   }
 
@@ -69,21 +74,38 @@ class WalletBalances extends Command {
       //   JSON.stringify(this.bchWallet.utxos.utxoStore, null, 2),
       // )
 
+      // If UTXOs fail to update, try one more time.
+      if (!this.bchWallet.utxos.utxoStore) {
+        await this.bchWallet.getUtxos()
+
+        // Throw an error if UTXOs are still not updated.
+        if (!this.bchWallet.utxos.utxoStore) { throw new Error('UTXOs failed to update. Try again.') }
+      }
+
+      return this.bchWallet
+    } catch (err) {
+      console.log('Error in getBalances()')
+      throw err
+    }
+  }
+
+  // Take the updated wallet data and display it on the screen.
+  displayBalance (walletData) {
+    try {
       // Loop through each BCH UTXO and add up the balance.
       let bchBalance = 0
-      for (let i = 0; i < this.bchWallet.utxos.utxoStore.bchUtxos.length; i++) {
-        const thisUtxo = this.bchWallet.utxos.utxoStore.bchUtxos[i]
+      for (let i = 0; i < walletData.utxos.utxoStore.bchUtxos.length; i++) {
+        const thisUtxo = walletData.utxos.utxoStore.bchUtxos[i]
 
         bchBalance += thisUtxo.value
       }
-      const coinBalance =
-        this.bchWallet.bchjs.BitcoinCash.toBitcoinCash(bchBalance)
+      const coinBalance = walletData.bchjs.BitcoinCash.toBitcoinCash(bchBalance)
       console.log(`BCH balance: ${bchBalance} satoshis or ${coinBalance} BCH`)
 
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
       const tokens = this.getTokenBalances(
-        this.bchWallet.utxos.utxoStore.slpUtxos.type1.tokens
+        walletData.utxos.utxoStore.slpUtxos.type1.tokens
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]
@@ -93,14 +115,16 @@ class WalletBalances extends Command {
       if (flags.verbose) {
         console.log(
           `\nUTXO information:\n${JSON.stringify(
-            this.bchWallet.utxos.utxoStore,
+            walletData.utxos.utxoStore,
             null,
             2
           )}`
         )
       }
+
+      return true
     } catch (err) {
-      if (err.code !== 'EEXIT') console.log('Error in createWallet().')
+      console.error('Error in displayBalance()')
       throw err
     }
   }
