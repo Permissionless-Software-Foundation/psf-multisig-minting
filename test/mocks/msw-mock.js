@@ -5,7 +5,7 @@
 const BCHJS = require('@psf/bch-js')
 
 class BchWallet {
-  constructor() {
+  constructor () {
     this.walletInfoPromise = true
 
     this.walletInfo = {
@@ -19,7 +19,7 @@ class BchWallet {
       slpAddress: 'simpleledger:qp65erjld4jetgzwgvh6sxkyay97cl6gfy28jw0u86',
       legacyAddress: '1BhDmfBRALFVZ4zryxDXNz8xJMxadyZD7k',
       hdPath: "m/44'/245'/0'/0/0",
-      description: '',
+      description: ''
     }
 
     this.bchjs = new BCHJS()
@@ -40,7 +40,7 @@ class BchWallet {
               value: 1000,
               txid: '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
               vout: 0,
-              isValid: false,
+              isValid: false
             },
             {
               height: 700685,
@@ -50,8 +50,8 @@ class BchWallet {
               value: 19406,
               txid: '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
               vout: 2,
-              isValid: false,
-            },
+              isValid: false
+            }
           ],
           nullUtxos: [],
           slpUtxos: {
@@ -77,22 +77,22 @@ class BchWallet {
                   decimals: 2,
                   tokenType: 1,
                   isValid: true,
-                  tokenQty: '4.25',
-                },
-              ],
+                  tokenQty: '4.25'
+                }
+              ]
             },
             nft: {
               groupMintBatons: [],
               groupTokens: [],
-              tokens: [],
-            },
-          },
-        },
+              tokens: []
+            }
+          }
+        }
       }
     }
   }
 
-  async getUtxos() {
+  async getUtxos () {
     return {}
   }
 }

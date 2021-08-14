@@ -44,6 +44,8 @@ describe('wallet-balances', () => {
       // console.log('mockWallet: ', mockWallet)
 
       const result = uut.displayBalance(mockWallet)
+
+      assert.equal(result, true)
     })
 
     it('should display verbose UTXO data when flag is set', () => {
@@ -51,10 +53,12 @@ describe('wallet-balances', () => {
       // console.log('mockWallet: ', mockWallet)
 
       const flags = {
-        verbose: true,
+        verbose: true
       }
 
       const result = uut.displayBalance(mockWallet, flags)
+
+      assert.equal(result, true)
     })
 
     it('should catch and throw errors', () => {
@@ -105,7 +109,7 @@ describe('wallet-balances', () => {
 
   describe('#validateFlags()', () => {
     it('validateFlags() should return true if name is supplied.', () => {
-      assert.equal(uut.validateFlags({name: 'test'}), true, 'return true')
+      assert.equal(uut.validateFlags({ name: 'test' }), true, 'return true')
     })
 
     it('validateFlags() should throw error if name is not supplied.', () => {
@@ -115,7 +119,7 @@ describe('wallet-balances', () => {
         assert.include(
           err.message,
           'You must specify a wallet with the -n flag',
-          'Expected error message.',
+          'Expected error message.'
         )
       }
     })
@@ -128,10 +132,10 @@ describe('wallet-balances', () => {
       sandbox.stub(uut, 'displayBalance').resolves({})
 
       const flags = {
-        name: 'test123',
+        name: 'test123'
       }
       // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({flags: flags})
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
 
       const result = await uut.run()
 
