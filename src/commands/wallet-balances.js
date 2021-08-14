@@ -13,22 +13,24 @@ const collect = require('collect.js')
 const WalletUtil = require('../lib/wallet-util')
 const WalletService = require('../lib/adapters/wallet-service')
 
-const { Command, flags } = require('@oclif/command')
+const {Command, flags} = require('@oclif/command')
 
 const fs = require('fs')
 
 class WalletBalances extends Command {
-  constructor (argv, config) {
+  constructor(argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
     this.fs = fs
     this.walletUtil = new WalletUtil()
+    this.walletService = new WalletService()
+    this.BchWallet = BchWallet
   }
 
-  async run () {
+  async run() {
     try {
-      const { flags } = this.parse(WalletBalances)
+      const {flags} = this.parse(WalletBalances)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -38,10 +40,10 @@ class WalletBalances extends Command {
       }.json`
 
       // Get the wallet with updated UTXO data.
-      const walletData = await this.getBalances(filename, flags)
+      const walletData = await this.getBalances(filename)
 
       // Display wallet balances on the screen.
-      this.displayBalance(walletData)
+      this.displayBalance(walletData, flags)
 
       return true
     } catch (err) {
@@ -52,34 +54,32 @@ class WalletBalances extends Command {
   }
 
   // Create a new wallet file.
-  async getBalances (filename, flags) {
+  async getBalances(filename) {
     try {
       // Load the wallet file.
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
       // Configure the minimal-slp-wallet library.
-      const walletService = new WalletService()
       const advancedConfig = {
         interface: 'json-rpc',
-        jsonRpcWalletService: walletService
+        jsonRpcWalletService: this.walletService,
       }
-
-      this.bchWallet = new BchWallet(walletData.mnemonic, advancedConfig)
+      this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
       // console.log('bchWallet: ', this.bchWallet)
-      await this.bchWallet.walletInfoPromise
 
-      // console.log(
-      //   'bchWallet.utxos.utxoStore: ',
-      //   JSON.stringify(this.bchWallet.utxos.utxoStore, null, 2),
-      // )
+      // Wait for the wallet to initialize and retrieve UTXO data from the
+      // blockchain.
+      await this.bchWallet.walletInfoPromise
 
       // If UTXOs fail to update, try one more time.
       if (!this.bchWallet.utxos.utxoStore) {
         await this.bchWallet.getUtxos()
 
         // Throw an error if UTXOs are still not updated.
-        if (!this.bchWallet.utxos.utxoStore) { throw new Error('UTXOs failed to update. Try again.') }
+        if (!this.bchWallet.utxos.utxoStore) {
+          throw new Error('UTXOs failed to update. Try again.')
+        }
       }
 
       return this.bchWallet
@@ -90,7 +90,7 @@ class WalletBalances extends Command {
   }
 
   // Take the updated wallet data and display it on the screen.
-  displayBalance (walletData) {
+  displayBalance(walletData, flags = {}) {
     try {
       // Loop through each BCH UTXO and add up the balance.
       let bchBalance = 0
@@ -105,7 +105,7 @@ class WalletBalances extends Command {
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
       const tokens = this.getTokenBalances(
-        walletData.utxos.utxoStore.slpUtxos.type1.tokens
+        walletData.utxos.utxoStore.slpUtxos.type1.tokens,
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]
@@ -117,8 +117,8 @@ class WalletBalances extends Command {
           `\nUTXO information:\n${JSON.stringify(
             walletData.utxos.utxoStore,
             null,
-            2
-          )}`
+            2,
+          )}`,
         )
       }
 
@@ -131,67 +131,62 @@ class WalletBalances extends Command {
 
   // Add up the token balances.
   // At the moment, minting batons, NFTs, and group tokens are not suported.
-  getTokenBalances (tokenUtxos) {
-    try {
-      // console.log('tokenUtxos: ', tokenUtxos)
+  getTokenBalances(tokenUtxos) {
+    // console.log('tokenUtxos: ', tokenUtxos)
 
-      const tokens = []
-      const tokenIds = []
+    const tokens = []
+    const tokenIds = []
 
-      // Summarized token data into an array of token UTXOs.
-      for (let i = 0; i < tokenUtxos.length; i++) {
-        const thisUtxo = tokenUtxos[i]
+    // Summarized token data into an array of token UTXOs.
+    for (let i = 0; i < tokenUtxos.length; i++) {
+      const thisUtxo = tokenUtxos[i]
 
-        const thisToken = {
-          ticker: thisUtxo.tokenTicker,
-          tokenId: thisUtxo.tokenId,
-          qty: parseFloat(thisUtxo.tokenQty)
-        }
-
-        tokens.push(thisToken)
-
-        tokenIds.push(thisUtxo.tokenId)
+      const thisToken = {
+        ticker: thisUtxo.tokenTicker,
+        tokenId: thisUtxo.tokenId,
+        qty: parseFloat(thisUtxo.tokenQty),
       }
 
-      // Create a unique collection of tokenIds
-      const collection = collect(tokenIds)
-      let unique = collection.unique()
-      unique = unique.toArray()
+      tokens.push(thisToken)
 
-      // Add up any duplicate entries.
-      // The finalTokenData array contains unique objects, one for each token,
-      // with a total quantity of tokens for the entire wallet.
-      const finalTokenData = []
-      for (let i = 0; i < unique.length; i++) {
-        const thisTokenId = unique[i]
-
-        const thisTokenData = {
-          tokenId: thisTokenId,
-          qty: 0
-        }
-
-        // Add up the UTXO quantities for the current token ID.
-        for (let j = 0; j < tokens.length; j++) {
-          const thisToken = tokens[j]
-
-          if (thisTokenId === thisToken.tokenId) {
-            thisTokenData.ticker = thisToken.ticker
-            thisTokenData.qty += thisToken.qty
-          }
-        }
-
-        finalTokenData.push(thisTokenData)
-      }
-
-      return finalTokenData
-    } catch (err) {
-      console.error('Error in getTokenBalances()')
-      throw err
+      tokenIds.push(thisUtxo.tokenId)
     }
+
+    // Create a unique collection of tokenIds
+    const collection = collect(tokenIds)
+    let unique = collection.unique()
+    unique = unique.toArray()
+
+    // Add up any duplicate entries.
+    // The finalTokenData array contains unique objects, one for each token,
+    // with a total quantity of tokens for the entire wallet.
+    const finalTokenData = []
+    for (let i = 0; i < unique.length; i++) {
+      const thisTokenId = unique[i]
+
+      const thisTokenData = {
+        tokenId: thisTokenId,
+        qty: 0,
+      }
+
+      // Add up the UTXO quantities for the current token ID.
+      for (let j = 0; j < tokens.length; j++) {
+        const thisToken = tokens[j]
+
+        if (thisTokenId === thisToken.tokenId) {
+          thisTokenData.ticker = thisToken.ticker
+          thisTokenData.qty += thisToken.qty
+        }
+      }
+
+      finalTokenData.push(thisTokenData)
+    }
+
+    return finalTokenData
   }
 
   // Validate the proper flags are passed in.
-  validateFlags (flags) {
+  validateFlags(flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -205,11 +200,11 @@ class WalletBalances extends Command {
 WalletBalances.description = 'Display the balances of the wallet'
 
 WalletBalances.flags = {
-  name: flags.string({ char: 'n', description: 'Name of wallet' }),
+  name: flags.string({char: 'n', description: 'Name of wallet'}),
   verbose: flags.boolean({
     char: 'v',
-    description: 'Show verbose UTXO information'
-  })
+    description: 'Show verbose UTXO information',
+  }),
 }
 
 module.exports = WalletBalances
