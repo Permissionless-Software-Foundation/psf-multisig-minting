@@ -9,7 +9,8 @@ const BchWallet = require('minimal-slp-wallet/index')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
-const WalletService = require('../lib/adapters/wallet-service')
+// const WalletService = require('../lib/adapters/wallet-service')
+const WalletBalances = require('./wallet-balances')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -20,6 +21,7 @@ class SendBch extends Command {
     // Encapsulate dependencies.
     this.walletUtil = new WalletUtil()
     this.BchWallet = BchWallet
+    this.walletBalances = new WalletBalances()
   }
 
   async run () {
@@ -49,8 +51,7 @@ class SendBch extends Command {
 
       return txid
     } catch (err) {
-      if (err.message) console.log(err.message)
-      else console.log('Error in send-bch.js/run(): ', err)
+      console.log('Error in send-bch.js/run(): ', err)
 
       return 0
     }
@@ -65,91 +66,28 @@ class SendBch extends Command {
         throw new Error('filename required.')
       }
 
-      // Load the wallet file.
-      const walletJSON = require(filename)
-      const walletData = walletJSON.wallet
+      const walletData = await this.walletBalances.getBalances(filename)
 
-      // Configure the minimal-slp-wallet library.
-      const walletService = new WalletService()
-      const advancedConfig = {
-        interface: 'json-rpc',
-        jsonRpcWalletService: walletService
-      }
-
-      // Wait for the wallet to be created.
-      this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
-      await this.bchWallet.walletInfoPromise
-
-      // Loop through each BCH UTXO and add up the balance.
-      let bchBalance = 0
-      for (let i = 0; i < this.bchWallet.utxos.utxoStore.bchUtxos.length; i++) {
-        const thisUtxo = this.bchWallet.utxos.utxoStore.bchUtxos[i]
-
-        bchBalance += thisUtxo.value
-      }
-      const coinBalance =
-        this.bchWallet.bchjs.BitcoinCash.toBitcoinCash(bchBalance)
-      // console.log(`BCH balance: ${bchBalance} satoshis or ${coinBalance} BCH`)
-
-      if (coinBalance < flags.qty) {
+      if (walletData.bchBalance < flags.qty) {
         throw new Error(
-          `Insufficient funds. You are trying to send ${flags.qty} BCH, but the wallet only has ${coinBalance} BCH`
+          `Insufficient funds. You are trying to send ${flags.qty} BCH, but the wallet only has ${walletData.bchBalance} BCH`
         )
       }
 
       const receivers = [
         {
           address: flags.sendAddr,
-          amountSat: this.bchWallet.bchjs.BitcoinCash.toSatoshi(flags.qty)
+          amountSat: walletData.bchjs.BitcoinCash.toSatoshi(flags.qty)
         }
       ]
 
-      const txid = await this.bchWallet.send(receivers)
+      const txid = await walletData.send(receivers)
       return txid
     } catch (err) {
       console.error('Error in sendBch()')
       throw err
     }
   }
-  //
-  // // Create a new wallet file.
-  // async createWallet(filename, desc) {
-  //   try {
-  //     if (!filename || typeof filename !== 'string') {
-  //       throw new Error('filename required.')
-  //     }
-  //
-  //     if (!desc) desc = ''
-  //
-  //     // Configure the minimal-slp-wallet library to use the JSON RPC over IPFS.
-  //     const walletService = new WalletService()
-  //     const advancedConfig = {
-  //       interface: 'json-rpc',
-  //       jsonRpcWalletService: walletService,
-  //       noUpdate: true,
-  //     }
-  //
-  //     // Wait for the wallet to be created.
-  //     this.bchWallet = new this.BchWallet(undefined, advancedConfig)
-  //     await this.bchWallet.walletInfoPromise
-  //
-  //     // console.log('bchWallet.walletInfo: ', this.bchWallet.walletInfo)
-  //
-  //     // Create the initial wallet JSON object.
-  //     const walletData = {
-  //       wallet: this.bchWallet.walletInfo,
-  //     }
-  //     walletData.wallet.description = desc
-  //
-  //     // Write out the basic information into a json file for other apps to use.
-  //     await this.walletUtil.saveWallet(filename, walletData)
-  //
-  //     return walletData.wallet
-  //   } catch (err) {
-  //     if (err.code !== 'EEXIT') console.log('Error in createWallet().')
-  //     throw err
-  //   }
-  // }
 
   // Validate the proper flags are passed in.
   validateFlags (flags) {

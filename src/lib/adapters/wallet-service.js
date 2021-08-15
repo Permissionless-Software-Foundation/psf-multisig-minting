@@ -4,7 +4,7 @@
 */
 
 // Configuration variables.
-const LOCAL_REST_API = 'http://localhost:5000/'
+const LOCAL_REST_API = 'http://localhost:5000/wallet/'
 
 // Public npm libraries.
 const axios = require('axios')

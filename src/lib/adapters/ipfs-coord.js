@@ -80,6 +80,17 @@ class IpfsCoordAdapter {
     // Signal that this adapter is ready.
     this.isReady = true
 
+    // Debugging
+    // setInterval(function () {
+    //   // console.log('this.ipfsCoord: ', _this.ipfsCoord)
+    //
+    //   const circuitRelays = _this.ipfsCoord.ipfs.cr.state
+    //   console.log(`circuitRelays: ${JSON.stringify(circuitRelays, null, 2)}`)
+    //
+    //   const peerState = _this.ipfsCoord.ipfs.peers.state
+    //   console.log(`Peer state: ${JSON.stringify(peerState, null, 2)}`)
+    // }, 10000)
+
     return this.isReady
   }
 

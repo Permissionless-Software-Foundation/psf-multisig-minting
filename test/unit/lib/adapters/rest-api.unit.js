@@ -198,4 +198,38 @@ describe('#REST-API', () => {
       assert.equal(ctx.body, 'some data')
     })
   })
+
+  describe('#localApiHandler', () => {
+    it('should catch and throw errors', async () => {
+      try {
+        ctx.request = {}
+
+        await uut.localApiHandler(ctx)
+
+        assert.fail('Unexpected code path.')
+      } catch (err) {
+        // console.log('err.message: ', err.message)
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+
+    it('should report the state of circuit relays', async () => {
+      // Mock dependencies
+      uut.ipfsCoordAdapter.ipfsCoord.ipfs = {
+        cr: {
+          state: 'test data'
+        }
+      }
+
+      ctx.request.body = {
+        relays: true
+      }
+
+      await uut.localApiHandler(ctx)
+
+      // console.log('ctx.body: ', ctx.body)
+
+      assert.equal(ctx.body, 'test data')
+    })
+  })
 })

@@ -1,6 +1,7 @@
 /*
-  A class library for creating a Koa REST API. This API has one endpoint,
-  for accepting a JSON string and passing it on to the wallet service.
+  A class library for creating a Koa REST API. This API is used locally
+  by the different wallet commands. This library translates the REST call
+  from the different wallet commands into JSON RPC over IPFS.
 
   curl -X POST http://localhost:5000/ -d '{"test": "test"}'
 */
@@ -47,10 +48,14 @@ class RestApi {
   // Handle RPC input, and match the input to the RPC queue.
   rpcHandler (data) {
     try {
-      // console.log('rest-api.js/rpcHandler() data: ', data)
-
       // Convert string input into an object.
       const jsonData = JSON.parse(data)
+
+      // console.log(
+      //   'rest-api.js/rpcHandler() data: ',
+      //   JSON.stringify(jsonData, null, 2),
+      // )
+      console.log(`JSON RPC response for ID ${jsonData.id} received.`)
 
       _this.rpcDataQueue.push(jsonData)
     } catch (err) {
@@ -69,7 +74,13 @@ class RestApi {
 
       // Attach a router for the single POST endpoint.
       this.router = new Router({ prefix: '/' })
-      this.router.post('/', this.apiHandler)
+
+      // Normal API handler for interacting with other IPFS peers over JSON RPC.
+      this.router.post('wallet/', this.apiHandler)
+
+      // Local commands
+      this.router.post('local/', this.localApiHandler)
+
       app.use(this.router.routes())
       app.use(this.router.allowedMethods())
 
@@ -92,9 +103,26 @@ class RestApi {
     console.log('ipfsCoordAdapter updated in rest-api.js')
   }
 
-  // This function handles incoming REST API calls.
+  // This REST API deals with commands concerned with the health of the local
+  // IPFS node.
+  async localApiHandler (ctx, next) {
+    try {
+      // console.log('Ping from localApiHandler()')
+
+      if (ctx.request.body.relays) {
+        ctx.body = _this.ipfsCoordAdapter.ipfsCoord.ipfs.cr.state
+      }
+    } catch (err) {
+      console.error('Error in localApiHandler()')
+      throw err
+    }
+  }
+
+  // This function handles incoming REST API calls for wallet functions.
   async apiHandler (ctx, next) {
     try {
+      console.log('Ping from apiHandler()')
+
       // const body = ctx.request.body
       // console.log('Input: ', body)
 
@@ -164,7 +192,7 @@ class RestApi {
 
         // Wait between loops.
         // await this.sleep(1000)
-        await this.ipfsCoordAdapter.bchjs.Util.sleep(1000)
+        await this.ipfsCoordAdapter.bchjs.Util.sleep(2000)
 
         cnt++
 
