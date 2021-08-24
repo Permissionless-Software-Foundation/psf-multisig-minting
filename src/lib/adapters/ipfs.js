@@ -25,7 +25,7 @@ class IpfsAdapter {
         start: true,
         config: {
           relay: {
-            enabled: false, // enable circuit relay dialer and listener
+            enabled: true, // enable circuit relay dialer and listener
             hop: {
               enabled: false // enable circuit relay HOP (make this node a relay)
             }
@@ -37,12 +37,6 @@ class IpfsAdapter {
               LowWater: 10
             }
           }
-          // Addresses: {
-          //   Swarm: [
-          //     `/ip4/0.0.0.0/tcp/${this.config.ipfsTcpPort}`,
-          //     `/ip4/0.0.0.0/tcp/${this.config.ipfsWsPort}/ws`
-          //   ]
-          // }
         }
       }
 

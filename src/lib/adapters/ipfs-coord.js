@@ -10,7 +10,7 @@ const semver = require('semver')
 const Conf = require('conf')
 
 // The minimum version of ipfs-bch-wallet-service that this wallet can work with.
-const MIN_BCH_WALLET_VERSION = '1.9.0'
+const MIN_BCH_WALLET_VERSION = '1.11.0'
 const WALLET_PROTOCOL = 'bch-wallet'
 
 let _this
@@ -70,11 +70,12 @@ class IpfsCoordAdapter {
       privateLog: this.peerInputHandler, // Default to console.log
       isCircuitRelay: false,
       apiInfo: '',
-      announceJsonLd: announceJsonLd
+      announceJsonLd: announceJsonLd,
+      debugLevel: 1
     })
 
     // Wait for the ipfs-coord library to signal that it is ready.
-    await this.ipfsCoord.ipfs.start()
+    await this.ipfsCoord.start()
     // await this.ipfsCoord.isReady()
 
     // Signal that this adapter is ready.
@@ -110,21 +111,25 @@ class IpfsCoordAdapter {
   pollForServices () {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
-      const peers = _this.ipfsCoord.ipfs.peers.state.peerList
-      // console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
+      const peers = _this.ipfsCoord.thisNode.peerList
+      console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
 
       // Array of objects. Each object is the IPFS ID of the peer and contains
       // data about that peer.
-      const peerData = _this.ipfsCoord.ipfs.peers.state.peers
-      // console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
+      const peerData = _this.ipfsCoord.thisNode.peerData
+      console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
 
       for (let i = 0; i < peers.length; i++) {
         const thisPeer = peers[i]
-        const thisPeerData = peerData[thisPeer]
+        const thisData = peerData.filter(x => x.from === thisPeer)
+        const thisPeerData = thisData[0]
 
         // Create a 'fingerprint' that defines the wallet service.
-        const protocol = thisPeerData.jsonLd.protocol
-        const version = thisPeerData.jsonLd.version
+        const protocol = thisPeerData.data.jsonLd.protocol
+        const version = thisPeerData.data.jsonLd.version
+        // console.log(
+        //   `debug: peer ${thisPeer} uses protocol: ${protocol} v${version}`,
+        // )
 
         let versionMatches = false
         if (version) {
@@ -143,7 +148,7 @@ class IpfsCoordAdapter {
 
             // Persist the config setting, so it can be used by other commands.
             _this.conf.set('selectedService', thisPeer)
-            console.log(`BCH wallet service selected: ${thisPeer}`)
+            console.log(`---->BCH wallet service selected: ${thisPeer}`)
           }
 
           // Add the peer to the list of serviceProviders.
