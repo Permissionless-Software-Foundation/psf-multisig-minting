@@ -1,6 +1,6 @@
 // Public npm libraries
 const BCHJS = require('@psf/bch-js')
-const {Command} = require('@oclif/command')
+const { Command } = require('@oclif/command')
 const EventEmitter = require('events')
 
 // Local libraries.
@@ -9,7 +9,7 @@ const IpfsAdapter = require('../lib/adapters/ipfs')
 const IpfsCoordAdapter = require('../lib/adapters/ipfs-coord')
 
 class Daemon extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
     // _this = this
 
@@ -19,7 +19,7 @@ class Daemon extends Command {
     this.ipfsCoordAdapter = {} // placeholder
     this.restApi = new RestApi({
       eventEmitter: this.eventEmitter,
-      ipfsCoordAdapter: this.ipfsCoordAdapter,
+      ipfsCoordAdapter: this.ipfsCoordAdapter
     })
     this.ipfsAdapter = new IpfsAdapter()
     this.IpfsCoordAdapter = IpfsCoordAdapter
@@ -27,7 +27,7 @@ class Daemon extends Command {
     this.ipfs = {} // placeholder
   }
 
-  async start() {
+  async start () {
     try {
       // Start IPFS
       await this.ipfsAdapter.start()
@@ -40,7 +40,7 @@ class Daemon extends Command {
       this.ipfsCoordAdapter = new this.IpfsCoordAdapter({
         ipfs: this.ipfs,
         bchjs: this.bchjs,
-        eventEmitter: this.eventEmitter,
+        eventEmitter: this.eventEmitter
       })
       await this.ipfsCoordAdapter.start()
       console.log('ipfs-coord is ready.')
@@ -56,7 +56,7 @@ class Daemon extends Command {
   }
 
   // This handler function recieves data from other ipfs-coord peers.
-  rpcHandler(inData) {
+  rpcHandler (inData) {
     try {
       console.log('Data recieved by rpcHandler: ', inData)
 
@@ -70,7 +70,7 @@ class Daemon extends Command {
     }
   }
 
-  async run() {
+  async run () {
     // const {flags} = this.parse(Daemon)
     // const name = flags.name || 'world'
     // this.log(`hello ${name} from ./src/commands/hello.js`)
@@ -78,7 +78,7 @@ class Daemon extends Command {
     await this.startDaemon()
   }
 
-  async startDaemon() {
+  async startDaemon () {
     // Connect to the IPFS network.
     await this.start()
 

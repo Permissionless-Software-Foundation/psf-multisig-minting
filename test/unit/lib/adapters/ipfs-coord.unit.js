@@ -122,13 +122,9 @@ describe('#ipfs-coord', () => {
   describe('#pollForServices', () => {
     it('should find and select the wallet service', () => {
       uut.ipfsCoord = {
-        ipfs: {
-          peers: {
-            state: {
-              peerList: mockData.peers,
-              peers: mockData.peerData
-            }
-          }
+        thisNode: {
+          peerList: mockData.peers,
+          peerData: mockData.peerData
         }
       }
 
@@ -137,7 +133,7 @@ describe('#ipfs-coord', () => {
       // It should fine the service in the mocked data.
       assert.equal(
         uut.state.selectedServiceProvider,
-        'QmZSyLnRQWMBknVNjUroLQnrcmDnUVAUU4pMQ2LGhh6b9v'
+        'QmWkjYRRTaxVEuGK8ip2X3trVyJShFs6U9g1h9x6fK5mZ2'
       )
     })
 

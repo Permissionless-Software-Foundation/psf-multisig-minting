@@ -121,7 +121,7 @@ class RestApi {
   // This function handles incoming REST API calls for wallet functions.
   async apiHandler (ctx, next) {
     try {
-      console.log('Ping from apiHandler()')
+      // console.log('Ping from apiHandler()')
 
       // const body = ctx.request.body
       // console.log('Input: ', body)
@@ -144,9 +144,11 @@ class RestApi {
       // console.log('cmdStr: ', cmdStr)
 
       // Send the RPC command to selected wallet service.
-      await _this.ipfsCoordAdapter.ipfsCoord.ipfs.orbitdb.sendToDb(
+      const thisNode = _this.ipfsCoordAdapter.ipfsCoord.thisNode
+      await _this.ipfsCoordAdapter.ipfsCoord.useCases.peer.sendPrivateMessage(
         sendTo,
-        cmdStr
+        cmdStr,
+        thisNode
       )
 
       // Wait for data to come back from the wallet service.

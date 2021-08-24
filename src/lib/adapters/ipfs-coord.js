@@ -16,24 +16,24 @@ const WALLET_PROTOCOL = 'bch-wallet'
 let _this
 
 class IpfsCoordAdapter {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     // Dependency injection.
     this.ipfs = localConfig.ipfs
     if (!this.ipfs) {
       throw new Error(
-        'Instance of IPFS must be passed when instantiating ipfs-coord adapter.',
+        'Instance of IPFS must be passed when instantiating ipfs-coord adapter.'
       )
     }
     this.bchjs = localConfig.bchjs
     if (!this.bchjs) {
       throw new Error(
-        'Instance of bch-js must be passed when instantiating ipfs-coord adapter.',
+        'Instance of bch-js must be passed when instantiating ipfs-coord adapter.'
       )
     }
     this.eventEmitter = localConfig.eventEmitter
     if (!this.eventEmitter) {
       throw new Error(
-        'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.',
+        'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.'
       )
     }
 
@@ -54,14 +54,14 @@ class IpfsCoordAdapter {
     // State object. TODO: Make this more robust.
     this.state = {
       serviceProviders: [],
-      selectedServiceProvider: '',
+      selectedServiceProvider: ''
     }
 
     _this = this
   }
 
   // Start the IPFS node.
-  async start(localConfig = {}) {
+  async start (localConfig = {}) {
     this.ipfsCoord = new this.IpfsCoord({
       ipfs: this.ipfs,
       type: 'node.js',
@@ -71,7 +71,7 @@ class IpfsCoordAdapter {
       isCircuitRelay: false,
       apiInfo: '',
       announceJsonLd: announceJsonLd,
-      debugLevel: 2,
+      debugLevel: 1
     })
 
     // Wait for the ipfs-coord library to signal that it is ready.
@@ -97,7 +97,7 @@ class IpfsCoordAdapter {
 
   // Expects router to be a function, which handles the input data from the
   // pubsub channel. It's expected to be capable of routing JSON RPC commands.
-  attachRPCRouter(router) {
+  attachRPCRouter (router) {
     try {
       _this.ipfsCoord.privateLog = router
       _this.ipfsCoord.ipfs.orbitdb.privateLog = router
@@ -108,16 +108,16 @@ class IpfsCoordAdapter {
   }
 
   // Poll the ipfs-coord coordination channel for available service providers.
-  pollForServices() {
+  pollForServices () {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
       const peers = _this.ipfsCoord.thisNode.peerList
-      // console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
+      console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
 
       // Array of objects. Each object is the IPFS ID of the peer and contains
       // data about that peer.
       const peerData = _this.ipfsCoord.thisNode.peerData
-      // console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
+      console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
 
       for (let i = 0; i < peers.length; i++) {
         const thisPeer = peers[i]
@@ -127,6 +127,9 @@ class IpfsCoordAdapter {
         // Create a 'fingerprint' that defines the wallet service.
         const protocol = thisPeerData.data.jsonLd.protocol
         const version = thisPeerData.data.jsonLd.version
+        // console.log(
+        //   `debug: peer ${thisPeer} uses protocol: ${protocol} v${version}`,
+        // )
 
         let versionMatches = false
         if (version) {
@@ -136,7 +139,7 @@ class IpfsCoordAdapter {
         // Ignore any peers that don't match the fingerprint for a BCH wallet
         // service.
         if (protocol && protocol.includes(WALLET_PROTOCOL) && versionMatches) {
-          console.log('Matching peer: ', thisPeerData)
+          // console.log('Matching peer: ', thisPeerData)
 
           // Temporary business logic.
           // Use the first available wallet service detected.
@@ -145,7 +148,7 @@ class IpfsCoordAdapter {
 
             // Persist the config setting, so it can be used by other commands.
             _this.conf.set('selectedService', thisPeer)
-            console.log(`BCH wallet service selected: ${thisPeer}`)
+            console.log(`---->BCH wallet service selected: ${thisPeer}`)
           }
 
           // Add the peer to the list of serviceProviders.
@@ -160,7 +163,7 @@ class IpfsCoordAdapter {
 
   // This method handles input coming in from other IPFS peers.
   // It passes the data on to the REST API library by emitting an event.
-  peerInputHandler(data) {
+  peerInputHandler (data) {
     try {
       // console.log('peerInputHandler triggered with this data: ', data)
 
@@ -179,7 +182,7 @@ const announceJsonLd = {
   '@context': 'https://schema.org/',
   '@type': 'Person',
   name: `wallet-consumer-${randNum}`,
-  description: 'A consumer of BCH wallet services',
+  description: 'A consumer of BCH wallet services'
 }
 
 module.exports = IpfsCoordAdapter

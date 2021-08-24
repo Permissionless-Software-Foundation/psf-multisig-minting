@@ -185,9 +185,9 @@ describe('#REST-API', () => {
       }
 
       // Mock dependencies
-      uut.ipfsCoordAdapter.ipfsCoord.ipfs = {
-        orbitdb: {
-          sendToDb: () => {}
+      uut.ipfsCoordAdapter.ipfsCoord.useCases = {
+        peer: {
+          sendPrivateMessage: () => {}
         }
       }
       sandbox.stub(uut, 'waitForRPCResponse').resolves('some data')
