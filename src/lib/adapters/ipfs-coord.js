@@ -112,12 +112,12 @@ class IpfsCoordAdapter {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
       const peers = _this.ipfsCoord.thisNode.peerList
-      console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
+      // console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
 
       // Array of objects. Each object is the IPFS ID of the peer and contains
       // data about that peer.
       const peerData = _this.ipfsCoord.thisNode.peerData
-      console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
+      // console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
 
       for (let i = 0; i < peers.length; i++) {
         const thisPeer = peers[i]
