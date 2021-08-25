@@ -92,4 +92,24 @@ describe('#Wallet-Util', () => {
       }
     })
   })
+
+  describe('#getEncryptionMnemonic', () => {
+    it('should return the e2ee mnemonic', () => {
+      const result = uut.getEncryptionMnemonic()
+
+      assert.isString(result)
+    })
+
+    it('should generate a mnemonic if one does not exist', () => {
+      // Mock conf so that the original mnemonic is not overwritten.
+      sandbox.stub(uut.conf, 'set').returns()
+
+      // Force conf.get to return false.
+      sandbox.stub(uut.conf, 'get').returns(false)
+
+      const result = uut.getEncryptionMnemonic()
+
+      assert.isString(result)
+    })
+  })
 })

@@ -8,6 +8,7 @@
 const IpfsCoord = require('ipfs-coord')
 const semver = require('semver')
 const Conf = require('conf')
+const WalletUtil = require('../wallet-util')
 
 // The minimum version of ipfs-bch-wallet-service that this wallet can work with.
 const MIN_BCH_WALLET_VERSION = '1.11.0'
@@ -42,6 +43,7 @@ class IpfsCoordAdapter {
     this.ipfsCoord = {}
     this.semver = semver
     this.conf = new Conf()
+    this.walletUtil = new WalletUtil()
     // this.rpc = new JSONRPC()
     // this.config = config
 
@@ -62,6 +64,9 @@ class IpfsCoordAdapter {
 
   // Start the IPFS node.
   async start (localConfig = {}) {
+    const mnemonic = this.walletUtil.getEncryptionMnemonic()
+    // console.log('e2ee mnemonic: ', mnemonic)
+
     this.ipfsCoord = new this.IpfsCoord({
       ipfs: this.ipfs,
       type: 'node.js',
@@ -71,12 +76,15 @@ class IpfsCoordAdapter {
       isCircuitRelay: false,
       apiInfo: '',
       announceJsonLd: announceJsonLd,
-      debugLevel: 1
+      debugLevel: 1,
+      mnemonic
     })
 
     // Wait for the ipfs-coord library to signal that it is ready.
     await this.ipfsCoord.start()
     // await this.ipfsCoord.isReady()
+
+    // console.log('thisNode.publicKey: ', this.ipfsCoord.thisNode.publicKey)
 
     // Signal that this adapter is ready.
     this.isReady = true
@@ -112,12 +120,12 @@ class IpfsCoordAdapter {
     try {
       // An array of IPFS IDs of other nodes in the coordination pubsub channel.
       const peers = _this.ipfsCoord.thisNode.peerList
-      console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
+      // console.log(`peers: ${JSON.stringify(peers, null, 2)}`)
 
       // Array of objects. Each object is the IPFS ID of the peer and contains
       // data about that peer.
       const peerData = _this.ipfsCoord.thisNode.peerData
-      console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
+      // console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
 
       for (let i = 0; i < peers.length; i++) {
         const thisPeer = peers[i]

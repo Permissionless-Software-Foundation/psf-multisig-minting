@@ -4,6 +4,7 @@
 
 const fs = require('fs').promises
 const BCHJS = require('@psf/bch-js')
+const Conf = require('conf')
 
 let _this // Global variable points at instance of this Class.
 
@@ -11,6 +12,7 @@ class WalletUtil {
   constructor (localConfig = {}) {
     this.fs = fs
     this.bchjs = new BCHJS()
+    this.conf = new Conf()
 
     _this = this
   }
@@ -60,6 +62,26 @@ class WalletUtil {
     }
 
     return bulkAddresses
+  }
+
+  // Retrieves the 12-word menomnic used for e2e encryption with the wallet
+  // service. If it doesn't exist in the config, then it will be created.
+  getEncryptionMnemonic () {
+    let e2eeMnemonic = this.conf.get('e2eeMnemonic', false)
+
+    // If the mnemonic doesn't exist, generate it and save to the config.
+    if (!e2eeMnemonic) {
+      const mnemonic = this.bchjs.Mnemonic.generate(
+        128,
+        this.bchjs.Mnemonic.wordLists().english
+      )
+
+      this.conf.set('e2eeMnemonic', mnemonic)
+
+      e2eeMnemonic = mnemonic
+    }
+
+    return e2eeMnemonic
   }
 }
 
