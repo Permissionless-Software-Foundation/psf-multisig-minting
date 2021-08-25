@@ -4,19 +4,21 @@
 
 const fs = require('fs').promises
 const BCHJS = require('@psf/bch-js')
+const Conf = require('conf')
 
 let _this // Global variable points at instance of this Class.
 
 class WalletUtil {
-  constructor (localConfig = {}) {
+  constructor(localConfig = {}) {
     this.fs = fs
     this.bchjs = new BCHJS()
+    this.conf = new Conf()
 
     _this = this
   }
 
   // Save the wallet data into a .json text file.
-  async saveWallet (filename, walletData) {
+  async saveWallet(filename, walletData) {
     await _this.fs.writeFile(filename, JSON.stringify(walletData, null, 2))
 
     return true
@@ -26,7 +28,7 @@ class WalletUtil {
   // Address are generated from index to limit.
   // e.g. generateAddress(walletData, 20, 10)
   // will generate a 10-element array of addresses from index 20 to 29
-  async generateAddress (walletData, index, limit) {
+  async generateAddress(walletData, index, limit) {
     // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
 
     if (!walletData.mnemonic) throw new Error('mnemonic is undefined!')
@@ -40,7 +42,7 @@ class WalletUtil {
     // HDNode of BIP44 account
     const account = this.bchjs.HDNode.derivePath(
       masterHDNode,
-      `m/44'/${walletData.derivation}'/0'`
+      `m/44'/${walletData.derivation}'/0'`,
     )
 
     // Empty array for collecting generated addresses
@@ -60,6 +62,22 @@ class WalletUtil {
     }
 
     return bulkAddresses
+  }
+
+  // Retrieves the 12-word menomnic used for e2e encryption with the wallet
+  // service. If it doesn't exist in the config, then it will be created.
+  getEncryptionMnemonic() {
+    const e2eeMnemonic = this.conf.get('e2eeMnemonic', false)
+
+    // If the mnemonic doesn't exist, generate it and save to the config.
+    if (!e2eeMnemonic) {
+      const mnemonic = this.bchjs.Mnemonic.generate(
+        128,
+        this.bchjs.Mnemonic.wordLists().english,
+      )
+
+      this.conf.set('e2eeMnemonic', mnemonic)
+    }
   }
 }
 
