@@ -80,38 +80,6 @@ class TokenBurn extends Command {
     }
   }
 
-  // Send BCH from the wallet implied by filename, and with the settings saved
-  // in the flags object.
-  async sendBch(filename, flags) {
-    try {
-      // Input validation
-      if (!filename || typeof filename !== 'string') {
-        throw new Error('filename required.')
-      }
-
-      const walletData = await this.walletBalances.getBalances(filename)
-
-      if (walletData.bchBalance < flags.qty) {
-        throw new Error(
-          `Insufficient funds. You are trying to send ${flags.qty} BCH, but the wallet only has ${walletData.bchBalance} BCH`,
-        )
-      }
-
-      const receivers = [
-        {
-          address: flags.sendAddr,
-          amountSat: walletData.bchjs.BitcoinCash.toSatoshi(flags.qty),
-        },
-      ]
-
-      const txid = await walletData.send(receivers)
-      return txid
-    } catch (err) {
-      console.error('Error in sendBch()')
-      throw err
-    }
-  }
-
   // Validate the proper flags are passed in.
   validateFlags(flags) {
     // Exit if wallet not specified.
