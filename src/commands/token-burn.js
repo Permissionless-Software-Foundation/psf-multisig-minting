@@ -12,10 +12,10 @@ const WalletUtil = require('../lib/wallet-util')
 // const WalletService = require('../lib/adapters/wallet-service')
 const WalletBalances = require('./wallet-balances')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 class TokenBurn extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
@@ -24,9 +24,9 @@ class TokenBurn extends Command {
     this.walletBalances = new WalletBalances()
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(TokenBurn)
+      const { flags } = this.parse(TokenBurn)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -58,7 +58,7 @@ class TokenBurn extends Command {
   }
 
   // Burn a quantity of tokens.
-  async tokenBurn(filename, flags) {
+  async tokenBurn (filename, flags) {
     try {
       // Input validation
       if (!filename || typeof filename !== 'string') {
@@ -70,7 +70,7 @@ class TokenBurn extends Command {
 
       const txid = await walletData.burnTokens(
         parseFloat(flags.qty),
-        flags.tokenId,
+        flags.tokenId
       )
 
       return txid
@@ -81,7 +81,7 @@ class TokenBurn extends Command {
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -91,7 +91,7 @@ class TokenBurn extends Command {
     const qty = flags.qty
     if (isNaN(Number(qty))) {
       throw new TypeError(
-        'You must specify a quantity in BCH with the -q flag.',
+        'You must specify a quantity in BCH with the -q flag.'
       )
     }
 
@@ -107,9 +107,9 @@ class TokenBurn extends Command {
 TokenBurn.description = 'Burn a specific quantity of SLP tokens.'
 
 TokenBurn.flags = {
-  name: flags.string({char: 'n', description: 'Name of wallet'}),
-  qty: flags.string({char: 'q', description: 'Quantity of tokens to burn'}),
-  tokenId: flags.string({char: 't', description: 'tokenId of token to burn'}),
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
+  qty: flags.string({ char: 'q', description: 'Quantity of tokens to burn' }),
+  tokenId: flags.string({ char: 't', description: 'tokenId of token to burn' })
 }
 
 module.exports = TokenBurn

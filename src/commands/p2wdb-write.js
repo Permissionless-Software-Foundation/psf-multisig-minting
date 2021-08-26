@@ -14,7 +14,7 @@ const axios = require('axios')
 const WalletUtil = require('../lib/wallet-util')
 const WalletBalances = require('./wallet-balances')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 const PROOF_OF_BURN_QTY = 0.01
 const P2WDB_TOKEN_ID =
@@ -24,7 +24,7 @@ const P2WDB_TOKEN_ID =
 const P2WDB_SERVER = 'https://p2wdb.fullstack.cash/entry/write'
 
 class P2WDBWrite extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
@@ -33,9 +33,9 @@ class P2WDBWrite extends Command {
     this.walletBalances = new WalletBalances()
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(P2WDBWrite)
+      const { flags } = this.parse(P2WDBWrite)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -77,7 +77,7 @@ class P2WDBWrite extends Command {
   }
 
   // Generate a cryptographic signature, required to write to the database.
-  async generateSignature(walletData, flags) {
+  async generateSignature (walletData, flags) {
     try {
       const privKey = walletData.walletInfo.privateKey
 
@@ -86,7 +86,7 @@ class P2WDBWrite extends Command {
 
       const signature = walletData.bchjs.BitcoinCash.signMessageWithPrivKey(
         privKey,
-        flags.data,
+        flags.data
       )
 
       return signature
@@ -97,7 +97,7 @@ class P2WDBWrite extends Command {
   }
 
   // Write data to the P2WDB using the txid as proof-of-burn
-  async p2wdbWrite(txid, signature, flags) {
+  async p2wdbWrite (txid, signature, flags) {
     try {
       const now = new Date()
 
@@ -106,7 +106,7 @@ class P2WDBWrite extends Command {
         appId: flags.appId,
         title: flags.data,
         timestamp: now.toISOString(),
-        localTimestamp: now.toLocaleString(),
+        localTimestamp: now.toLocaleString()
       }
 
       // REST API body data.
@@ -114,7 +114,7 @@ class P2WDBWrite extends Command {
         txid,
         message: flags.data,
         signature,
-        data: JSON.stringify(dataObj),
+        data: JSON.stringify(dataObj)
       }
 
       const result = await axios.post(P2WDB_SERVER, bodyData)
@@ -127,7 +127,7 @@ class P2WDBWrite extends Command {
 
   // Create an instance of minimal-slp-wallet populated with data from filename
   // and the blockchain.
-  async getWallet(filename) {
+  async getWallet (filename) {
     try {
       // Input validation
       if (!filename || typeof filename !== 'string') {
@@ -144,7 +144,7 @@ class P2WDBWrite extends Command {
   }
 
   // Burn enough PSF to generate a valide proof-of-burn for writing to the P2WDB.
-  async burnPsf(walletData) {
+  async burnPsf (walletData) {
     try {
       // console.log('walletData: ', walletData)
       // console.log(
@@ -173,14 +173,15 @@ class P2WDBWrite extends Command {
         }
       }
 
-      if (tokenUtxo.tokenId !== P2WDB_TOKEN_ID)
+      if (tokenUtxo.tokenId !== P2WDB_TOKEN_ID) {
         throw new Error(
-          `Token UTXO of with ID of ${P2WDB_TOKEN_ID} and quantity greater than ${PROOF_OF_BURN_QTY} could not be found in wallet.`,
+          `Token UTXO of with ID of ${P2WDB_TOKEN_ID} and quantity greater than ${PROOF_OF_BURN_QTY} could not be found in wallet.`
         )
+      }
 
       const result = await walletData.burnTokens(
         PROOF_OF_BURN_QTY,
-        P2WDB_TOKEN_ID,
+        P2WDB_TOKEN_ID
       )
 
       return result
@@ -196,7 +197,7 @@ class P2WDBWrite extends Command {
   }
 
   // Validate the proper flags are passed in.
-  validateFlags(flags) {
+  validateFlags (flags) {
     // Exit if wallet not specified.
     const name = flags.name
     if (!name || name === '') {
@@ -220,15 +221,15 @@ class P2WDBWrite extends Command {
 P2WDBWrite.description = 'Burn a specific quantity of SLP tokens.'
 
 P2WDBWrite.flags = {
-  name: flags.string({char: 'n', description: 'Name of wallet'}),
+  name: flags.string({ char: 'n', description: 'Name of wallet' }),
   data: flags.string({
     char: 'd',
-    description: 'String of data to write to the P2WDB',
+    description: 'String of data to write to the P2WDB'
   }),
   appId: flags.string({
     char: 'a',
-    description: 'appId string to categorize data',
-  }),
+    description: 'appId string to categorize data'
+  })
 }
 
 module.exports = P2WDBWrite
