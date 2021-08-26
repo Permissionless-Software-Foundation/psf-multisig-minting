@@ -23,7 +23,7 @@ const P2WDB_TOKEN_ID =
 // const P2WDB_SERVER = 'http://localhost:5001/entry/write'
 const P2WDB_SERVER = 'https://p2wdb.fullstack.cash/entry/write'
 
-class TokenBurn extends Command {
+class P2WDBWrite extends Command {
   constructor(argv, config) {
     super(argv, config)
 
@@ -35,7 +35,7 @@ class TokenBurn extends Command {
 
   async run() {
     try {
-      const {flags} = this.parse(TokenBurn)
+      const {flags} = this.parse(P2WDBWrite)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -70,7 +70,7 @@ class TokenBurn extends Command {
 
       return txid
     } catch (err) {
-      console.log('Error in token-burn.js/run(): ', err)
+      console.log('Error in p2wdb-write.js/run(): ', err)
 
       return 0
     }
@@ -195,21 +195,6 @@ class TokenBurn extends Command {
     }
   }
 
-  // Burn a quantity of tokens.
-  async tokenBurn(filename, flags) {
-    try {
-      const txid = await walletData.burnTokens(
-        parseFloat(flags.qty),
-        flags.tokenId,
-      )
-
-      return txid
-    } catch (err) {
-      console.error('Error in tokenBurn()')
-      throw err
-    }
-  }
-
   // Validate the proper flags are passed in.
   validateFlags(flags) {
     // Exit if wallet not specified.
@@ -232,9 +217,9 @@ class TokenBurn extends Command {
   }
 }
 
-TokenBurn.description = 'Burn a specific quantity of SLP tokens.'
+P2WDBWrite.description = 'Burn a specific quantity of SLP tokens.'
 
-TokenBurn.flags = {
+P2WDBWrite.flags = {
   name: flags.string({char: 'n', description: 'Name of wallet'}),
   data: flags.string({
     char: 'd',
@@ -246,4 +231,4 @@ TokenBurn.flags = {
   }),
 }
 
-module.exports = TokenBurn
+module.exports = P2WDBWrite
