@@ -5,20 +5,20 @@
 // Public NPM libraries
 const axios = require('axios')
 
-const {Command} = require('@oclif/command')
+const { Command } = require('@oclif/command')
 
 class IpfsRelays extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
     this.axios = axios
   }
 
-  async run() {
+  async run () {
     try {
       const result = await this.axios.post('http://localhost:5000/local/', {
-        relays: true,
+        relays: true
       })
       console.log(`Circuit Relays: ${JSON.stringify(result.data, null, 2)}`)
 
