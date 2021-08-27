@@ -2,12 +2,19 @@
 
 This is a command-line (CLI) app for working with the Bitcoin Cash (BCH) blockchain, and SLP tokens.
 
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/bin-cli-boilerplate.svg)](https://npmjs.org/package/bin-cli-boilerplate)
-[![Downloads/week](https://img.shields.io/npm/dw/bin-cli-boilerplate.svg)](https://npmjs.org/package/bin-cli-boilerplate)
-[![License](https://img.shields.io/npm/l/bin-cli-boilerplate.svg)](https://github.com/christroutner/bin-cli-boilerplate/blob/master/package.json)
+This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-service) over [IPFS](https://ipfs.io), using the [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) library. This app uses the [oclif CLI framework](https://oclif.io/).
 
-This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-service) over [IPFS](https://ipfs.io), using the [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) library. This app uses the [oclif CLI framework](https://oclif.io/) compiled to a binary file using [pkg](https://github.com/vercel/pkg).
+## Install
+
+- `git clone` this repository.
+- `npm install` dependencies.
+- `./bin/run help` to see a list of available commands.
+- `./bin/run daemon` to create an IPFS node and connect to the network. Leave daemon running in order to execute blockchain-based commands.
+- `./bin/run wallet-create` to create a wallet. Wallet files are stored in the `.wallets` directory.
+
+## License
+
+[MIT](./LICENSE.md)
 
 ## Credit
 
@@ -21,14 +28,16 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 ## Table of Contents
 
 <!-- toc -->
-* [psf-bch-wallet](#psf-bch-wallet)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [psf-bch-wallet](#psf-bch-wallet)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g psf-bch-wallet
 $ psf-bch-wallet COMMAND
@@ -40,17 +49,19 @@ USAGE
   $ psf-bch-wallet COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
-* [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
-* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
-* [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
-* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
-* [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+
+- [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
+- [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
+- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+- [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+- [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
+- [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -152,4 +163,5 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv1.0.0/src/commands/wallet-remove.js)_
+
 <!-- commandsstop -->
