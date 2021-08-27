@@ -107,10 +107,13 @@ class RestApi {
   // IPFS node.
   async localApiHandler (ctx, next) {
     try {
-      // console.log('Ping from localApiHandler()')
+      console.log('Ping from localApiHandler()')
 
       if (ctx.request.body.relays) {
-        ctx.body = _this.ipfsCoordAdapter.ipfsCoord.ipfs.cr.state
+        // ctx.body = _this.ipfsCoordAdapter.ipfsCoord.ipfs.cr.state
+        ctx.body = _this.ipfsCoordAdapter.ipfsCoord.thisNode.relayData
+      } else if (ctx.request.body.peers) {
+        ctx.body = _this.ipfsCoordAdapter.ipfsCoord.thisNode.peerData
       }
     } catch (err) {
       console.error('Error in localApiHandler()')

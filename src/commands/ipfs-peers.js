@@ -1,5 +1,5 @@
 /*
-  Query the state of the IPFS Circuit Relays this IPFS node is connected to.
+  Query the state of the IPFS subnet Peers this IPFS node is connected to.
 */
 
 // Public NPM libraries
@@ -7,7 +7,7 @@ const axios = require('axios')
 
 const { Command } = require('@oclif/command')
 
-class IpfsRelays extends Command {
+class IpfsPeers extends Command {
   constructor (argv, config) {
     super(argv, config)
 
@@ -18,9 +18,10 @@ class IpfsRelays extends Command {
   async run () {
     try {
       const result = await this.axios.post('http://localhost:5000/local/', {
-        relays: true
+        peers: true
       })
-      console.log(`Circuit Relays: ${JSON.stringify(result.data, null, 2)}`)
+      console.log(`Subnet Peers: ${JSON.stringify(result.data, null, 2)}`)
+      console.log(`Number of peers: ${result.data.length}`)
 
       return true
     } catch (err) {
@@ -31,8 +32,8 @@ class IpfsRelays extends Command {
   }
 }
 
-IpfsRelays.description = 'Query the state of circuit relays'
+IpfsPeers.description = 'Query the state of subnet peers'
 
-IpfsRelays.flags = {}
+IpfsPeers.flags = {}
 
-module.exports = IpfsRelays
+module.exports = IpfsPeers
