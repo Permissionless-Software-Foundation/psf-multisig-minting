@@ -1,5 +1,5 @@
 /*
-  Unit tests for the wallet-create command.
+  Unit tests for the send-bch command.
 */
 
 'use strict'
@@ -8,29 +8,37 @@ const assert = require('chai').assert
 const sinon = require('sinon')
 const fs = require('fs').promises
 
+const SendBch = require('../../../src/commands/send-bch')
+const SendBCHMock = require('../../mocks/send-bch-mock')
 const WalletCreate = require('../../../src/commands/wallet-create')
-const BchWalletMock = require('../../mocks/msw-mock')
+const walletCreate = new WalletCreate()
 
 const filename = `${__dirname.toString()}/../../../.wallets/test123.json`
 
-describe('wallet-create', () => {
+describe('send-bch', () => {
   let uut
   let sandbox
 
+  before(async () => {
+    await walletCreate.createWallet(filename)
+  })
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
 
-    uut = new WalletCreate()
+    uut = new SendBch()
   })
 
   afterEach(() => {
     sandbox.restore()
   })
+  after(async () => {
+    await fs.rm(filename)
+  })
 
-  describe('#createWallet()', () => {
+  describe('#sendBch()', () => {
     it('should exit with error status if called without a filename.', async () => {
       try {
-        await uut.createWallet(undefined, undefined)
+        await uut.sendBch(undefined, undefined)
 
         assert.fail('Unexpected result')
       } catch (err) {
@@ -41,58 +49,98 @@ describe('wallet-create', () => {
         )
       }
     })
+    it('should exit with error status if bch balance is less that qty provided.', async () => {
+      try {
+        const flags = {
+          name: 'test123',
+          qty: 3,
+          sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
+        }
+        // Mock methods that will be tested elsewhere.
+        sandbox
+          .stub(uut.walletBalances, 'getBalances')
+          .resolves(SendBCHMock.getBalancesResult)
 
-    // it('Should exit with error status if called with a filename that already exists.', async () => {
-    //   try {
-    //     // Force the error for testing purposes.
-    //     sandbox.stub(uut.fs, 'existsSync').returns(true)
-    //
-    //     await uut.createWallet(filename, 'testnet')
-    //
-    //     assert.fail('Unexpected result')
-    //   } catch (err) {
-    //     assert.equal(
-    //       err.message,
-    //       'filename already exist',
-    //       'Should throw expected error.',
-    //     )
-    //   }
-    // })
+        await uut.sendBch(filename, flags)
 
-    it('should create a mainnet wallet file with the given name', async () => {
-      // Mock dependencies
-      uut.BchWallet = BchWalletMock
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(
+          err.message,
+          'Insufficient funds',
+          'Should throw expected error.'
+        )
+      }
+    })
 
-      const walletData = await uut.createWallet(filename)
-      // console.log(`walletData: ${JSON.stringify(walletData, null, 2)}`)
+    it('should send bch.', async () => {
+      const flags = {
+        name: 'test123',
+        qty: 1,
+        sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
+      }
+      // Mock methods that will be tested elsewhere.
+      sandbox
+        .stub(uut.walletBalances, 'getBalances')
+        .resolves(SendBCHMock.getBalancesResult)
 
-      assert.property(walletData, 'mnemonic')
-      assert.property(walletData, 'privateKey')
-      assert.property(walletData, 'publicKey')
-      assert.property(walletData, 'address')
-      assert.property(walletData, 'cashAddress')
-      assert.property(walletData, 'slpAddress')
-      assert.property(walletData, 'legacyAddress')
-      assert.property(walletData, 'hdPath')
-      assert.property(walletData, 'description')
+      const result = await uut.sendBch(filename, flags)
 
-      // Clean up.
-      await fs.rm(filename)
+      assert.isObject(result)
+      assert.property(result, 'success')
+      assert.property(result, 'status')
+      assert.property(result, 'endpoint')
+      assert.property(result, 'txid')
     })
   })
 
   describe('#validateFlags()', () => {
-    it('validateFlags() should return true if name is supplied.', () => {
-      assert.equal(uut.validateFlags({ name: 'test' }), true, 'return true')
+    it('validateFlags() should return true .', () => {
+      const flags = {
+        name: 'test123',
+        qty: 1,
+        sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
+      }
+      assert.equal(uut.validateFlags(flags), true, 'return true')
     })
 
     it('validateFlags() should throw error if name is not supplied.', () => {
       try {
-        uut.validateFlags({})
+        const flags = {}
+        uut.validateFlags(flags)
       } catch (err) {
         assert.include(
           err.message,
-          'You must specify a wallet with the -n flag',
+          'You must specify a wallet with the -n flag.',
+          'Expected error message.'
+        )
+      }
+    })
+    it('validateFlags() should throw error if qty is not supplied.', () => {
+      try {
+        const flags = {
+          name: 'test123'
+        }
+        uut.validateFlags(flags)
+      } catch (err) {
+        assert.include(
+          err.message,
+          'You must specify a quantity in BCH with the -q flag.',
+          'Expected error message.'
+        )
+      }
+    })
+    it('validateFlags() should throw error if sendAddr is not supplied.', () => {
+      try {
+        const flags = {
+          name: 'test123',
+          qty: 1
+        }
+        uut.validateFlags(flags)
+      } catch (err) {
+        assert.include(
+          err.message,
+          'You must specify a send-to address with the -a flag.',
           'Expected error message.'
         )
       }
@@ -100,33 +148,6 @@ describe('wallet-create', () => {
   })
 
   describe('#run()', () => {
-    it('should run the run() function', async () => {
-      // Mock dependencies
-      uut.BchWallet = BchWalletMock
-
-      const flags = {
-        name: 'test123'
-      }
-      // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({ flags: flags })
-
-      const walletData = await uut.run()
-      // console.log('walletData: ', walletData)
-
-      assert.property(walletData, 'mnemonic')
-      assert.property(walletData, 'privateKey')
-      assert.property(walletData, 'publicKey')
-      assert.property(walletData, 'address')
-      assert.property(walletData, 'cashAddress')
-      assert.property(walletData, 'slpAddress')
-      assert.property(walletData, 'legacyAddress')
-      assert.property(walletData, 'hdPath')
-      assert.property(walletData, 'description')
-
-      // Clean up.
-      await fs.rm(filename)
-    })
-
     it('should return 0 and display error.message on empty flags', async () => {
       sandbox.stub(uut, 'parse').returns({ flags: {} })
 
@@ -142,32 +163,43 @@ describe('wallet-create', () => {
 
       assert.equal(result, 0)
     })
-
-    it('should add a description when provided', async () => {
+    it('should return 0 , if the response return success property as false', async () => {
       // Mock dependencies
-      uut.BchWallet = BchWalletMock
-
       const flags = {
         name: 'test123',
-        description: 'test'
+        qty: 1,
+        sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
       }
+      // Mock methods that will be tested elsewhere.
+      sandbox
+        .stub(uut.walletBalances, 'getBalances')
+        .resolves(SendBCHMock.getBalancesResult2)
+
       // Mock methods that will be tested elsewhere.
       sandbox.stub(uut, 'parse').returns({ flags: flags })
 
-      const walletData = await uut.run()
+      const result = await uut.run()
 
-      assert.property(walletData, 'mnemonic')
-      assert.property(walletData, 'privateKey')
-      assert.property(walletData, 'publicKey')
-      assert.property(walletData, 'address')
-      assert.property(walletData, 'cashAddress')
-      assert.property(walletData, 'slpAddress')
-      assert.property(walletData, 'legacyAddress')
-      assert.property(walletData, 'hdPath')
-      assert.property(walletData, 'description')
+      assert.equal(result, 0)
+    })
+    it('should run the run() function', async () => {
+      // Mock dependencies
+      const flags = {
+        name: 'test123',
+        qty: 1,
+        sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
+      }
+      // Mock methods that will be tested elsewhere.
+      sandbox
+        .stub(uut.walletBalances, 'getBalances')
+        .resolves(SendBCHMock.getBalancesResult)
 
-      // Clean up.
-      await fs.rm(filename)
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
+
+      const result = await uut.run()
+
+      assert.isString(result)
     })
   })
 })
