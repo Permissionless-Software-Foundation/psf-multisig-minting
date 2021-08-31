@@ -36,7 +36,11 @@ class IpfsAdapter {
               HighWater: 30,
               LowWater: 10
             }
-          }
+          },
+          preload: {
+            enabled: false
+          },
+          offline: true
         }
       }
 
@@ -44,7 +48,8 @@ class IpfsAdapter {
       this.ipfs = await this.IPFS.create(ipfsOptions)
 
       // Set the 'server' profile so the node does not scan private networks.
-      await this.ipfs.config.profiles.apply('server')
+      // await this.ipfs.config.profiles.apply('server')
+      await this.ipfs.config.profiles.apply('lowpower')
 
       // const nodeConfig = await this.ipfs.config.getAll()
       // console.log(
