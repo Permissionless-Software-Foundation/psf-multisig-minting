@@ -4,7 +4,7 @@
 */
 
 // Global npm libraries
-const IPFS = require('ipfs')
+const IPFS = require('@chris.troutner/ipfs')
 
 class IpfsAdapter {
   constructor (localConfig = {}) {
