@@ -47,6 +47,7 @@ class WalletAddrs extends Command {
       console.log(`SLP Address: ${walletData.slpAddress}`)
       console.log(`Legacy Address: ${walletData.legacyAddress}`)
       console.log(' ')
+      return walletData
     } catch (err) {
       console.error('Error in getAddrs()')
       throw err
