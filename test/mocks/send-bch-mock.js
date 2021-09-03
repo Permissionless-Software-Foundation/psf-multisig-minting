@@ -8,10 +8,10 @@ const getBalancesResult = {
       success: true,
       status: 200,
       endpoint: 'broadcast',
-      txid: 'deedc4f82bb77d920b0c867aeaf7b410ee8d71cb76ac9367b8c6d624feff757b',
+      txid: 'deedc4f82bb77d920b0c867aeaf7b410ee8d71cb76ac9367b8c6d624feff757b'
     }
   },
-  bchjs: new BCHJS(),
+  bchjs: new BCHJS()
 }
 
 const getBalancesResult2 = {
@@ -21,12 +21,12 @@ const getBalancesResult2 = {
       success: false,
       status: 422,
       endpoint: 'broadcast',
-      txid: '',
+      txid: ''
     }
   },
-  bchjs: new BCHJS(),
+  bchjs: new BCHJS()
 }
 module.exports = {
   getBalancesResult,
-  getBalancesResult2,
+  getBalancesResult2
 }
