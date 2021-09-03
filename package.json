@@ -17,7 +17,7 @@
     "collect.js": "^4.28.6",
     "conf-cli": "^0.1.9",
     "@chris.troutner/ipfs": "2.0.2",
-    "ipfs-coord": "^6.6.0",
+    "ipfs-coord": "^6.6.1",
     "jsonrpc-lite": "^2.2.0",
     "koa": "^2.13.1",
     "koa-bodyparser": "^4.3.0",
