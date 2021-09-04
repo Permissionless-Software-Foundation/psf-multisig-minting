@@ -5,22 +5,22 @@
 // Public NPM libraries
 const axios = require('axios')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 class IpfsPeers extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
     this.axios = axios
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(IpfsPeers)
+      // const { flags } = this.parse(IpfsPeers)
 
       const result = await this.axios.post('http://localhost:5000/local/', {
-        peers: true,
+        peers: true
       })
       console.log(`Subnet Peers: ${JSON.stringify(result.data, null, 2)}`)
       console.log(`Number of peers: ${result.data.length}`)
@@ -37,7 +37,7 @@ class IpfsPeers extends Command {
 IpfsPeers.description = 'Query the state of subnet peers'
 
 IpfsPeers.flags = {
-  all: flags.string({char: 'a', description: 'Display all peers'}),
+  all: flags.string({ char: 'a', description: 'Display all peers' })
 }
 
 module.exports = IpfsPeers
