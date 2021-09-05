@@ -1,3 +1,12 @@
+/*
+  This daemon command spins up a new IPFS node, using ipfs-coord. It connects
+  to the PSF subnetwork on IPFS, searches for and selects a wallet service.
+
+  The daemon also starts a small REST API server that the other wallet commands
+  connect to, in order to send JSON RPC commands to the services on the IPFS
+  subnet.
+*/
+
 // Public npm libraries
 const BCHJS = require('@psf/bch-js')
 const { Command } = require('@oclif/command')
