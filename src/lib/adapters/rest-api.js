@@ -10,23 +10,23 @@
 const Koa = require('koa')
 const Router = require('koa-router')
 const bodyParser = require('koa-bodyparser')
-const {v4: uid} = require('uuid')
+const { v4: uid } = require('uuid')
 const jsonrpc = require('jsonrpc-lite')
 
 let _this
 
 class RestApi {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     this.eventEmitter = localConfig.eventEmitter
     if (!this.eventEmitter) {
       throw new Error(
-        'An instance of an EventEmitter must be passed when instantiating the RestApi library.',
+        'An instance of an EventEmitter must be passed when instantiating the RestApi library.'
       )
     }
     this.ipfsCoordAdapter = localConfig.ipfsCoordAdapter
     if (!this.ipfsCoordAdapter) {
       throw new Error(
-        'An instance of ipfsCoordAdapter must be passed when instantiating the RestApi library.',
+        'An instance of ipfsCoordAdapter must be passed when instantiating the RestApi library.'
       )
     }
 
@@ -46,7 +46,7 @@ class RestApi {
 
   // This handler is triggered when RPC data comes in over IPFS.
   // Handle RPC input, and match the input to the RPC queue.
-  rpcHandler(data) {
+  rpcHandler (data) {
     try {
       // Convert string input into an object.
       const jsonData = JSON.parse(data)
@@ -66,14 +66,14 @@ class RestApi {
 
   // Launch the single REST API endpoint that the other app commands use to
   // broadcast JSON RPC commands to other IPFS peers.
-  async startRestApi() {
+  async startRestApi () {
     try {
       // Create a Koa instance.
       const app = new Koa()
       app.use(this.bodyParser())
 
       // Attach a router for the single POST endpoint.
-      this.router = new Router({prefix: '/'})
+      this.router = new Router({ prefix: '/' })
 
       // Normal API handler for interacting with other IPFS peers over JSON RPC.
       this.router.post('wallet/', this.apiHandler)
@@ -98,14 +98,14 @@ class RestApi {
 
   // Update the pointer to the ipfs-coord adapter.
   // This allows the REST API to communicate over IPFS.
-  async updateIpfsCoord(adapter) {
+  async updateIpfsCoord (adapter) {
     this.ipfsCoordAdapter = adapter
     console.log('ipfsCoordAdapter updated in rest-api.js')
   }
 
   // This REST API deals with commands concerned with the health of the local
   // IPFS node.
-  async localApiHandler(ctx, next) {
+  async localApiHandler (ctx, next) {
     try {
       console.log('Ping from localApiHandler()')
 
@@ -123,13 +123,17 @@ class RestApi {
   }
 
   // Hydrate data about the peers connected to this IPFS node.
-  async getPeers(showAll) {
+  async getPeers (showAll) {
     try {
       const peerData = this.ipfsCoordAdapter.ipfsCoord.thisNode.peerData
       // console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
 
-      const ipfsPeers =
+      let ipfsPeers =
         await this.ipfsCoordAdapter.ipfsCoord.adapters.ipfs.getPeers()
+      // console.log('ipfsPeers: ', ipfsPeers)
+
+      ipfsPeers = this._removeDuplicatePeers(ipfsPeers)
+      // console.log('filtered ipfsPeers: ', ipfsPeers)
 
       // Loop through each IPFS peer and hydrate it with data from the peerData.
       for (let i = 0; i < ipfsPeers.length; i++) {
@@ -163,7 +167,7 @@ class RestApi {
           }
         } catch (err) {
           console.log(
-            `Error trying to hydrate peer ${thisPeer.peer}: ${err.message}`,
+            `Error trying to hydrate peer ${thisPeer.peer}: ${err.message}`
           )
         }
       }
@@ -175,8 +179,15 @@ class RestApi {
     }
   }
 
+  // Expects an array of peers and returns an array of peers with duplicates
+  // removed.
+  _removeDuplicatePeers (arr) {
+    // https://stackoverflow.com/questions/2218999/how-to-remove-all-duplicates-from-an-array-of-objects
+    return arr.filter((v, i, a) => a.findIndex(t => t.peer === v.peer) === i)
+  }
+
   // This function handles incoming REST API calls for wallet functions.
-  async apiHandler(ctx, next) {
+  async apiHandler (ctx, next) {
     try {
       // console.log('Ping from apiHandler()')
 
@@ -205,7 +216,7 @@ class RestApi {
       await _this.ipfsCoordAdapter.ipfsCoord.useCases.peer.sendPrivateMessage(
         sendTo,
         cmdStr,
-        thisNode,
+        thisNode
       )
 
       // Wait for data to come back from the wallet service.
@@ -219,7 +230,7 @@ class RestApi {
   }
 
   // Returns a promise that resolves to data when the RPC response is recieved.
-  async waitForRPCResponse(rpcId) {
+  async waitForRPCResponse (rpcId) {
     try {
       // Initialize variables for tracking the return data.
       let dataFound = false
@@ -227,7 +238,7 @@ class RestApi {
       let data = {
         success: false,
         message: 'request timed out',
-        data: '',
+        data: ''
       }
 
       // Loop that waits for a response from the service provider.
