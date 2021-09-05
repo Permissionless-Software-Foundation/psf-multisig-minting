@@ -8,8 +8,6 @@ const Conf = require('conf')
 
 const {Command, flags} = require('@oclif/command')
 
-let badData = {}
-
 class WalletService extends Command {
   constructor(argv, config) {
     super(argv, config)
@@ -29,12 +27,15 @@ class WalletService extends Command {
         // all: flags.all,
       })
       const peers = result.data
-      badData = result.data
       // console.log(`Subnet Peers: ${JSON.stringify(result.data, null, 2)}`)
       // console.log(`Number of peers: ${result.data.length}`)
 
       // Filter the wallet services from the peers.
-      const servicePeers = peers.filter(x => x.protocol.includes('bch-wallet'))
+      const servicePeers = peers.filter(x => {
+        if (!x.protocol) return false
+
+        return x.protocol.includes('bch-wallet')
+      })
 
       if (flags.select) this.selectService(servicePeers, flags)
 
@@ -54,7 +55,6 @@ class WalletService extends Command {
       return true
     } catch (err) {
       console.log('Error in run(): ', err)
-      console.log('badData: ', badData)
 
       return false
     }
