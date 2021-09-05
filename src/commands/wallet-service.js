@@ -6,10 +6,10 @@
 const axios = require('axios')
 const Conf = require('conf')
 
-const {Command, flags} = require('@oclif/command')
+const { Command, flags } = require('@oclif/command')
 
 class WalletService extends Command {
-  constructor(argv, config) {
+  constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
@@ -17,13 +17,13 @@ class WalletService extends Command {
     this.conf = new Conf()
   }
 
-  async run() {
+  async run () {
     try {
-      const {flags} = this.parse(WalletService)
+      const { flags } = this.parse(WalletService)
 
       // Get a list of the IPFS peers this node is connected to.
       const result = await this.axios.post('http://localhost:5000/local/', {
-        peers: true,
+        peers: true
         // all: flags.all,
       })
       const peers = result.data
@@ -46,10 +46,11 @@ class WalletService extends Command {
       // Add the isSelected flag.
       servicePeers.map(x => {
         x.isSelected = x.peer.includes(serviceId)
+        return x
       })
 
       console.log(
-        `Wallet service peers: ${JSON.stringify(servicePeers, null, 2)}`,
+        `Wallet service peers: ${JSON.stringify(servicePeers, null, 2)}`
       )
 
       return true
@@ -61,7 +62,7 @@ class WalletService extends Command {
   }
 
   // Select a different peer to use as a wallet service.
-  selectService(servicePeers, flags) {
+  selectService (servicePeers, flags) {
     try {
       const chosenPeer = flags.select
 
@@ -88,8 +89,8 @@ WalletService.description = 'List and/or select a wallet service provider.'
 WalletService.flags = {
   select: flags.string({
     char: 's',
-    description: 'Switch to a given IPFS ID for wallet service.',
-  }),
+    description: 'Switch to a given IPFS ID for wallet service.'
+  })
 }
 
 module.exports = WalletService
