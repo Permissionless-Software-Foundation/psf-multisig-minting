@@ -36,11 +36,10 @@ class SendTokens extends Command {
       }.json`
 
       const txid = await this.sendTokens(filename, flags)
-      // console.log('result: ', result)
+      console.log('txid: ', txid)
 
-      console.log(`TXID: ${txid}`)
       console.log('\nView this transaction on a block explorer:')
-      console.log(`https://explorer.bitcoin.com/bch/tx/${txid}`)
+      console.log(`https://simpleledger.info/#tx/${txid}`)
 
       return txid
     } catch (err) {
@@ -64,10 +63,11 @@ class SendTokens extends Command {
       if (!tokens.length) {
         throw new Error('No tokens found on this wallet.')
       }
-      console.log('tokens', tokens)
+      // console.log('tokens', tokens)
 
       const tokenToSend = tokens.find(val => val.tokenId === flags.tokenId)
-      console.log('tokenToSend', tokenToSend)
+      // console.log('tokenToSend', tokenToSend)
+
       if (!tokenToSend) {
         throw new Error('No tokens in the wallet matched the given token ID.')
       }
@@ -83,9 +83,10 @@ class SendTokens extends Command {
         qty: flags.qty
       }
 
-      const txid = await walletData.sendTokens(receiver, 5.0)
-      console.log('result', txid)
-      return txid
+      const result = await walletData.sendTokens(receiver, 5.0)
+      // console.log('result: ', result)
+
+      return result.txid
     } catch (err) {
       console.error('Error in sendTokens()')
       throw err

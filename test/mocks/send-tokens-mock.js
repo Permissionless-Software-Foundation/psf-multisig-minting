@@ -4,7 +4,9 @@ const BCHJS = require('@psf/bch-js')
 const getBalancesResult = {
   bchBalance: 2,
   sendTokens: () => {
-    return '4aee846d3ef9bd70d36359c842dd6f4f278eaa794de4143456d23e862488a87e'
+    return {
+      txid: '4aee846d3ef9bd70d36359c842dd6f4f278eaa794de4143456d23e862488a87e'
+    }
   },
   bchjs: new BCHJS(),
   utxos: {
