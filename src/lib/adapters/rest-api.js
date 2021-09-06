@@ -81,6 +81,9 @@ class RestApi {
       // Local commands
       this.router.post('local/', this.localApiHandler)
 
+      // P2WDB commands
+      this.router.post('p2wdb/', this.p2wdbApiHandler)
+
       app.use(this.router.routes())
       app.use(this.router.allowedMethods())
 
@@ -225,6 +228,49 @@ class RestApi {
       ctx.body = data
     } catch (err) {
       console.error('Error in apiHandler()')
+      throw err
+    }
+  }
+
+  // This function handles incoming REST API calls for wallet functions.
+  async p2wdbApiHandler (ctx, next) {
+    try {
+      // console.log('Ping from apiHandler()')
+
+      // const body = ctx.request.body
+      // console.log('Input: ', body)
+
+      // Input Validation
+      const sendTo = ctx.request.body.sendTo
+      if (!sendTo) throw new Error('sendTo property must include an IPFS ID.')
+
+      const rpcData = ctx.request.body.rpcData
+      if (!rpcData) throw new Error('rpcData property required')
+
+      // Generate a UUID to uniquly identify the response comming back from
+      // the IPFS peer.
+      const rpcId = _this.uid()
+      // console.log('rpcId: ', rpcId)
+
+      // Generate a JSON RPC command.
+      const cmd = _this.jsonrpc.request(rpcId, 'p2wdb', rpcData)
+      const cmdStr = JSON.stringify(cmd)
+      // console.log('cmdStr: ', cmdStr)
+
+      // Send the RPC command to selected wallet service.
+      const thisNode = _this.ipfsCoordAdapter.ipfsCoord.thisNode
+      await _this.ipfsCoordAdapter.ipfsCoord.useCases.peer.sendPrivateMessage(
+        sendTo,
+        cmdStr,
+        thisNode
+      )
+
+      // Wait for data to come back from the wallet service.
+      const data = await _this.waitForRPCResponse(rpcId)
+
+      ctx.body = data
+    } catch (err) {
+      console.error('Error in p2wdbHandler()')
       throw err
     }
   }
