@@ -9,10 +9,12 @@
 // Public NPM libraries
 const BchWallet = require('minimal-slp-wallet/index')
 const axios = require('axios')
+const Conf = require('conf')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
 const WalletBalances = require('./wallet-balances')
+const P2wdbService = require('../lib/adapters/p2wdb-service')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -31,6 +33,8 @@ class P2WDBWrite extends Command {
     this.walletUtil = new WalletUtil()
     this.BchWallet = BchWallet
     this.walletBalances = new WalletBalances()
+    this.conf = new Conf()
+    this.p2wdbService = new P2wdbService()
   }
 
   async run () {
@@ -59,14 +63,18 @@ class P2WDBWrite extends Command {
 
       const txid = burnResult.txid
 
-      console.log(`TXID: ${txid}`)
-      console.log('\nView this transaction on a block explorer:')
+      console.log(`\nProof-of-burn BCH TXID: ${txid}`)
+      console.log('View this transaction on a block explorer:')
       console.log(`https://simpleledger.info/#tx/${txid}`)
 
       // Wait a few seconds to let TX data propegate around the BCH network.
       await walletData.bchjs.Util.sleep(3000)
 
-      await this.p2wdbWrite(txid, signature, flags)
+      // Write data to the P2WDB.
+      const hash = await this.p2wdbWrite(txid, signature, flags)
+
+      console.log(`\nP2WDB hash for entry: ${hash}`)
+      console.log(`Data URL: https://p2wdb.fullstack.cash/entry/hash/${hash}`)
 
       return txid
     } catch (err) {
@@ -109,7 +117,7 @@ class P2WDBWrite extends Command {
         localTimestamp: now.toLocaleString()
       }
 
-      // REST API body data.
+      // Body of data to transmit via REST or JSON RPC
       const bodyData = {
         txid,
         message: flags.data,
@@ -117,8 +125,17 @@ class P2WDBWrite extends Command {
         data: JSON.stringify(dataObj)
       }
 
-      const result = await axios.post(P2WDB_SERVER, bodyData)
-      console.log(`Response from API: ${JSON.stringify(result.data, null, 2)}`)
+      // If centralized mode is selected
+      if (flags.centralize) {
+        const result = await axios.post(P2WDB_SERVER, bodyData)
+        // console.log(`Response from API: ${JSON.stringify(result.data, null, 2)}`)
+
+        return result.data.hash
+      }
+
+      // Decentralized mode.
+      const hash = await this.p2wdbService.writeEntry(bodyData)
+      return hash
     } catch (err) {
       console.error('Error in p2wdbWrite()')
       throw err
@@ -214,6 +231,16 @@ class P2WDBWrite extends Command {
       throw new Error('You must specify an appId with the -a flag.')
     }
 
+    const centralized = flags.centralized
+    if (!centralized) {
+      const p2wdbService = this.conf.get('p2wdbService')
+      if (!p2wdbService) {
+        throw new Error(
+          'Use p2wdb-service command to select a service, or use -c argument for centralized mode.'
+        )
+      }
+    }
+
     return true
   }
 }
@@ -229,6 +256,10 @@ P2WDBWrite.flags = {
   appId: flags.string({
     char: 'a',
     description: 'appId string to categorize data'
+  }),
+  centralized: flags.boolean({
+    char: 'c',
+    description: 'Use centralized mode to connect to P2WDB.'
   })
 }
 
