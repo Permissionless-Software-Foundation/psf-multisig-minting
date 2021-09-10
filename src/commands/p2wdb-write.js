@@ -63,9 +63,9 @@ class P2WDBWrite extends Command {
 
       const txid = burnResult.txid
 
-      console.log(`\nProof-of-burn BCH TXID: ${txid}`)
-      console.log('View this transaction on a block explorer:')
-      console.log(`https://simpleledger.info/#tx/${txid}`)
+      this.log(`\nProof-of-burn BCH TXID: ${txid}`)
+      this.log('View this transaction on a block explorer:')
+      this.log(`https://simpleledger.info/#tx/${txid}`)
 
       // Wait a few seconds to let TX data propegate around the BCH network.
       await walletData.bchjs.Util.sleep(3000)
@@ -73,14 +73,32 @@ class P2WDBWrite extends Command {
       // Write data to the P2WDB.
       const hash = await this.p2wdbWrite(txid, signature, flags)
 
-      console.log(`\nP2WDB hash for entry: ${hash}`)
-      console.log(`Data URL: https://p2wdb.fullstack.cash/entry/hash/${hash}`)
+      this.log(`\nP2WDB hash for entry: ${hash}`)
+      this.log(`Data URL: https://p2wdb.fullstack.cash/entry/hash/${hash}`)
 
-      return txid
+      return { txid, hash }
     } catch (err) {
-      console.log('Error in p2wdb-write.js/run(): ', err)
+      console.log('Error in p2wdb-write.js/run(): ')
 
       return 0
+    }
+  }
+
+  // Create an instance of minimal-slp-wallet populated with data from filename
+  // and the blockchain.
+  async getWallet (filename) {
+    try {
+      // Input validation
+      if (!filename || typeof filename !== 'string') {
+        throw new Error('filename required.')
+      }
+
+      const walletData = await this.walletBalances.getBalances(filename)
+
+      return walletData
+    } catch (err) {
+      console.error('Error in getWallet()')
+      throw err
     }
   }
 
@@ -100,62 +118,6 @@ class P2WDBWrite extends Command {
       return signature
     } catch (err) {
       console.error('Error in generateSignature()')
-      throw err
-    }
-  }
-
-  // Write data to the P2WDB using the txid as proof-of-burn
-  async p2wdbWrite (txid, signature, flags) {
-    try {
-      const now = new Date()
-
-      // Data to be inserted into the database.
-      const dataObj = {
-        appId: flags.appId,
-        title: flags.data,
-        timestamp: now.toISOString(),
-        localTimestamp: now.toLocaleString()
-      }
-
-      // Body of data to transmit via REST or JSON RPC
-      const bodyData = {
-        txid,
-        message: flags.data,
-        signature,
-        data: JSON.stringify(dataObj)
-      }
-
-      // If centralized mode is selected
-      if (flags.centralize) {
-        const result = await axios.post(P2WDB_SERVER, bodyData)
-        // console.log(`Response from API: ${JSON.stringify(result.data, null, 2)}`)
-
-        return result.data.hash
-      }
-
-      // Decentralized mode.
-      const hash = await this.p2wdbService.writeEntry(bodyData)
-      return hash
-    } catch (err) {
-      console.error('Error in p2wdbWrite()')
-      throw err
-    }
-  }
-
-  // Create an instance of minimal-slp-wallet populated with data from filename
-  // and the blockchain.
-  async getWallet (filename) {
-    try {
-      // Input validation
-      if (!filename || typeof filename !== 'string') {
-        throw new Error('filename required.')
-      }
-
-      const walletData = await this.walletBalances.getBalances(filename)
-
-      return walletData
-    } catch (err) {
-      console.error('Error in getWallet()')
       throw err
     }
   }
@@ -200,6 +162,7 @@ class P2WDBWrite extends Command {
         PROOF_OF_BURN_QTY,
         P2WDB_TOKEN_ID
       )
+      // console.log('walletData.burnTokens() result: ', result)
 
       return result
 
@@ -209,6 +172,44 @@ class P2WDBWrite extends Command {
       // }
     } catch (err) {
       console.error('Error in burnPsf()')
+      throw err
+    }
+  }
+
+  // Write data to the P2WDB using the txid as proof-of-burn
+  async p2wdbWrite (txid, signature, flags) {
+    try {
+      const now = new Date()
+
+      // Data to be inserted into the database.
+      const dataObj = {
+        appId: flags.appId,
+        title: flags.data,
+        timestamp: now.toISOString(),
+        localTimestamp: now.toLocaleString()
+      }
+
+      // Body of data to transmit via REST or JSON RPC
+      const bodyData = {
+        txid,
+        message: flags.data,
+        signature,
+        data: JSON.stringify(dataObj)
+      }
+
+      // If centralized mode is selected
+      if (flags.centralize) {
+        const result = await axios.post(P2WDB_SERVER, bodyData)
+        // console.log(`Response from API: ${JSON.stringify(result.data, null, 2)}`)
+
+        return result.data.hash
+      }
+
+      // Decentralized mode.
+      const hash = await this.p2wdbService.writeEntry(bodyData)
+      return hash
+    } catch (err) {
+      console.error('Error in p2wdbWrite()')
       throw err
     }
   }

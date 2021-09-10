@@ -78,6 +78,27 @@ class BchWallet {
                   tokenType: 1,
                   isValid: true,
                   tokenQty: '4.25'
+                },
+                {
+                  height: 0,
+                  tx_hash:
+                    'c0ac066ce6efa1fa4763bf85a91c738e57c12b8765731bd07f0d8f5a55ce582f',
+                  tx_pos: 1,
+                  value: 546,
+                  txid: 'c0ac066ce6efa1fa4763bf85a91c738e57c12b8765731bd07f0d8f5a55ce582f',
+                  vout: 1,
+                  utxoType: 'token',
+                  transactionType: 'send',
+                  tokenId:
+                    '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0',
+                  tokenTicker: 'PSF',
+                  tokenName: 'Permissionless Software Foundation',
+                  tokenDocumentUrl: 'psfoundation.cash',
+                  tokenDocumentHash: '',
+                  decimals: 8,
+                  tokenType: 1,
+                  isValid: true,
+                  tokenQty: '1'
                 }
               ]
             },
