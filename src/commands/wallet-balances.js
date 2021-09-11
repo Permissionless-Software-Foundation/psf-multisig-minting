@@ -41,6 +41,13 @@ class WalletBalances extends Command {
 
       // Get the wallet with updated UTXO data.
       const walletData = await this.getBalances(filename)
+      // console.log(
+      //   `walletData.utxos.utxoStore: ${JSON.stringify(
+      //     walletData.utxos.utxoStore,
+      //     null,
+      //     2,
+      //   )}`,
+      // )
 
       // Display wallet balances on the screen.
       this.displayBalance(walletData, flags)
