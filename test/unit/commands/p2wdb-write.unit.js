@@ -44,7 +44,7 @@ describe('p2wdb-write', () => {
         name: 'test123',
         data: 'a string of data',
         appId: 'test',
-        centralized: true
+        centralized: true,
       }
       assert.equal(uut.validateFlags(flags), true, 'return true')
     })
@@ -57,7 +57,7 @@ describe('p2wdb-write', () => {
         assert.include(
           err.message,
           'You must specify a wallet with the -n flag.',
-          'Expected error message.'
+          'Expected error message.',
         )
       }
     })
@@ -65,14 +65,14 @@ describe('p2wdb-write', () => {
     it('validateFlags() should throw error if data is not supplied.', () => {
       try {
         const flags = {
-          name: 'test123'
+          name: 'test123',
         }
         uut.validateFlags(flags)
       } catch (err) {
         assert.include(
           err.message,
           'You must specify a string of data with the -d flag.',
-          'Expected error message.'
+          'Expected error message.',
         )
       }
     })
@@ -81,14 +81,14 @@ describe('p2wdb-write', () => {
       try {
         const flags = {
           name: 'test123',
-          data: 'test data'
+          data: 'test data',
         }
         uut.validateFlags(flags)
       } catch (err) {
         assert.include(
           err.message,
           'You must specify an appId with the -a flag.',
-          'Expected error message.'
+          'Expected error message.',
         )
       }
     })
@@ -96,7 +96,7 @@ describe('p2wdb-write', () => {
 
   describe('#run()', () => {
     it('should return 0 and display error.message on empty flags', async () => {
-      sandbox.stub(uut, 'parse').returns({ flags: {} })
+      sandbox.stub(uut, 'parse').returns({flags: {}})
 
       const result = await uut.run()
 
@@ -107,11 +107,11 @@ describe('p2wdb-write', () => {
       // mock dependencies
       sandbox.stub(uut, 'log').returns()
       mockWallet.bchjs.Util.sleep = async () => {}
-      sandbox.stub(uut, 'parse').returns({ flags: {} })
+      sandbox.stub(uut, 'parse').returns({flags: {}})
       sandbox.stub(uut, 'validateFlags').returns()
       sandbox.stub(uut, 'getWallet').resolves(mockWallet)
       sandbox.stub(uut, 'generateSignature').resolves()
-      sandbox.stub(uut, 'burnPsf').resolves({ success: true, txid: 'testTxid' })
+      sandbox.stub(uut, 'burnPsf').resolves({success: true, txid: 'testTxid'})
       sandbox.stub(uut, 'p2wdbWrite').resolves('testHash')
 
       const result = await uut.run()
@@ -127,11 +127,11 @@ describe('p2wdb-write', () => {
       // mock dependencies
       sandbox.stub(uut, 'log').returns()
       mockWallet.bchjs.Util.sleep = async () => {}
-      sandbox.stub(uut, 'parse').returns({ flags: {} })
+      sandbox.stub(uut, 'parse').returns({flags: {}})
       sandbox.stub(uut, 'validateFlags').returns()
       sandbox.stub(uut, 'getWallet').resolves(mockWallet)
       sandbox.stub(uut, 'generateSignature').resolves()
-      sandbox.stub(uut, 'burnPsf').resolves({ success: false })
+      sandbox.stub(uut, 'burnPsf').resolves({success: false})
       sandbox.stub(uut, 'p2wdbWrite').resolves('testHash')
 
       const result = await uut.run()
@@ -154,7 +154,7 @@ describe('p2wdb-write', () => {
 
     it('should return the wallet object', async () => {
       // Mock dependencies
-      sandbox.stub(uut.walletBalances, 'getBalances').resolves({ foo: 'bar' })
+      sandbox.stub(uut.walletBalances, 'getBalances').resolves({foo: 'bar'})
 
       const result = await uut.getWallet('filename')
 
@@ -165,8 +165,8 @@ describe('p2wdb-write', () => {
       try {
         // Force an error
         sandbox
-          .stub(uut.walletBalances, 'getBalances')
-          .rejects(new Error('test error'))
+        .stub(uut.walletBalances, 'getBalances')
+        .rejects(new Error('test error'))
 
         await uut.getWallet('filename')
 
@@ -180,7 +180,7 @@ describe('p2wdb-write', () => {
   describe('#generateSignature', () => {
     it('should return a signature', async () => {
       const flags = {
-        data: 'test message'
+        data: 'test message',
       }
 
       const result = await uut.generateSignature(mockWallet, flags)
@@ -188,20 +188,20 @@ describe('p2wdb-write', () => {
 
       assert.equal(
         result,
-        'IMNqJ77kjX9evHlcZM8yE88jmVew6ofX2Zfow57qPnzWKF0Jr41L4VnrBfPS2imY80kwjhQkB2xNhftMR4e8A/k='
+        'IMNqJ77kjX9evHlcZM8yE88jmVew6ofX2Zfow57qPnzWKF0Jr41L4VnrBfPS2imY80kwjhQkB2xNhftMR4e8A/k=',
       )
     })
 
     it('should catch and throw errors', async () => {
       try {
         const flags = {
-          data: 'test message'
+          data: 'test message',
         }
 
         // Force an error
         sandbox
-          .stub(mockWallet.bchjs.BitcoinCash, 'signMessageWithPrivKey')
-          .throws(new Error('test error'))
+        .stub(mockWallet.bchjs.BitcoinCash, 'signMessageWithPrivKey')
+        .throws(new Error('test error'))
 
         await uut.generateSignature(mockWallet, flags)
 
@@ -216,7 +216,7 @@ describe('p2wdb-write', () => {
     it('should burn PSF tokens and return the txid', async () => {
       // Mock dependencies
       mockWallet.burnTokens = async () => {
-        return { success: true, txid: 'txid' }
+        return {success: true, txid: 'txid'}
       }
 
       const result = await uut.burnPsf(mockWallet)
@@ -226,9 +226,77 @@ describe('p2wdb-write', () => {
       assert.equal(result.txid, 'txid')
     })
 
+    it('should throw error if no PSF tokens are found', async () => {
+      try {
+        // Mock dependencies
+        mockWallet.burnTokens = async () => {
+          return {success: true, txid: 'txid'}
+        }
+
+        // Remove the PSF token from the mock data.
+        mockWallet.utxos.utxoStore.slpUtxos.type1.tokens.pop()
+
+        await uut.burnPsf(mockWallet)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'Token UTXO of with ID of')
+      }
+    })
+
     it('should catch and throw an error', async () => {
       try {
         await uut.burnPsf()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'Cannot read property')
+      }
+    })
+  })
+
+  describe('#p2wdbWrite', () => {
+    it('should write data using centralized service', async () => {
+      // Mock test data
+      const txid = 'fakeTxid'
+      const signature = 'fakeSig'
+      const flags = {
+        appId: 'fakeAppId',
+        data: 'a message',
+        centralize: true,
+      }
+
+      // Mock dependencies
+      sandbox.stub(uut.axios, 'post').resolves({data: {hash: 'fakeHash'}})
+
+      const result = await uut.p2wdbWrite(txid, signature, flags)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'fakeHash')
+    })
+
+    it('should write data using decentralized service', async () => {
+      // Mock test data
+      const txid = 'fakeTxid'
+      const signature = 'fakeSig'
+      const flags = {
+        appId: 'fakeAppId',
+        data: 'a message',
+        centralize: false,
+      }
+
+      // Mock dependencies
+      sandbox.stub(uut.p2wdbService, 'writeEntry').resolves('fakeHash')
+
+      const result = await uut.p2wdbWrite(txid, signature, flags)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'fakeHash')
+    })
+
+    it('should catch and throw an error', async () => {
+      try {
+        await uut.p2wdbWrite()
 
         assert.fail('Unexpected code path')
       } catch (err) {
