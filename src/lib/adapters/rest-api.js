@@ -113,8 +113,8 @@ class RestApi {
       console.log('Ping from localApiHandler()')
 
       if (ctx.request.body.relays) {
-        // ctx.body = _this.ipfsCoordAdapter.ipfsCoord.ipfs.cr.state
-        ctx.body = _this.ipfsCoordAdapter.ipfsCoord.thisNode.relayData
+        // ctx.body = _this.ipfsCoordAdapter.ipfsCoord.thisNode.relayData
+        ctx.body = _this.getRelays()
       } else if (ctx.request.body.peers) {
         const all = ctx.request.body.all
         ctx.body = await _this.getPeers(all)
@@ -122,6 +122,36 @@ class RestApi {
     } catch (err) {
       console.error('Error in localApiHandler()')
       throw err
+    }
+  }
+
+  // Get data about the known Circuit Relays. Hydrate with data from peers list.
+  getRelays () {
+    try {
+      const relayData = _this.ipfsCoordAdapter.ipfsCoord.thisNode.relayData
+      const peerData = this.ipfsCoordAdapter.ipfsCoord.thisNode.peerData
+      // console.log(`peerData: ${JSON.stringify(peerData, null, 2)}`)
+
+      for (let i = 0; i < relayData.length; i++) {
+        const thisRelay = relayData[i]
+
+        // Find the peer that corresponds to this relay.
+        const thisPeer = peerData.filter(x => x.from.includes(thisRelay.ipfsId))
+        // console.log('thisPeer: ', thisPeer)
+
+        // If the peer couldn't be found, skip.
+        if (!thisPeer.length) {
+          thisRelay.name = ''
+          continue
+        }
+
+        thisRelay.name = thisPeer[0].data.jsonLd.name
+      }
+
+      return relayData
+    } catch (err) {
+      console.error('Error in getRelays(): ', err)
+      return {}
     }
   }
 

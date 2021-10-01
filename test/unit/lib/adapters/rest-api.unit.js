@@ -215,9 +215,10 @@ describe('#REST-API', () => {
 
     it('should report the state of circuit relays', async () => {
       // Mock dependencies
-      uut.ipfsCoordAdapter.ipfsCoord.thisNode = {
-        relayData: 'test data'
-      }
+      // uut.ipfsCoordAdapter.ipfsCoord.thisNode = {
+      //   relayData: 'test data'
+      // }
+      sandbox.stub(uut, 'getRelays').returns('test data')
 
       ctx.request.body = {
         relays: true
