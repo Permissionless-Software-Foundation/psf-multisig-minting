@@ -213,15 +213,27 @@ describe('#REST-API', () => {
       }
     })
 
-    it('should report the state of circuit relays', async () => {
+    it('should route to the circuit relays function', async () => {
       // Mock dependencies
-      // uut.ipfsCoordAdapter.ipfsCoord.thisNode = {
-      //   relayData: 'test data'
-      // }
       sandbox.stub(uut, 'getRelays').returns('test data')
 
       ctx.request.body = {
         relays: true
+      }
+
+      await uut.localApiHandler(ctx)
+
+      // console.log('ctx.body: ', ctx.body)
+
+      assert.equal(ctx.body, 'test data')
+    })
+
+    it('should route to the peers function', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'getPeers').returns('test data')
+
+      ctx.request.body = {
+        peers: true
       }
 
       await uut.localApiHandler(ctx)
