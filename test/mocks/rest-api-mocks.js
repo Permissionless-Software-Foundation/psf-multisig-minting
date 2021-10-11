@@ -176,8 +176,37 @@ const mockPeerData = [
   },
 ]
 
+const ipfsMockPeers = [
+  {
+    addr: '/ip4/139.162.76.54/tcp/5269/ws/p2p/QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
+    peer: 'QmaKzQTAtoJWYMiG5ATx41uWsMajr1kSxRdtg919s8fK77',
+    direction: 'outbound',
+    muxer: '/mplex/6.7.0',
+    latency: 'n/a',
+    streams: [],
+  },
+  {
+    addr: '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
+    peer: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKp',
+    direction: 'outbound',
+    muxer: '/mplex/6.7.0',
+    latency: 'n/a',
+    streams: [],
+  },
+  // This data is used to exercise some of the exception code paths.
+  {
+    addr: '/ip4/143.198.60.119/tcp/4003/ws/p2p/QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKo',
+    peer: 'QmcewynF2DMxuvK7zk1E5es1cvBwZrfnYEaiN995KVYaKo',
+    direction: 'outbound',
+    muxer: '/mplex/6.7.0',
+    latency: 'n/a',
+    streams: [],
+  },
+]
+
 module.exports = {
   rpcData,
   mockRelayData,
   mockPeerData,
+  ipfsMockPeers,
 }

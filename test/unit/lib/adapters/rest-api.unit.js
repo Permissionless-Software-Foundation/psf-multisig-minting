@@ -273,4 +273,57 @@ describe('#REST-API', () => {
       assert.isObject(result)
     })
   })
+
+  describe('#getPeers', () => {
+    it('should get and aggregate peer data', async () => {
+      // Load mock data for testing purposes.
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode = {}
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode.peerData = mockData.mockPeerData
+      uut.ipfsCoordAdapter.ipfsCoord.adapters = {
+        ipfs: {
+          getPeers: async () => mockData.ipfsMockPeers,
+        },
+      }
+
+      const result = await uut.getPeers(false)
+      // console.log(result)
+
+      // Mock data should return 2 results.
+      assert.equal(result.length, 3)
+
+      // Ensure the results have the expected properties.
+      assert.property(result[0], 'addr')
+      assert.property(result[0], 'peer')
+      assert.property(result[0], 'direction')
+      assert.property(result[0], 'name')
+      assert.property(result[0], 'protocol')
+      assert.property(result[0], 'version')
+    })
+
+    it('should report errors and return an empty object', async () => {
+      const result = await uut.getPeers()
+      // console.log(result)
+
+      assert.isObject(result)
+    })
+
+    it('should include extra data if showAll flag is set to true', async () => {
+      // Load mock data for testing purposes.
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode = {}
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode.peerData = mockData.mockPeerData
+      uut.ipfsCoordAdapter.ipfsCoord.adapters = {
+        ipfs: {
+          getPeers: async () => mockData.ipfsMockPeers,
+        },
+      }
+
+      const result = await uut.getPeers(true)
+      // console.log(result)
+
+      // Ensure extra properties are included.
+      assert.property(result[0], 'muxer')
+      assert.property(result[0], 'latency')
+      assert.property(result[0], 'streams')
+    })
+  })
 })
