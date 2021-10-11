@@ -11,7 +11,7 @@ const BCHJS = require('@psf/bch-js')
 
 // Local libraries
 const RestApi = require('../../../../src/lib/adapters/rest-api')
-const { context } = require('../../../mocks/ctx-mock')
+const {context} = require('../../../mocks/ctx-mock')
 const IpfsCoordAdapter = require('../../../../src/lib/adapters/ipfs-coord')
 const IPFSMock = require('../../../mocks/ipfs-mock')
 const mockDataLib = require('../../../mocks/rest-api-mocks')
@@ -21,23 +21,26 @@ describe('#REST-API', () => {
   let uut
   let ctx
   let mockData
+  let ipfsCoordAdapter
 
   beforeEach(async () => {
     const eventEmitter = new EventEmitter()
     const ipfs = IPFSMock.create()
     const bchjs = new BCHJS()
-    const ipfsCoordAdapter = new IpfsCoordAdapter({ ipfs, bchjs, eventEmitter })
+    ipfsCoordAdapter = new IpfsCoordAdapter({ipfs, bchjs, eventEmitter})
 
     sandbox = sinon.createSandbox()
 
     ctx = context()
     mockData = cloneDeep(mockDataLib)
 
-    uut = new RestApi({ eventEmitter, ipfsCoordAdapter })
+    uut = new RestApi({eventEmitter, ipfsCoordAdapter})
   })
 
   afterEach(() => {
     sandbox.restore()
+
+    clearInterval(ipfsCoordAdapter.pollServiceInterval)
   })
 
   describe('#constructor', () => {
@@ -49,7 +52,7 @@ describe('#REST-API', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'An instance of an EventEmitter must be passed when instantiating the RestApi library.'
+          'An instance of an EventEmitter must be passed when instantiating the RestApi library.',
         )
       }
     })
@@ -58,13 +61,13 @@ describe('#REST-API', () => {
       try {
         const eventEmitter = new EventEmitter()
 
-        uut = new RestApi({ eventEmitter })
+        uut = new RestApi({eventEmitter})
 
         assert.fail('Unexpected code path')
       } catch (err) {
         assert.include(
           err.message,
-          'An instance of ipfsCoordAdapter must be passed when instantiating the RestApi library.'
+          'An instance of ipfsCoordAdapter must be passed when instantiating the RestApi library.',
         )
       }
     })
@@ -131,8 +134,8 @@ describe('#REST-API', () => {
       try {
         // Force an error
         sandbox
-          .stub(uut.ipfsCoordAdapter.bchjs.Util, 'sleep')
-          .rejects(new Error('test error'))
+        .stub(uut.ipfsCoordAdapter.bchjs.Util, 'sleep')
+        .rejects(new Error('test error'))
 
         // Mock data.
         const rpcId = '123'
@@ -164,7 +167,7 @@ describe('#REST-API', () => {
 
     it('should throw an error if rpcData property is not included in body', async () => {
       try {
-        ctx.request.body = { sendTo: 'fakeIPFSid' }
+        ctx.request.body = {sendTo: 'fakeIPFSid'}
 
         await uut.apiHandler(ctx)
 
@@ -180,15 +183,15 @@ describe('#REST-API', () => {
         sendTo: 'fakeIPFSid',
         rpcData: {
           endpoint: 'utxos',
-          address: 'fakeAddress'
-        }
+          address: 'fakeAddress',
+        },
       }
 
       // Mock dependencies
       uut.ipfsCoordAdapter.ipfsCoord.useCases = {
         peer: {
-          sendPrivateMessage: () => {}
-        }
+          sendPrivateMessage: () => {},
+        },
       }
       sandbox.stub(uut, 'waitForRPCResponse').resolves('some data')
 
@@ -218,7 +221,7 @@ describe('#REST-API', () => {
       sandbox.stub(uut, 'getRelays').returns('test data')
 
       ctx.request.body = {
-        relays: true
+        relays: true,
       }
 
       await uut.localApiHandler(ctx)
@@ -233,7 +236,7 @@ describe('#REST-API', () => {
       sandbox.stub(uut, 'getPeers').returns('test data')
 
       ctx.request.body = {
-        peers: true
+        peers: true,
       }
 
       await uut.localApiHandler(ctx)
@@ -241,6 +244,33 @@ describe('#REST-API', () => {
       // console.log('ctx.body: ', ctx.body)
 
       assert.equal(ctx.body, 'test data')
+    })
+  })
+
+  describe('#getRelays', () => {
+    it('should get relays, hydrated with peer data', async () => {
+      // Load mock data for testing purposes.
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode = {}
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode.relayData = mockData.mockRelayData
+      uut.ipfsCoordAdapter.ipfsCoord.thisNode.peerData = mockData.mockPeerData
+
+      const result = uut.getRelays()
+      // console.log('result: ', result)
+
+      // 3 entries in the mock data, so this function should return 3 entries.
+      assert.equal(result.length, 3)
+
+      // First entry should have a 'name' from the peer data.
+      assert.property(result[0], 'name')
+
+      // Third entry should have an empty name, because there is no peer data for it.
+      assert.equal(result[2].name, '')
+    })
+
+    it('should report errors and return an empty object', async () => {
+      const result = uut.getRelays()
+
+      assert.isObject(result)
     })
   })
 })
