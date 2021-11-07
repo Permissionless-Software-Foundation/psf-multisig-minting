@@ -24,7 +24,7 @@ describe('#ipfs-coord', () => {
     const ipfs = IPFSMock.create()
     const bchjs = new BCHJS()
     const eventEmitter = new EventEmitter()
-    uut = new IPFSCoordAdapter({ipfs, bchjs, eventEmitter})
+    uut = new IPFSCoordAdapter({ ipfs, bchjs, eventEmitter })
 
     mockData = cloneDeep(mockDataLib)
 
@@ -46,7 +46,7 @@ describe('#ipfs-coord', () => {
       } catch (err) {
         assert.include(
           err.message,
-          'Instance of IPFS must be passed when instantiating ipfs-coord adapter.',
+          'Instance of IPFS must be passed when instantiating ipfs-coord adapter.'
         )
       }
     })
@@ -54,13 +54,13 @@ describe('#ipfs-coord', () => {
     it('should throw an error if bchjs instance is not included', () => {
       try {
         const ipfs = IPFSMock.create()
-        uut = new IPFSCoordAdapter({ipfs})
+        uut = new IPFSCoordAdapter({ ipfs })
 
         assert.fail('Unexpected code path')
       } catch (err) {
         assert.include(
           err.message,
-          'Instance of bch-js must be passed when instantiating ipfs-coord adapter.',
+          'Instance of bch-js must be passed when instantiating ipfs-coord adapter.'
         )
       }
     })
@@ -69,13 +69,13 @@ describe('#ipfs-coord', () => {
       try {
         const ipfs = IPFSMock.create()
         const bchjs = new BCHJS()
-        uut = new IPFSCoordAdapter({ipfs, bchjs})
+        uut = new IPFSCoordAdapter({ ipfs, bchjs })
 
         assert.fail('Unexpected code path')
       } catch (err) {
         assert.include(
           err.message,
-          'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.',
+          'An instance of an EventEmitter must be passed when instantiating the ipfs-coord adapter.'
         )
       }
     })
@@ -100,9 +100,9 @@ describe('#ipfs-coord', () => {
         privateLog: {},
         ipfs: {
           orbitdb: {
-            privateLog: {},
-          },
-        },
+            privateLog: {}
+          }
+        }
       }
 
       const router = console.log
@@ -128,8 +128,8 @@ describe('#ipfs-coord', () => {
       uut.ipfsCoord = {
         thisNode: {
           peerList: mockData.peers,
-          peerData: mockData.peerData,
-        },
+          peerData: mockData.peerData
+        }
       }
 
       uut.pollForServices()
@@ -137,7 +137,7 @@ describe('#ipfs-coord', () => {
       // It should fine the service in the mocked data.
       assert.equal(
         uut.state.selectedServiceProvider,
-        'QmWkjYRRTaxVEuGK8ip2X3trVyJShFs6U9g1h9x6fK5mZ2',
+        'QmWkjYRRTaxVEuGK8ip2X3trVyJShFs6U9g1h9x6fK5mZ2'
       )
     })
 
