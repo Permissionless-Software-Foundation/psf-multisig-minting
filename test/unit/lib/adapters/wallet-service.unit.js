@@ -190,4 +190,45 @@ describe('#WalletService', () => {
       }
     })
   })
+
+  describe('#getPubKey', () => {
+    it('should throw an error if input is not string', async () => {
+      try {
+        await uut.getPubKey()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'getPubKey() input bchAddress must be a string.')
+      }
+    })
+
+    it('should get public key', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.axios, 'post').resolves({ data: 'test-data' })
+
+      const bchAddress = 'test-address'
+
+      const result = await uut.getPubKey(bchAddress)
+      // console.log('result: ', result)
+
+      assert.equal(result, 'test-data')
+    })
+
+    it('should throw an error if network timeout', async () => {
+      try {
+        // Force network timeout
+        sandbox
+          .stub(uut.axios, 'post')
+          .resolves({ data: { success: false, message: 'request timed out' } })
+
+        const bchAddress = 'test-address'
+
+        await uut.getPubKey(bchAddress)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        assert.include(err.message, 'request timed out')
+      }
+    })
+  })
 })
