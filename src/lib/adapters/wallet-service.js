@@ -120,6 +120,31 @@ class WalletService {
       throw err
     }
   }
+
+  // Obtains the public key of a bch address
+  async getPubKey (bchAddress) {
+    try {
+      // Input validation
+      if (!bchAddress || typeof bchAddress !== 'string') {
+        throw new Error('getPubKey() input bchAddress must be a string.')
+      }
+      const serviceId = this.checkServiceId()
+      // console.log(`serviceId: ${serviceId}`)
+
+      const result = await this.axios.post(LOCAL_REST_API, {
+        sendTo: serviceId,
+        rpcData: {
+          endpoint: 'pubkey',
+          address: bchAddress
+        }
+      })
+      if (result.data.success === false) throw new Error(result.data.message)
+      return result.data
+    } catch (err) {
+      console.error('Error in getPubKey()')
+      throw err
+    }
+  }
 }
 
 module.exports = WalletService
