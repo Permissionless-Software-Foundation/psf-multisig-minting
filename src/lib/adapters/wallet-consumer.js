@@ -1,12 +1,14 @@
 /*
-  This library interacts with the ipfs-bch-wallet-service via the JSON RPC
-  over IPFS.
+  This library interacts with the ipfs-bch-wallet-consumer REST API:
+  https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-consumer
 
-  This library will be deprecated in favor of wallet-consumer.js
+  This library is injected into minimal-slp-wallet when the library is initialized.
+  It provides the interface needed by minimal-slp-wallet to interact with the
+  ipfs-bch-wallet-consumer REST API.
 */
 
 // Configuration variables.
-const LOCAL_REST_API = "http://localhost:5000/wallet/";
+const LOCAL_REST_API = "http://localhost:5001/bch";
 
 // Public npm libraries.
 const axios = require("axios");
@@ -41,21 +43,12 @@ class WalletService {
         );
       }
 
-      const serviceId = this.checkServiceId();
-      // console.log(`serviceId: ${serviceId}`)
+      const body = {
+        addresses: addrs,
+      };
+      const result = await this.axios.post(`${LOCAL_REST_API}/balance`, body);
 
-      const result = await this.axios.post(LOCAL_REST_API, {
-        sendTo: serviceId,
-        rpcData: {
-          endpoint: "balance",
-          addresses: addrs,
-        },
-      });
-      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
-
-      // If there is a timeout or other network failure.
-      if (result.data.success === false) throw new Error(result.data.message);
-
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
       return result.data;
     } catch (err) {
       console.error("Error in getBalance()");
@@ -71,21 +64,13 @@ class WalletService {
         throw new Error("getUtxos() input address must be a string.");
       }
 
-      const serviceId = this.checkServiceId();
-      // console.log(`serviceId: ${serviceId}`)
+      const body = {
+        address: addr,
+      };
 
-      const result = await this.axios.post(LOCAL_REST_API, {
-        sendTo: serviceId,
-        rpcData: {
-          endpoint: "utxos",
-          address: addr,
-        },
-      });
-      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
+      const result = await this.axios.post(`${LOCAL_REST_API}/utxos`, body);
 
-      // If there is a timeout or other network failure.
-      if (result.data.success === false) throw new Error(result.data.message);
-
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
       return result.data;
     } catch (err) {
       console.error("Error in getUtxos()");
@@ -101,20 +86,12 @@ class WalletService {
         throw new Error("sendTx() input hex must be a string.");
       }
 
-      const serviceId = this.checkServiceId();
-      // console.log(`serviceId: ${serviceId}`)
+      const body = {
+        hex,
+      };
 
-      const result = await this.axios.post(LOCAL_REST_API, {
-        sendTo: serviceId,
-        rpcData: {
-          endpoint: "broadcast",
-          hex,
-        },
-      });
-      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
-
-      // If there is a timeout or other network failure.
-      if (result.data.success === false) throw new Error(result.data.message);
+      const result = await this.axios.post(`${LOCAL_REST_API}/broadcast`, body);
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       return result.data;
     } catch (err) {
