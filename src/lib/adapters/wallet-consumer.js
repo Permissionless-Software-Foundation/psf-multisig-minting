@@ -8,122 +8,122 @@
 */
 
 // Configuration variables.
-const LOCAL_REST_API = "http://localhost:5001/bch";
+const LOCAL_REST_API = 'http://localhost:5001/bch'
 
 // Public npm libraries.
-const axios = require("axios");
-const Conf = require("conf");
+const axios = require('axios')
+const Conf = require('conf')
 
 class WalletService {
-  constructor(localConfig = {}) {
+  constructor (localConfig = {}) {
     // Encapsulate dependencies
-    this.axios = axios;
-    this.conf = new Conf();
+    this.axios = axios
+    this.conf = new Conf()
   }
 
-  checkServiceId() {
+  checkServiceId () {
     // this.conf = new Conf()
 
-    const serviceId = this.conf.get("selectedService");
+    const serviceId = this.conf.get('selectedService')
 
     if (!serviceId) {
-      throw new Error("Wallet service ID does not exist in config.");
+      throw new Error('Wallet service ID does not exist in config.')
     }
 
-    return serviceId;
+    return serviceId
   }
 
   // Get up to 20 addresses.
-  async getBalances(addrs) {
+  async getBalances (addrs) {
     try {
       // Input validation.
       if (!addrs || !Array.isArray(addrs)) {
         throw new Error(
-          "addrs input to getBalance() must be an array, of up to 20 addresses."
-        );
+          'addrs input to getBalance() must be an array, of up to 20 addresses.'
+        )
       }
 
       const body = {
-        addresses: addrs,
-      };
-      const result = await this.axios.post(`${LOCAL_REST_API}/balance`, body);
+        addresses: addrs
+      }
+      const result = await this.axios.post(`${LOCAL_REST_API}/balance`, body)
 
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
-      return result.data;
+      return result.data
     } catch (err) {
-      console.error("Error in getBalance()");
-      throw err;
+      console.error('Error in getBalance()')
+      throw err
     }
   }
 
   // Get hydrated UTXOs for an address
-  async getUtxos(addr) {
+  async getUtxos (addr) {
     try {
       // Input validation
-      if (!addr || typeof addr !== "string") {
-        throw new Error("getUtxos() input address must be a string.");
+      if (!addr || typeof addr !== 'string') {
+        throw new Error('getUtxos() input address must be a string.')
       }
 
       const body = {
-        address: addr,
-      };
+        address: addr
+      }
 
-      const result = await this.axios.post(`${LOCAL_REST_API}/utxos`, body);
+      const result = await this.axios.post(`${LOCAL_REST_API}/utxos`, body)
 
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
-      return result.data;
+      return result.data
     } catch (err) {
-      console.error("Error in getUtxos()");
-      throw err;
+      console.error('Error in getUtxos()')
+      throw err
     }
   }
 
   // Broadcast a transaction to the network.
-  async sendTx(hex) {
+  async sendTx (hex) {
     try {
       // Input validation
-      if (!hex || typeof hex !== "string") {
-        throw new Error("sendTx() input hex must be a string.");
+      if (!hex || typeof hex !== 'string') {
+        throw new Error('sendTx() input hex must be a string.')
       }
 
       const body = {
-        hex,
-      };
+        hex
+      }
 
-      const result = await this.axios.post(`${LOCAL_REST_API}/broadcast`, body);
+      const result = await this.axios.post(`${LOCAL_REST_API}/broadcast`, body)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
-      return result.data;
+      return result.data
     } catch (err) {
-      console.error("Error in sendTx()");
-      throw err;
+      console.error('Error in sendTx()')
+      throw err
     }
   }
 
   // Obtains the public key of a bch address
-  async getPubKey(bchAddress) {
+  async getPubKey (bchAddress) {
     try {
       // Input validation
-      if (!bchAddress || typeof bchAddress !== "string") {
-        throw new Error("getPubKey() input bchAddress must be a string.");
+      if (!bchAddress || typeof bchAddress !== 'string') {
+        throw new Error('getPubKey() input bchAddress must be a string.')
       }
-      const serviceId = this.checkServiceId();
+      const serviceId = this.checkServiceId()
       // console.log(`serviceId: ${serviceId}`)
 
       const result = await this.axios.post(LOCAL_REST_API, {
         sendTo: serviceId,
         rpcData: {
-          endpoint: "pubkey",
-          address: bchAddress,
-        },
-      });
-      if (result.data.success === false) throw new Error(result.data.message);
-      return result.data;
+          endpoint: 'pubkey',
+          address: bchAddress
+        }
+      })
+      if (result.data.success === false) throw new Error(result.data.message)
+      return result.data
     } catch (err) {
-      console.error("Error in getPubKey()");
-      throw err;
+      console.error('Error in getPubKey()')
+      throw err
     }
   }
 }
 
-module.exports = WalletService;
+module.exports = WalletService

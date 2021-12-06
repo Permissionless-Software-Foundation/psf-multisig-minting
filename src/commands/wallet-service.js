@@ -2,38 +2,38 @@
   List and/or select a wallet service provider.
 */
 
-const SERVER = "http://localhost:5001/bch";
+const SERVER = 'http://localhost:5001/bch'
 
 // Public NPM libraries
-const axios = require("axios");
-const Conf = require("conf");
+const axios = require('axios')
+const Conf = require('conf')
 
-const { Command, flags } = require("@oclif/command");
+const { Command, flags } = require('@oclif/command')
 
 class WalletService extends Command {
-  constructor(argv, config) {
-    super(argv, config);
+  constructor (argv, config) {
+    super(argv, config)
 
     // Encapsulate dependencies.
-    this.axios = axios;
-    this.conf = new Conf();
+    this.axios = axios
+    this.conf = new Conf()
   }
 
-  async run() {
+  async run () {
     try {
-      const { flags } = this.parse(WalletService);
+      const { flags } = this.parse(WalletService)
 
       // Get a list of the IPFS peers this node is connected to.
-      const result = await this.axios.get(SERVER);
+      const result = await this.axios.get(SERVER)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
-      const providers = result.data.status.state.serviceProviders;
-      const selectedProvider = result.data.status.state.selectedServiceProvider;
+      const providers = result.data.status.state.serviceProviders
+      const selectedProvider = result.data.status.state.selectedServiceProvider
 
-      console.log(`Selected service provider: ${selectedProvider}`);
+      console.log(`Selected service provider: ${selectedProvider}`)
       console.log(
         `Available service providers: ${JSON.stringify(providers, null, 2)}`
-      );
+      )
 
       // const peers = result.data
       // console.log(`Subnet Peers: ${JSON.stringify(result.data, null, 2)}`)
@@ -46,7 +46,7 @@ class WalletService extends Command {
       //   return x.protocol.includes("bch-wallet");
       // });
       //
-      if (flags.select) await this.selectService(flags);
+      if (flags.select) await this.selectService(flags)
       //
       // // Get the IPFS ID for the currently selected wallet service.
       // const serviceId = this.conf.get("selectedService");
@@ -62,27 +62,27 @@ class WalletService extends Command {
       //   `Wallet service peers: ${JSON.stringify(servicePeers, null, 2)}`
       // );
 
-      return true;
+      return true
     } catch (err) {
-      console.log("Error in run(): ", err);
+      console.log('Error in run(): ', err)
 
-      return false;
+      return false
     }
   }
 
   // Select a different peer to use as a wallet service.
-  async selectService(flags) {
+  async selectService (flags) {
     try {
-      const chosenPeer = flags.select;
+      const chosenPeer = flags.select
 
       const body = {
-        provider: chosenPeer,
-      };
-      await this.axios.post(`${SERVER}/provider`, body);
+        provider: chosenPeer
+      }
+      await this.axios.post(`${SERVER}/provider`, body)
 
-      console.log(`Service provider switched to ${chosenPeer}`);
+      console.log(`Service provider switched to ${chosenPeer}`)
 
-      return true;
+      return true
 
       // Loop through the available wallet service peers.
       // for (let i = 0; i < servicePeers.length; i++) {
@@ -96,19 +96,19 @@ class WalletService extends Command {
       //   }
       // }
     } catch (err) {
-      console.log("Error in selectService()");
-      throw err;
+      console.log('Error in selectService()')
+      throw err
     }
   }
 }
 
-WalletService.description = "List and/or select a wallet service provider.";
+WalletService.description = 'List and/or select a wallet service provider.'
 
 WalletService.flags = {
   select: flags.string({
-    char: "s",
-    description: "Switch to a given IPFS ID for wallet service.",
-  }),
-};
+    char: 's',
+    description: 'Switch to a given IPFS ID for wallet service.'
+  })
+}
 
-module.exports = WalletService;
+module.exports = WalletService
