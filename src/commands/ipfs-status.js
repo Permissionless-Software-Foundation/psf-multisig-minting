@@ -1,5 +1,5 @@
 /*
-  Query the state of the IPFS Circuit Relays this IPFS node is connected to.
+  Query the state of the IPFS node in ipfs-bch-wallet-consumer.
 */
 
 // const SERVER = 'http://localhost:5001/ipfs'
@@ -12,7 +12,7 @@ const WalletUtil = require('../lib/wallet-util')
 
 const { Command } = require('@oclif/command')
 
-class IpfsRelays extends Command {
+class IpfsStatus extends Command {
   constructor (argv, config) {
     super(argv, config)
 
@@ -25,8 +25,8 @@ class IpfsRelays extends Command {
     try {
       const server = this.walletUtil.getRestServer()
 
-      const result = await this.axios.post(`${server}/ipfs/relays`, {})
-      console.log(`Circuit Relays: ${JSON.stringify(result.data, null, 2)}`)
+      const result = await this.axios.get(`${server}/ipfs`)
+      console.log(`IPFS status: ${JSON.stringify(result.data, null, 2)}`)
 
       return true
     } catch (err) {
@@ -37,8 +37,8 @@ class IpfsRelays extends Command {
   }
 }
 
-IpfsRelays.description = 'Query the state of circuit relays'
+IpfsStatus.description = 'Query the state of the IPFS node'
 
-IpfsRelays.flags = {}
+IpfsStatus.flags = {}
 
-module.exports = IpfsRelays
+module.exports = IpfsStatus

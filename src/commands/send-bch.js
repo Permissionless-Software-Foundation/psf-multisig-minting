@@ -47,7 +47,7 @@ class SendBch extends Command {
 
       console.log(`TXID: ${txid}`)
       console.log('\nView this transaction on a block explorer:')
-      console.log(`https://explorer.bitcoin.com/bch/tx/${txid}`)
+      console.log(`https://blockchair.com/bitcoin-cash/transaction/${txid}`)
 
       return txid
     } catch (err) {

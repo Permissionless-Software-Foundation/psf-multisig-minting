@@ -1,6 +1,8 @@
 /*
   This library interacts with the ipfs-bch-wallet-service via the JSON RPC
   over IPFS.
+
+  This library will be deprecated in favor of wallet-consumer.js
 */
 
 // Configuration variables.

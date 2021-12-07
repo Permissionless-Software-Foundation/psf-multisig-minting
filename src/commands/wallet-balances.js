@@ -11,7 +11,7 @@ const collect = require('collect.js')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
-const WalletService = require('../lib/adapters/wallet-service')
+const WalletConsumer = require('../lib/adapters/wallet-consumer')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -24,7 +24,7 @@ class WalletBalances extends Command {
     // Encapsulate dependencies.
     this.fs = fs
     this.walletUtil = new WalletUtil()
-    this.walletService = new WalletService()
+    this.walletService = new WalletConsumer()
     this.BchWallet = BchWallet
   }
 
@@ -130,7 +130,9 @@ class WalletBalances extends Command {
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]
-        console.log(`${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`)
+        console.log(
+          `${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`
+        )
       }
 
       if (flags.verbose) {

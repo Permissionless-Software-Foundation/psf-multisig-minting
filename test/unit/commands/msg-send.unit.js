@@ -1,4 +1,3 @@
-
 'use strict'
 
 /* Unit tests for the msg-send command. */
@@ -13,8 +12,7 @@ describe('msg-send', () => {
   let uut
   let sandbox
 
-  before(async () => {
-  })
+  before(async () => {})
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
 
@@ -24,8 +22,7 @@ describe('msg-send', () => {
   afterEach(() => {
     sandbox.restore()
   })
-  after(async () => {
-  })
+  after(async () => {})
 
   describe('#msgSend()', () => {
     it('should exit with error status if called without a bchAddress.', async () => {
@@ -122,30 +119,22 @@ describe('msg-send', () => {
       assert.isObject(result)
     })
 
-    it('should throw an error if the address does not have a transaction history', async () => {
-      try {
-        // Mock dependencies
-        const flags = {
-          bchAddress: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
-        }
-        // Mock methods that will be tested elsewhere.
-        sandbox
-          .stub(uut.walletService.axios, 'post')
-          .resolves({ data: MsgSendMock.getPubkeyErrorResult })
-
-        // Mock methods that will be tested elsewhere.
-        sandbox.stub(uut, 'parse').returns({ flags: flags })
-
-        await uut.run()
-
-        assert.fail('Unexpected result')
-      } catch (err) {
-        assert.include(
-          err.message,
-          'No transaction history',
-          'Expected error message.'
-        )
+    it('should display error message if the address does not have a transaction history', async () => {
+      // Mock dependencies
+      const flags = {
+        bchAddress: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
       }
+
+      // Mock methods that will be tested elsewhere.
+      // sandbox
+      sandbox.stub(uut, 'msgSend').rejects(new Error('No transaction history'))
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
+
+      const result = await uut.run()
+
+      assert.equal(result, 0)
     })
   })
 })
