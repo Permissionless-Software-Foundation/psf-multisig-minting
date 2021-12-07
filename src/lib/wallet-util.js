@@ -83,6 +83,25 @@ class WalletUtil {
 
     return e2eeMnemonic
   }
+
+  // Retrieve the REST API server address from the config. Generate the default
+  // if it has not yet been set.
+  getRestServer () {
+    try {
+      let restServer = this.conf.get('restServer', false)
+
+      if (!restServer) {
+        restServer = 'https://free-bch.fullstack.cash'
+
+        this.conf.set('restServer', restServer)
+      }
+
+      return restServer
+    } catch (err) {
+      console.log('Error in getRestServer()')
+      throw err
+    }
+  }
 }
 
 module.exports = WalletUtil

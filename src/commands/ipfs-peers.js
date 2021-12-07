@@ -2,10 +2,13 @@
   Query the state of the IPFS subnet Peers this IPFS node is connected to.
 */
 
-const SERVER = 'http://localhost:5001/ipfs'
+// const SERVER = 'http://localhost:5001/ipfs'
 
 // Public NPM libraries
 const axios = require('axios')
+
+// Local libraries
+const WalletUtil = require('../lib/wallet-util')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -15,13 +18,16 @@ class IpfsPeers extends Command {
 
     // Encapsulate dependencies.
     this.axios = axios
+    this.walletUtil = new WalletUtil()
   }
 
   async run () {
     try {
       const { flags } = this.parse(IpfsPeers)
 
-      const result = await this.axios.post(`${SERVER}/peers`, {
+      const server = this.walletUtil.getRestServer()
+
+      const result = await this.axios.post(`${server}/ipfs/peers`, {
         showAll: flags.all
       })
       // console.log("result.data: ", result.data);

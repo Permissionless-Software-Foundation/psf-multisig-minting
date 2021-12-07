@@ -8,30 +8,33 @@
 */
 
 // Configuration variables.
-const LOCAL_REST_API = 'http://localhost:5001/bch'
+// const LOCAL_REST_API = 'http://localhost:5001/bch'
 
 // Public npm libraries.
 const axios = require('axios')
 const Conf = require('conf')
+
+const WalletUtil = require('../wallet-util')
 
 class WalletService {
   constructor (localConfig = {}) {
     // Encapsulate dependencies
     this.axios = axios
     this.conf = new Conf()
+    this.walletUtil = new WalletUtil()
   }
 
-  checkServiceId () {
-    // this.conf = new Conf()
-
-    const serviceId = this.conf.get('selectedService')
-
-    if (!serviceId) {
-      throw new Error('Wallet service ID does not exist in config.')
-    }
-
-    return serviceId
-  }
+  // checkServiceId () {
+  //   // this.conf = new Conf()
+  //
+  //   const serviceId = this.conf.get('selectedService')
+  //
+  //   if (!serviceId) {
+  //     throw new Error('Wallet service ID does not exist in config.')
+  //   }
+  //
+  //   return serviceId
+  // }
 
   // Get up to 20 addresses.
   async getBalances (addrs) {
@@ -43,10 +46,12 @@ class WalletService {
         )
       }
 
+      const server = this.walletUtil.getRestServer()
+
       const body = {
         addresses: addrs
       }
-      const result = await this.axios.post(`${LOCAL_REST_API}/balance`, body)
+      const result = await this.axios.post(`${server}/bch/balance`, body)
 
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
       return result.data
@@ -64,11 +69,13 @@ class WalletService {
         throw new Error('getUtxos() input address must be a string.')
       }
 
+      const server = this.walletUtil.getRestServer()
+
       const body = {
         address: addr
       }
 
-      const result = await this.axios.post(`${LOCAL_REST_API}/utxos`, body)
+      const result = await this.axios.post(`${server}/bch/utxos`, body)
 
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
       return result.data
@@ -86,11 +93,13 @@ class WalletService {
         throw new Error('sendTx() input hex must be a string.')
       }
 
+      const server = this.walletUtil.getRestServer()
+
       const body = {
         hex
       }
 
-      const result = await this.axios.post(`${LOCAL_REST_API}/broadcast`, body)
+      const result = await this.axios.post(`${server}/bch/broadcast`, body)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       return result.data
@@ -107,17 +116,16 @@ class WalletService {
       if (!bchAddress || typeof bchAddress !== 'string') {
         throw new Error('getPubKey() input bchAddress must be a string.')
       }
-      const serviceId = this.checkServiceId()
-      // console.log(`serviceId: ${serviceId}`)
 
-      const result = await this.axios.post(LOCAL_REST_API, {
-        sendTo: serviceId,
-        rpcData: {
-          endpoint: 'pubkey',
-          address: bchAddress
-        }
-      })
-      if (result.data.success === false) throw new Error(result.data.message)
+      const server = this.walletUtil.getRestServer()
+
+      const body = {
+        address: bchAddress
+      }
+
+      const result = await this.axios.post(`${server}/bch/pubkey`, body)
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
+
       return result.data
     } catch (err) {
       console.error('Error in getPubKey()')

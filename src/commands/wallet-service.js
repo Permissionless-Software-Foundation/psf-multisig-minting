@@ -2,11 +2,14 @@
   List and/or select a wallet service provider.
 */
 
-const SERVER = 'http://localhost:5001/bch'
+// const SERVER = 'http://localhost:5001/bch'
 
 // Public NPM libraries
 const axios = require('axios')
 const Conf = require('conf')
+
+// Local libraries
+const WalletUtil = require('../lib/wallet-util')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -17,14 +20,17 @@ class WalletService extends Command {
     // Encapsulate dependencies.
     this.axios = axios
     this.conf = new Conf()
+    this.walletUtil = new WalletUtil()
   }
 
   async run () {
     try {
       const { flags } = this.parse(WalletService)
 
+      const server = this.walletUtil.getRestServer()
+
       // Get a list of the IPFS peers this node is connected to.
-      const result = await this.axios.get(SERVER)
+      const result = await this.axios.get(`${server}/bch`)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       const providers = result.data.status.state.serviceProviders
@@ -75,10 +81,12 @@ class WalletService extends Command {
     try {
       const chosenPeer = flags.select
 
+      const server = this.walletUtil.getRestServer()
+
       const body = {
         provider: chosenPeer
       }
-      await this.axios.post(`${SERVER}/provider`, body)
+      await this.axios.post(`${server}/bch/provider`, body)
 
       console.log(`Service provider switched to ${chosenPeer}`)
 

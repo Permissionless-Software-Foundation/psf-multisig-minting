@@ -1,5 +1,4 @@
-
-const WalletService = require('../lib/adapters/wallet-service')
+const WalletService = require('../lib/adapters/wallet-consumer')
 
 const { Command, flags } = require('@oclif/command')
 
