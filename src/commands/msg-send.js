@@ -17,9 +17,11 @@ class MsgSend extends Command {
       // Validate input flags
       this.validateFlags(flags)
 
-      return this.msgSend(flags.bchAddress)
+      const result = await this.msgSend(flags.bchAddress)
+
+      return result
     } catch (error) {
-      console.log('Error in p2wdb-write.js/run(): ')
+      console.log('Error in p2wdb-write.js/run(): ', error.message)
 
       return 0
     }
