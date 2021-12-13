@@ -8,6 +8,7 @@
 // const BCHJS = require('@psf/bch-js')
 const BchWallet = require('minimal-slp-wallet/index')
 const collect = require('collect.js')
+const Conf = require('conf')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
@@ -26,6 +27,7 @@ class WalletBalances extends Command {
     this.walletUtil = new WalletUtil()
     this.walletService = new WalletConsumer()
     this.BchWallet = BchWallet
+    this.conf = new Conf()
   }
 
   async run () {
@@ -67,10 +69,14 @@ class WalletBalances extends Command {
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
+      const restServer = this.conf.get('restServer')
+      console.log(`restServer: ${restServer}`)
+
       // Configure the minimal-slp-wallet library.
       const advancedConfig = {
-        interface: 'json-rpc',
-        jsonRpcWalletService: this.walletService
+        interface: 'consumer-api',
+        bchWalletApi: restServer
+        // jsonRpcWalletService: this.walletService,
       }
       this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
       // console.log('bchWallet: ', this.bchWallet)
