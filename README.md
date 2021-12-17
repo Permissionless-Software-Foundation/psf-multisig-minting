@@ -97,7 +97,7 @@ OPTIONS
   -v, --value=value      value of the config
 ```
 
-_See code: [conf-cli](https://github.com/natzcam/conf-cli/blob/v0.1.9/src/commands/conf.ts)_
+_See code: [conf-cli](https://github.com/natzcam/conf-cli/blob/master/src/commands/conf.ts)_
 
 ## `psf-bch-wallet daemon`
 
@@ -114,7 +114,7 @@ DESCRIPTION
   the BCH wallet service.
 ```
 
-_See code: [src/commands/daemon.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/daemon.js)_
+_See code: [src/commands/daemon.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/daemon.js)_
 
 ## `psf-bch-wallet help [COMMAND]`
 
@@ -145,7 +145,7 @@ OPTIONS
   -a, --all  Display all data about peers
 ```
 
-_See code: [src/commands/ipfs-peers.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/ipfs-peers.js)_
+_See code: [src/commands/ipfs-peers.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/ipfs-peers.js)_
 
 ## `psf-bch-wallet ipfs-relays`
 
@@ -156,7 +156,7 @@ USAGE
   $ psf-bch-wallet ipfs-relays
 ```
 
-_See code: [src/commands/ipfs-relays.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/ipfs-relays.js)_
+_See code: [src/commands/ipfs-relays.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/ipfs-relays.js)_
 
 ## `psf-bch-wallet p2wdb-read`
 
@@ -170,7 +170,7 @@ OPTIONS
   -h, --hash=hash  Hash representing P2WDB entry
 ```
 
-_See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/p2wdb-read.js)_
+_See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/p2wdb-read.js)_
 
 ## `psf-bch-wallet p2wdb-write`
 
@@ -186,7 +186,7 @@ OPTIONS
   -n, --name=name    Name of wallet
 ```
 
-_See code: [src/commands/p2wdb-write.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/p2wdb-write.js)_
+_See code: [src/commands/p2wdb-write.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/p2wdb-read.js)_
 
 ## `psf-bch-wallet send-bch`
 
@@ -202,7 +202,7 @@ OPTIONS
   -q, --qty=qty            Quantity in BCH
 ```
 
-_See code: [src/commands/send-bch.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/send-bch.js)_
+_See code: [src/commands/send-bch.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/send-bch.js)_
 
 ## `psf-bch-wallet send-tokens`
 
@@ -219,7 +219,7 @@ OPTIONS
   -t, --tokenId=tokenId    Token ID
 ```
 
-_See code: [src/commands/send-tokens.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/send-tokens.js)_
+_See code: [src/commands/send-tokens.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/send-tokens.js)_
 
 ## `psf-bch-wallet token-burn`
 
@@ -235,7 +235,7 @@ OPTIONS
   -t, --tokenId=tokenId  tokenId of token to burn
 ```
 
-_See code: [src/commands/token-burn.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/token-burn.js)_
+_See code: [src/commands/token-burn.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/token-burn.js)_
 
 ## `psf-bch-wallet wallet-addrs`
 
@@ -249,7 +249,7 @@ OPTIONS
   -n, --name=name  Name of wallet
 ```
 
-_See code: [src/commands/wallet-addrs.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/wallet-addrs.js)_
+_See code: [src/commands/wallet-addrs.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-addrs.js)_
 
 ## `psf-bch-wallet wallet-balances`
 
@@ -264,7 +264,7 @@ OPTIONS
   -v, --verbose    Show verbose UTXO information
 ```
 
-_See code: [src/commands/wallet-balances.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/wallet-balances.js)_
+_See code: [src/commands/wallet-balances.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-balances.js)_
 
 ## `psf-bch-wallet wallet-create`
 
@@ -279,7 +279,7 @@ OPTIONS
   -n, --name=name                Name of wallet
 ```
 
-_See code: [src/commands/wallet-create.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/wallet-create.js)_
+_See code: [src/commands/wallet-create.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-create.js)_
 
 ## `psf-bch-wallet wallet-list`
 
@@ -290,7 +290,7 @@ USAGE
   $ psf-bch-wallet wallet-list
 ```
 
-_See code: [src/commands/wallet-list.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/wallet-list.js)_
+_See code: [src/commands/wallet-list.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-list.js)_
 
 ## `psf-bch-wallet wallet-remove`
 
@@ -304,7 +304,7 @@ OPTIONS
   -n, --name=name  Name of wallet
 ```
 
-_See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/wallet-remove.js)_
+_See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-remove.js)_
 
 ## `psf-bch-wallet wallet-service`
 
@@ -318,6 +318,6 @@ OPTIONS
   -s, --select=select  Switch to a given IPFS ID for wallet service.
 ```
 
-_See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.0.0/src/commands/wallet-service.js)_
+_See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-service.js)_
 
 <!-- commandsstop -->
