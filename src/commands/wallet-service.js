@@ -33,40 +33,15 @@ class WalletService extends Command {
       const result = await this.axios.get(`${server}/bch`)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
-      const providers = result.data.status.state.serviceProviders
-      const selectedProvider = result.data.status.state.selectedServiceProvider
+      const providers = result.data.status.serviceProviders
+      const selectedProvider = result.data.status.selectedProvider
 
-      console.log(`Selected service provider: ${selectedProvider}`)
       console.log(
         `Available service providers: ${JSON.stringify(providers, null, 2)}`
       )
+      console.log(`Selected service provider: ${selectedProvider}`)
 
-      // const peers = result.data
-      // console.log(`Subnet Peers: ${JSON.stringify(result.data, null, 2)}`)
-      // console.log(`Number of peers: ${result.data.length}`)
-
-      // Filter the wallet services from the peers.
-      // const servicePeers = peers.filter((x) => {
-      //   if (!x.protocol) return false;
-      //
-      //   return x.protocol.includes("bch-wallet");
-      // });
-      //
       if (flags.select) await this.selectService(flags)
-      //
-      // // Get the IPFS ID for the currently selected wallet service.
-      // const serviceId = this.conf.get("selectedService");
-      // console.log("serviceId: ", serviceId);
-      //
-      // // Add the isSelected flag.
-      // servicePeers.map((x) => {
-      //   x.isSelected = x.peer.includes(serviceId);
-      //   return x;
-      // });
-      //
-      // console.log(
-      //   `Wallet service peers: ${JSON.stringify(servicePeers, null, 2)}`
-      // );
 
       return true
     } catch (err) {
