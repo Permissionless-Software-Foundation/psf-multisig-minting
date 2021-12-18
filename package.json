@@ -1,7 +1,7 @@
 {
   "name": "psf-bch-wallet",
   "description": "A command line (CLI) wallet app for working with Bitcoin Cash and SLP tokens. Uses services over IPFS.",
-  "version": "v2.0.0",
+  "version": "v2.14.2",
   "author": "Chris Troutner @christroutner",
   "bin": {
     "bin-cli-boilerplate": "./bin/run"

@@ -30,50 +30,49 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 ## Table of Contents
 
 <!-- toc -->
-
-- [psf-bch-wallet](#psf-bch-wallet)
-- [Usage](#usage)
-- [Commands](#commands)
+* [psf-bch-wallet](#psf-bch-wallet)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g psf-bch-wallet
 $ psf-bch-wallet COMMAND
 running command...
 $ psf-bch-wallet (-v|--version|version)
-psf-bch-wallet/v2.0.0 linux-x64 node-v14.17.5
+psf-bch-wallet/v2.14.2 linux-x64 node-v14.17.6
 $ psf-bch-wallet --help [COMMAND]
 USAGE
   $ psf-bch-wallet COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-
-- [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
-- [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
-- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
-- [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
-- [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
-- [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
-- [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
-- [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
-- [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
-- [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
-- [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
-- [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
-- [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
-- [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
-- [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
-- [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
+* [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
+* [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
+* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+* [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
+* [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
+* [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
+* [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
+* [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
+* [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
+* [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
+* [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
+* [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
+* [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
+* [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
+* [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
+* [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
+* [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+* [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -97,7 +96,7 @@ OPTIONS
   -v, --value=value      value of the config
 ```
 
-_See code: [conf-cli](https://github.com/natzcam/conf-cli/blob/master/src/commands/conf.ts)_
+_See code: [conf-cli](https://github.com/natzcam/conf-cli/blob/v0.1.9/src/commands/conf.ts)_
 
 ## `psf-bch-wallet daemon`
 
@@ -114,7 +113,7 @@ DESCRIPTION
   the BCH wallet service.
 ```
 
-_See code: [src/commands/daemon.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/daemon.js)_
+_See code: [src/commands/daemon.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/daemon.js)_
 
 ## `psf-bch-wallet help [COMMAND]`
 
@@ -145,7 +144,7 @@ OPTIONS
   -a, --all  Display all data about peers
 ```
 
-_See code: [src/commands/ipfs-peers.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/ipfs-peers.js)_
+_See code: [src/commands/ipfs-peers.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/ipfs-peers.js)_
 
 ## `psf-bch-wallet ipfs-relays`
 
@@ -156,7 +155,32 @@ USAGE
   $ psf-bch-wallet ipfs-relays
 ```
 
-_See code: [src/commands/ipfs-relays.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/ipfs-relays.js)_
+_See code: [src/commands/ipfs-relays.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/ipfs-relays.js)_
+
+## `psf-bch-wallet ipfs-status`
+
+Query the state of the IPFS node
+
+```
+USAGE
+  $ psf-bch-wallet ipfs-status
+```
+
+_See code: [src/commands/ipfs-status.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/ipfs-status.js)_
+
+## `psf-bch-wallet msg-send`
+
+Send encrypted messages
+
+```
+USAGE
+  $ psf-bch-wallet msg-send
+
+OPTIONS
+  -b, --bchAddress=bchAddress  BCH Address
+```
+
+_See code: [src/commands/msg-send.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-send.js)_
 
 ## `psf-bch-wallet p2wdb-read`
 
@@ -167,10 +191,25 @@ USAGE
   $ psf-bch-wallet p2wdb-read
 
 OPTIONS
-  -h, --hash=hash  Hash representing P2WDB entry
+  -c, --centralized  Use centralized mode to connect to P2WDB.
+  -h, --hash=hash    Hash representing P2WDB entry
 ```
 
-_See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/p2wdb-read.js)_
+_See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-read.js)_
+
+## `psf-bch-wallet p2wdb-service`
+
+List and/or select a P2WDB service provider.
+
+```
+USAGE
+  $ psf-bch-wallet p2wdb-service
+
+OPTIONS
+  -s, --select=select  Switch to a given IPFS ID for P2WDB service.
+```
+
+_See code: [src/commands/p2wdb-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-service.js)_
 
 ## `psf-bch-wallet p2wdb-write`
 
@@ -182,11 +221,12 @@ USAGE
 
 OPTIONS
   -a, --appId=appId  appId string to categorize data
+  -c, --centralized  Use centralized mode to connect to P2WDB.
   -d, --data=data    String of data to write to the P2WDB
   -n, --name=name    Name of wallet
 ```
 
-_See code: [src/commands/p2wdb-write.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/p2wdb-read.js)_
+_See code: [src/commands/p2wdb-write.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-write.js)_
 
 ## `psf-bch-wallet send-bch`
 
@@ -202,7 +242,7 @@ OPTIONS
   -q, --qty=qty            Quantity in BCH
 ```
 
-_See code: [src/commands/send-bch.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/send-bch.js)_
+_See code: [src/commands/send-bch.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/send-bch.js)_
 
 ## `psf-bch-wallet send-tokens`
 
@@ -219,7 +259,7 @@ OPTIONS
   -t, --tokenId=tokenId    Token ID
 ```
 
-_See code: [src/commands/send-tokens.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/send-tokens.js)_
+_See code: [src/commands/send-tokens.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/send-tokens.js)_
 
 ## `psf-bch-wallet token-burn`
 
@@ -235,7 +275,7 @@ OPTIONS
   -t, --tokenId=tokenId  tokenId of token to burn
 ```
 
-_See code: [src/commands/token-burn.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/token-burn.js)_
+_See code: [src/commands/token-burn.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-burn.js)_
 
 ## `psf-bch-wallet wallet-addrs`
 
@@ -249,7 +289,7 @@ OPTIONS
   -n, --name=name  Name of wallet
 ```
 
-_See code: [src/commands/wallet-addrs.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-addrs.js)_
+_See code: [src/commands/wallet-addrs.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-addrs.js)_
 
 ## `psf-bch-wallet wallet-balances`
 
@@ -264,7 +304,7 @@ OPTIONS
   -v, --verbose    Show verbose UTXO information
 ```
 
-_See code: [src/commands/wallet-balances.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-balances.js)_
+_See code: [src/commands/wallet-balances.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-balances.js)_
 
 ## `psf-bch-wallet wallet-create`
 
@@ -279,7 +319,7 @@ OPTIONS
   -n, --name=name                Name of wallet
 ```
 
-_See code: [src/commands/wallet-create.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-create.js)_
+_See code: [src/commands/wallet-create.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-create.js)_
 
 ## `psf-bch-wallet wallet-list`
 
@@ -290,7 +330,7 @@ USAGE
   $ psf-bch-wallet wallet-list
 ```
 
-_See code: [src/commands/wallet-list.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-list.js)_
+_See code: [src/commands/wallet-list.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-list.js)_
 
 ## `psf-bch-wallet wallet-remove`
 
@@ -304,7 +344,7 @@ OPTIONS
   -n, --name=name  Name of wallet
 ```
 
-_See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-remove.js)_
+_See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-remove.js)_
 
 ## `psf-bch-wallet wallet-service`
 
@@ -318,6 +358,5 @@ OPTIONS
   -s, --select=select  Switch to a given IPFS ID for wallet service.
 ```
 
-_See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/master/src/commands/wallet-service.js)_
-
+_See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service.js)_
 <!-- commandsstop -->
