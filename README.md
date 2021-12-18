@@ -11,7 +11,6 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 - `git clone` this repository.
 - `npm install` dependencies.
 - `./bin/run help` to see a list of available commands.
-- `./bin/run daemon` to create an IPFS node and connect to the network. Leave daemon running in order to execute blockchain-based commands.
 - `./bin/run wallet-create` to create a wallet. Wallet files are stored in the `.wallets` directory.
 
 ## License
@@ -37,21 +36,15 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 
 # Usage
 
-<!-- usage -->
 ```sh-session
-$ npm install -g psf-bch-wallet
-$ psf-bch-wallet COMMAND
-running command...
-$ psf-bch-wallet (-v|--version|version)
-psf-bch-wallet/v2.14.2 linux-x64 node-v14.17.6
-$ psf-bch-wallet --help [COMMAND]
-USAGE
-  $ psf-bch-wallet COMMAND
-...
+$ npm install
+$ ./bin/run [COMMAND] --help
+$ ./bin/run COMMAND
 ```
-<!-- usagestop -->
 
 # Commands
+
+In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 
 <!-- commands -->
 * [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
