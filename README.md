@@ -30,49 +30,49 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 ## Table of Contents
 
 <!-- toc -->
-* [psf-bch-wallet](#psf-bch-wallet)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [psf-bch-wallet](#psf-bch-wallet)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
-$ npm install -g psf-bch-wallet
-$ psf-bch-wallet COMMAND
+$ npm install
+$ ./bin/run help
+$ ./bin/run COMMAND
 running command...
-$ psf-bch-wallet (-v|--version|version)
-psf-bch-wallet/v2.14.2 linux-x64 node-v14.17.6
-$ psf-bch-wallet --help [COMMAND]
-USAGE
-  $ psf-bch-wallet COMMAND
-...
+$ ./bin/run [COMMAND] --help
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
-* [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
-* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
-* [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
-* [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
-* [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
-* [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
-* [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
-* [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
-* [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
-* [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
-* [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
-* [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
-* [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
-* [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
-* [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
-* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
-* [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
-* [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
+
+- [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
+- [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
+- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+- [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
+- [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
+- [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
+- [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
+- [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
+- [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
+- [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
+- [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
+- [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
+- [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
+- [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
+- [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
+- [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+- [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
+- [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+- [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -359,4 +359,5 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service.js)_
+
 <!-- commandsstop -->
