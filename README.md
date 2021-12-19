@@ -66,6 +66,7 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
 * [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
 * [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
+* [`psf-bch-wallet wallet-service-test`](#psf-bch-wallet-wallet-service-test)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -352,4 +353,19 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service.js)_
+
+## `psf-bch-wallet wallet-service-test`
+
+Display the balances of the wallet
+
+```
+USAGE
+  $ psf-bch-wallet wallet-service-test
+
+OPTIONS
+  -n, --name=name  Name of wallet
+  -v, --verbose    Show verbose UTXO information
+```
+
+_See code: [src/commands/wallet-service-test.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service-test.js)_
 <!-- commandsstop -->
