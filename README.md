@@ -13,6 +13,22 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 - `./bin/run help` to see a list of available commands.
 - `./bin/run wallet-create` to create a wallet. Wallet files are stored in the `.wallets` directory.
 
+## Configuration
+
+By default, this app uses [free-bch.fullstack.cash](https://free-bch.fullstack.cash) as its back end service for working with the BCH blockchain. That back-end service is simply a copy of [ipfs-bch-wallet-consumer](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-consumer). By running your own copy of ipfs-bch-wallet-consumer, you can have greater reliability and can use this app to switch between different back ends. If `free-bch.fullstack.cash` goes down for some reason, running your own instance of `ipfs-bch-wallet-consumer` allows you to easily switch to any functional back end on the internet.
+
+Switch to a local instance of `ipfs-bch-wallet-consumer`:
+
+- `./bin/run conf -k restServer -v http://localhost:5001`
+
+Switch back to [free-bch.fullstack.cash](https://free-bch.fullstack.cash):
+
+- `./bin/run conf -k restServer -v https://free-bch.fullstack.cash`
+
+Explore the other configuration settings:
+
+- `./bin/run conf`
+
 ## License
 
 [MIT](./LICENSE.md)
@@ -23,15 +39,15 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 - [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) - IPFS subnet coordination library.
 - [bch-js](https://github.com/Permissionless-Software-Foundation/bch-js) - BCH toolkit.
 - [oclif](https://oclif.io/) - CLI framework.
-- [pkg](https://github.com/vercel/pkg) - binary compiler.
 - [conf-cli](https://github.com/natzcam/conf-cli) - oclif config plugin.
 
 ## Table of Contents
 
 <!-- toc -->
-* [psf-bch-wallet](#psf-bch-wallet)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [psf-bch-wallet](#psf-bch-wallet)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
@@ -47,25 +63,27 @@ $ ./bin/run COMMAND
 In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 
 <!-- commands -->
-* [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
-* [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
-* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
-* [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
-* [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
-* [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
-* [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
-* [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
-* [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
-* [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
-* [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
-* [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
-* [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
-* [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
-* [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
-* [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
-* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
-* [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
-* [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
+
+- [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
+- [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
+- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+- [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
+- [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
+- [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
+- [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
+- [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
+- [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
+- [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
+- [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
+- [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
+- [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
+- [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
+- [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
+- [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+- [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
+- [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+- [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
+- [`psf-bch-wallet wallet-service-test`](#psf-bch-wallet-wallet-service-test)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -352,4 +370,20 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service.js)_
+
+## `psf-bch-wallet wallet-service-test`
+
+Display the balances of the wallet
+
+```
+USAGE
+  $ psf-bch-wallet wallet-service-test
+
+OPTIONS
+  -n, --name=name  Name of wallet
+  -v, --verbose    Show verbose UTXO information
+```
+
+_See code: [src/commands/wallet-service-test.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service-test.js)_
+
 <!-- commandsstop -->
