@@ -18,14 +18,14 @@ const WalletConsumer = require('../lib/adapters/wallet-consumer')
 
 const { Command, flags } = require('@oclif/command')
 
-const fs = require('fs')
+// const fs = require('fs')
 
 class WalletBalances extends Command {
   constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
-    this.fs = fs
+    // this.fs = fs
     this.walletUtil = new WalletUtil()
     this.walletService = new WalletConsumer()
     this.BchWallet = BchWallet
@@ -39,12 +39,12 @@ class WalletBalances extends Command {
       // Validate input flags
       this.validateFlags(flags)
 
-      const filename = `${__dirname.toString()}/../../.wallets/${
-        flags.name
-      }.json`
+      // const filename = `${__dirname.toString()}/../../.wallets/${
+      //   flags.name
+      // }.json`
 
       // Get the wallet with updated UTXO data.
-      const walletData = await this.getBalances(filename)
+      // const walletData = await this.getBalances(filename)
       // console.log(
       //   `walletData.utxos.utxoStore: ${JSON.stringify(
       //     walletData.utxos.utxoStore,
@@ -54,13 +54,62 @@ class WalletBalances extends Command {
       // )
 
       // Display wallet balances on the screen.
-      this.displayBalance(walletData, flags)
+      // this.displayBalance(walletData, flags)
+
+      await this.runTests()
 
       return true
     } catch (err) {
       console.log('Error in run(): ', err)
 
       return false
+    }
+  }
+
+  // Run all end-to-end tests.
+  async runTests () {
+    try {
+      // Initialize the BCH wallet. It will be available at this.bchWallet
+      await initWallet()
+    } catch (err) {
+      console.log('Error in runTests()')
+      throw err
+    }
+  }
+
+  // Initialize the wallet library.
+  async initWallet () {
+    try {
+      const restServer = this.conf.get('restServer')
+      console.log(`restServer: ${restServer}`)
+
+      // Instantiate the minimal-slp-wallet library.
+      const advancedConfig = {
+        interface: 'consumer-api',
+        bchWalletApi: restServer
+      }
+      this.bchWallet = new this.BchWallet(undefined, advancedConfig)
+
+      // Wait for the wallet to initialize and retrieve UTXO data from the
+      // blockchain.
+      await this.bchWallet.walletInfoPromise
+
+      // If UTXOs fail to update, try one more time.
+      if (!this.bchWallet.utxos.utxoStore) {
+        await this.bchWallet.getUtxos()
+
+        // Throw an error if UTXOs are still not updated.
+        if (!this.bchWallet.utxos.utxoStore) {
+          throw new Error(
+            'Wallet failed to initialize. Could not communicate with wallet service.'
+          )
+        }
+      }
+
+      return this.bchWallet
+    } catch (err) {
+      console.log('Error in initWallet()')
+      throw err
     }
   }
 
