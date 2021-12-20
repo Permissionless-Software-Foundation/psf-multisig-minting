@@ -7,20 +7,18 @@
 'use strict'
 
 // Public NPM libraries
-// const BCHJS = require('@psf/bch-js')
 const BchWallet = require('minimal-slp-wallet/index')
-const collect = require('collect.js')
 const Conf = require('conf')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
 const WalletConsumer = require('../lib/adapters/wallet-consumer')
 
-const { Command, flags } = require('@oclif/command')
+const { Command } = require('@oclif/command')
 
 // const fs = require('fs')
 
-class WalletBalances extends Command {
+class WalletServiceTest extends Command {
   constructor (argv, config) {
     super(argv, config)
 
@@ -34,28 +32,6 @@ class WalletBalances extends Command {
 
   async run () {
     try {
-      const { flags } = this.parse(WalletBalances)
-
-      // Validate input flags
-      this.validateFlags(flags)
-
-      // const filename = `${__dirname.toString()}/../../.wallets/${
-      //   flags.name
-      // }.json`
-
-      // Get the wallet with updated UTXO data.
-      // const walletData = await this.getBalances(filename)
-      // console.log(
-      //   `walletData.utxos.utxoStore: ${JSON.stringify(
-      //     walletData.utxos.utxoStore,
-      //     null,
-      //     2,
-      //   )}`,
-      // )
-
-      // Display wallet balances on the screen.
-      // this.displayBalance(walletData, flags)
-
       await this.runTests()
 
       return true
@@ -66,11 +42,17 @@ class WalletBalances extends Command {
     }
   }
 
+  // Top-level function that controlls and calls all the other functions.
   // Run all end-to-end tests.
   async runTests () {
     try {
       // Initialize the BCH wallet. It will be available at this.bchWallet
-      await initWallet()
+      await this.initWallet()
+
+      // Test the ability to get a balance for an address from the Fulcrum indexer.
+      await this.getBalance()
+
+      await this.testBroadcast()
     } catch (err) {
       console.log('Error in runTests()')
       throw err
@@ -106,6 +88,8 @@ class WalletBalances extends Command {
         }
       }
 
+      console.log('Wallet successfully initialized.')
+
       return this.bchWallet
     } catch (err) {
       console.log('Error in initWallet()')
@@ -113,176 +97,58 @@ class WalletBalances extends Command {
     }
   }
 
-  // Create a new wallet file.
-  async getBalances (filename) {
+  // Get the balance for a BCH address.
+  async getBalance () {
     try {
-      // Load the wallet file.
-      const walletJSON = require(filename)
-      const walletData = walletJSON.wallet
+      // console.log('this.bchWallet.ar: ', this.bchWallet.ar)
 
-      const restServer = this.conf.get('restServer')
-      console.log(`restServer: ${restServer}`)
+      const addrs = ['bitcoincash:qqh793x9au6ehvh7r2zflzguanlme760wuzehgzjh9']
+      const result = await this.bchWallet.ar.walletService.getBalances(addrs)
+      // console.log('result.balances[0].balance: ', result.balances[0].balance)
 
-      // Configure the minimal-slp-wallet library.
-      const advancedConfig = {
-        interface: 'consumer-api',
-        bchWalletApi: restServer
-        // jsonRpcWalletService: this.walletService,
-      }
-      this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
-      // console.log('bchWallet: ', this.bchWallet)
-
-      // Wait for the wallet to initialize and retrieve UTXO data from the
-      // blockchain.
-      await this.bchWallet.walletInfoPromise
-
-      // If UTXOs fail to update, try one more time.
-      if (!this.bchWallet.utxos.utxoStore) {
-        await this.bchWallet.getUtxos()
-
-        // Throw an error if UTXOs are still not updated.
-        if (!this.bchWallet.utxos.utxoStore) {
-          throw new Error('UTXOs failed to update. Try again.')
-        }
-      }
-
-      // Loop through each BCH UTXO and add up the balance.
-      let satBalance = 0
-      for (let i = 0; i < this.bchWallet.utxos.utxoStore.bchUtxos.length; i++) {
-        const thisUtxo = this.bchWallet.utxos.utxoStore.bchUtxos[i]
-
-        satBalance += thisUtxo.value
-      }
-      const bchBalance =
-        this.bchWallet.bchjs.BitcoinCash.toBitcoinCash(satBalance)
-      this.bchWallet.satBalance = satBalance
-      this.bchWallet.bchBalance = bchBalance
-
-      return this.bchWallet
-    } catch (err) {
-      console.log('Error in getBalances()')
-      throw err
-    }
-  }
-
-  // Take the updated wallet data and display it on the screen.
-  displayBalance (walletData, flags = {}) {
-    try {
-      // Loop through each BCH UTXO and add up the balance.
-      // let bchBalance = 0
-      // for (let i = 0; i < walletData.utxos.utxoStore.bchUtxos.length; i++) {
-      //   const thisUtxo = walletData.utxos.utxoStore.bchUtxos[i]
-      //
-      //   bchBalance += thisUtxo.value
-      // }
-      // const coinBalance = walletData.bchjs.BitcoinCash.toBitcoinCash(bchBalance)
-      console.log(
-        `BCH balance: ${walletData.satBalance} satoshis or ${walletData.bchBalance} BCH`
-      )
-
-      // Print out SLP Type1 tokens
-      console.log('\nTokens:')
-      const tokens = this.getTokenBalances(
-        walletData.utxos.utxoStore.slpUtxos.type1.tokens
-      )
-      for (let i = 0; i < tokens.length; i++) {
-        const thisToken = tokens[i]
-        console.log(`${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`)
-      }
-
-      if (flags.verbose) {
+      if (result.balances[0].balance.confirmed > 546) {
+        console.log('Fulcrum indexer successfully queried BCH balance.')
+      } else {
         console.log(
-          `\nUTXO information:\n${JSON.stringify(
-            walletData.utxos.utxoStore,
+          `Unexpected result when running getBalance: ${JSON.stringify(
+            result,
             null,
             2
           )}`
         )
       }
-
-      return true
     } catch (err) {
-      console.error('Error in displayBalance()')
+      console.log('Error in getBalance()')
       throw err
     }
   }
 
-  // Add up the token balances.
-  // At the moment, minting batons, NFTs, and group tokens are not suported.
-  getTokenBalances (tokenUtxos) {
-    // console.log('tokenUtxos: ', tokenUtxos)
+  async testBroadcast () {
+    try {
+      const txHex =
+        '020000000265d13ef402840c8a51f39779afb7ae4d49e4b0a3c24a3d0e7742038f2c679667010000006441dd1dd72770cadede1a7fd0363574846c48468a398ddfa41a9677c74cac8d2652b682743725a3b08c6c2021a629011e11a264d9036e9d5311e35b5f4937ca7b4e4121020797d8fd4d2fa6fd7cdeabe2526bfea2b90525d6e8ad506ec4ee3c53885aa309ffffffff65d13ef402840c8a51f39779afb7ae4d49e4b0a3c24a3d0e7742038f2c679667000000006441347d7f218c11c04487c1ad8baac28928fb10e5054cd4494b94d078cfa04ccf68e064fb188127ff656c0b98e9ce87f036d183925d0d0860605877d61e90375f774121028a53f95eb631b460854fc836b2e5d31cad16364b4dc3d970babfbdcc3f2e4954ffffffff035ac355000000000017a914189ce02e332548f4804bac65cba68202c9dbf822878dfd0800000000001976a914285bb350881b21ac89724c6fb6dc914d096cd53b88acf9ef3100000000001976a91445f1f1c4a9b9419a5088a3e9c24a293d7a150e6488ac00000000'
 
-    const tokens = []
-    const tokenIds = []
+      const result = await this.bchWallet.ar.walletService.sendTx(txHex)
+      // console.log('result: ', result)
 
-    // Summarized token data into an array of token UTXOs.
-    for (let i = 0; i < tokenUtxos.length; i++) {
-      const thisUtxo = tokenUtxos[i]
-
-      const thisToken = {
-        ticker: thisUtxo.tokenTicker,
-        tokenId: thisUtxo.tokenId,
-        qty: parseFloat(thisUtxo.tokenQty)
+      if (result.message.includes('Missing inputs')) {
+        console.log('TX broadcast responded with expected message')
+      } else {
+        console.log('TX broadcast reponsed with unexpected message: ', result)
       }
-
-      tokens.push(thisToken)
-
-      tokenIds.push(thisUtxo.tokenId)
+    } catch (err) {
+      console.log('Error in testBroadcast()')
+      throw err
     }
-
-    // Create a unique collection of tokenIds
-    const collection = collect(tokenIds)
-    let unique = collection.unique()
-    unique = unique.toArray()
-
-    // Add up any duplicate entries.
-    // The finalTokenData array contains unique objects, one for each token,
-    // with a total quantity of tokens for the entire wallet.
-    const finalTokenData = []
-    for (let i = 0; i < unique.length; i++) {
-      const thisTokenId = unique[i]
-
-      const thisTokenData = {
-        tokenId: thisTokenId,
-        qty: 0
-      }
-
-      // Add up the UTXO quantities for the current token ID.
-      for (let j = 0; j < tokens.length; j++) {
-        const thisToken = tokens[j]
-
-        if (thisTokenId === thisToken.tokenId) {
-          thisTokenData.ticker = thisToken.ticker
-          thisTokenData.qty += thisToken.qty
-        }
-      }
-
-      finalTokenData.push(thisTokenData)
-    }
-
-    return finalTokenData
-  }
-
-  // Validate the proper flags are passed in.
-  validateFlags (flags) {
-    // Exit if wallet not specified.
-    const name = flags.name
-    if (!name || name === '') {
-      throw new Error('You must specify a wallet with the -n flag.')
-    }
-
-    return true
   }
 }
 
-WalletBalances.description = 'Display the balances of the wallet'
+WalletServiceTest.description = `Run end-to-end tests on the selected wallet service.
 
-WalletBalances.flags = {
-  name: flags.string({ char: 'n', description: 'Name of wallet' }),
-  verbose: flags.boolean({
-    char: 'v',
-    description: 'Show verbose UTXO information'
-  })
-}
+This command will run a series of end-to-end (e2e) tests on a current global
+back end selected with the 'wallet-service' command. It will test that the
+selected service if fully function, and this app can adaquately communicate
+with that service.
+`
 
-module.exports = WalletBalances
+module.exports = WalletServiceTest
