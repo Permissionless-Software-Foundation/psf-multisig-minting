@@ -1,5 +1,8 @@
 /*
   List and/or select a P2WDB service provider.
+
+  TODO: This command should work like the wallet-service command. It instructs
+  ipfs-bch-wallet-service which P2WDB node to connect to.
 */
 
 // Public NPM libraries
@@ -31,7 +34,7 @@ class P2wdbService extends Command {
       // console.log(`Number of peers: ${result.data.length}`)
 
       // Filter the wallet services from the peers.
-      const servicePeers = peers.filter(x => {
+      const servicePeers = peers.filter((x) => {
         if (!x.protocol) return false
 
         return x.protocol.includes('p2wdb')
@@ -44,7 +47,7 @@ class P2wdbService extends Command {
       console.log('serviceId: ', serviceId)
 
       // Add the isSelected flag.
-      servicePeers.map(x => {
+      servicePeers.map((x) => {
         x.isSelected = x.peer.includes(serviceId)
         return x
       })

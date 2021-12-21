@@ -1,5 +1,9 @@
 /*
   Read data from the P2WDB.
+
+  TODO: This command should be refactored to use REST API endpoints of
+  ipfs-bch-wallet-consumer. ipfs-bch-wallet-consumer needs additional REST API
+  endpoints for interfacing with the p2wdb library.
 */
 
 'use strict'
@@ -93,7 +97,10 @@ class P2WDBRead extends Command {
 P2WDBRead.description = 'Burn a specific quantity of SLP tokens.'
 
 P2WDBRead.flags = {
-  hash: flags.string({ char: 'h', description: 'Hash representing P2WDB entry' }),
+  hash: flags.string({
+    char: 'h',
+    description: 'Hash representing P2WDB entry'
+  }),
   centralized: flags.boolean({
     char: 'c',
     description: 'Use centralized mode to connect to P2WDB.'
