@@ -9,6 +9,9 @@
 const axios = require('axios')
 const Conf = require('conf')
 
+// Local libraries
+const WalletUtil = require('../lib/wallet-util')
+
 const { Command, flags } = require('@oclif/command')
 
 class P2wdbService extends Command {
@@ -18,43 +21,28 @@ class P2wdbService extends Command {
     // Encapsulate dependencies.
     this.axios = axios
     this.conf = new Conf()
+    this.walletUtil = new WalletUtil()
   }
 
   async run () {
     try {
       const { flags } = this.parse(P2wdbService)
 
+      const server = this.walletUtil.getP2wdbServer()
+
       // Get a list of the IPFS peers this node is connected to.
-      const result = await this.axios.post('http://localhost:5000/local/', {
-        peers: true
-        // all: flags.all,
-      })
-      const peers = result.data
-      // console.log(`Subnet Peers: ${JSON.stringify(result.data, null, 2)}`)
-      // console.log(`Number of peers: ${result.data.length}`)
+      const result = await this.axios.get(`${server}/p2wdb`)
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
-      // Filter the wallet services from the peers.
-      const servicePeers = peers.filter((x) => {
-        if (!x.protocol) return false
-
-        return x.protocol.includes('p2wdb')
-      })
-
-      if (flags.select) this.selectService(servicePeers, flags)
-
-      // Get the IPFS ID for the currently selected wallet service.
-      const serviceId = this.conf.get('p2wdbService')
-      console.log('serviceId: ', serviceId)
-
-      // Add the isSelected flag.
-      servicePeers.map((x) => {
-        x.isSelected = x.peer.includes(serviceId)
-        return x
-      })
+      const providers = result.data.status.serviceProviders
+      const selectedProvider = result.data.status.selectedProvider
 
       console.log(
-        `P2WDB service peers: ${JSON.stringify(servicePeers, null, 2)}`
+        `Available service providers: ${JSON.stringify(providers, null, 2)}`
       )
+      console.log(`Selected service provider: ${selectedProvider}`)
+
+      if (flags.select) await this.selectService(flags)
 
       return true
     } catch (err) {
@@ -65,21 +53,20 @@ class P2wdbService extends Command {
   }
 
   // Select a different peer to use as a wallet service.
-  selectService (servicePeers, flags) {
+  async selectService (flags) {
     try {
       const chosenPeer = flags.select
 
-      // Loop through the available wallet service peers.
-      for (let i = 0; i < servicePeers.length; i++) {
-        const thisPeer = servicePeers[i]
+      const server = this.walletUtil.getP2wdbServer()
 
-        // If the chosen ID is found in the list, select it.
-        if (thisPeer.peer.includes(chosenPeer)) {
-          this.conf.set('p2wdbService', chosenPeer)
-
-          break
-        }
+      const body = {
+        provider: chosenPeer
       }
+      await this.axios.post(`${server}/p2wdb/provider`, body)
+
+      console.log(`P2WDB service provider switched to ${chosenPeer}`)
+
+      return true
     } catch (err) {
       console.log('Error in selectService()')
       throw err

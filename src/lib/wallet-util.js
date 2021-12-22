@@ -102,6 +102,25 @@ class WalletUtil {
       throw err
     }
   }
+
+  // Retrieve the REST API server address from the config. Generate the default
+  // if it has not yet been set.
+  getP2wdbServer () {
+    try {
+      let p2wdbServer = this.conf.get('p2wdbServer', false)
+
+      if (!p2wdbServer) {
+        p2wdbServer = 'https://p2wdb.fullstack.cash'
+
+        this.conf.set('p2wdbServer', p2wdbServer)
+      }
+
+      return p2wdbServer
+    } catch (err) {
+      console.log('Error in getP2wdbServer()')
+      throw err
+    }
+  }
 }
 
 module.exports = WalletUtil
