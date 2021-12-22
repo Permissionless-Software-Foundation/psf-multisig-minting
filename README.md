@@ -46,10 +46,9 @@ Explore the other configuration settings:
 ## Table of Contents
 
 <!-- toc -->
-
-- [psf-bch-wallet](#psf-bch-wallet)
-- [Usage](#usage)
-- [Commands](#commands)
+* [psf-bch-wallet](#psf-bch-wallet)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
@@ -65,27 +64,25 @@ $ ./bin/run COMMAND
 In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 
 <!-- commands -->
-
-- [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
-- [`psf-bch-wallet daemon`](#psf-bch-wallet-daemon)
-- [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
-- [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
-- [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
-- [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
-- [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
-- [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
-- [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
-- [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
-- [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
-- [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
-- [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
-- [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
-- [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
-- [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
-- [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
-- [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
-- [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
-- [`psf-bch-wallet wallet-service-test`](#psf-bch-wallet-wallet-service-test)
+* [`psf-bch-wallet conf [KEY] [VALUE]`](#psf-bch-wallet-conf-key-value)
+* [`psf-bch-wallet help [COMMAND]`](#psf-bch-wallet-help-command)
+* [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
+* [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
+* [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
+* [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
+* [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
+* [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
+* [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
+* [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
+* [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
+* [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
+* [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
+* [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
+* [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
+* [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
+* [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+* [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
+* [`psf-bch-wallet wallet-service-test`](#psf-bch-wallet-wallet-service-test)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -110,23 +107,6 @@ OPTIONS
 ```
 
 _See code: [conf-cli](https://github.com/natzcam/conf-cli/blob/v0.1.9/src/commands/conf.ts)_
-
-## `psf-bch-wallet daemon`
-
-Start a daemon connection to the wallet service.
-
-```
-USAGE
-  $ psf-bch-wallet daemon
-
-DESCRIPTION
-  This command will start a 'daemon' service, which is a IPFS node that will
-  connect to a BCH wallet service over IPFS. It will also start a REST API
-  server, which is how the other commands in this app will communicate with
-  the BCH wallet service.
-```
-
-_See code: [src/commands/daemon.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/daemon.js)_
 
 ## `psf-bch-wallet help [COMMAND]`
 
@@ -375,17 +355,18 @@ _See code: [src/commands/wallet-service.js](https://github.com/Permissionless-So
 
 ## `psf-bch-wallet wallet-service-test`
 
-Display the balances of the wallet
+Run end-to-end tests on the selected wallet service.
 
 ```
 USAGE
   $ psf-bch-wallet wallet-service-test
 
-OPTIONS
-  -n, --name=name  Name of wallet
-  -v, --verbose    Show verbose UTXO information
+DESCRIPTION
+  This command will run a series of end-to-end (e2e) tests on a current global
+  back end selected with the 'wallet-service' command. It will test that the
+  selected service if fully function, and this app can adaquately communicate
+  with that service.
 ```
 
 _See code: [src/commands/wallet-service-test.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service-test.js)_
-
 <!-- commandsstop -->
