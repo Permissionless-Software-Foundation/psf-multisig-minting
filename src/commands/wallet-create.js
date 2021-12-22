@@ -9,10 +9,11 @@
 // Public NPM libraries
 // const BCHJS = require('@psf/bch-js')
 const BchWallet = require('minimal-slp-wallet/index')
+const Conf = require('conf')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
-const WalletService = require('../lib/adapters/wallet-service')
+// const WalletService = require('../lib/adapters/wallet-service')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -23,6 +24,7 @@ class WalletCreate extends Command {
     // Encapsulate dependencies.
     this.walletUtil = new WalletUtil()
     this.BchWallet = BchWallet
+    this.conf = new Conf()
   }
 
   async run () {
@@ -59,11 +61,14 @@ class WalletCreate extends Command {
 
       if (!desc) desc = ''
 
+      const restServer = this.conf.get('restServer')
+      // console.log(`restServer: ${restServer}`)
+
       // Configure the minimal-slp-wallet library to use the JSON RPC over IPFS.
-      const walletService = new WalletService()
+      // const walletService = new WalletService()
       const advancedConfig = {
-        interface: 'json-rpc',
-        jsonRpcWalletService: walletService,
+        interface: 'consumer-api',
+        bchWalletApi: restServer,
         noUpdate: true
       }
 

@@ -24,6 +24,7 @@ describe('p2wdb-write', () => {
   before(async () => {
     await walletCreate.createWallet(filename)
   })
+
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
 

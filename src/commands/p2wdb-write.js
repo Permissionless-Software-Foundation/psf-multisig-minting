@@ -2,6 +2,10 @@
   This command does the following:
   - Burns 0.01 PSF tokens and saves the TXID.
   - Writes data to the P2WDB using the TXID as proof-of-burn
+
+  TODO:
+  - Use the p2wdb npm library for centralized mode.
+  - Add REST API endpoints to ipfs-bch-wallet-consumer for decentralized mode.
 */
 
 'use strict'

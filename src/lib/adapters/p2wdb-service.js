@@ -1,6 +1,9 @@
 /*
   This library interacts with the ipfs-p2wdb-service via the JSON RPC
   over IPFS.
+
+  TODO: Deprecate this library, after adding REST API endpoint to ipfs-bch-wallet-consumer
+  for interacting with the REST API.
 */
 
 // Configuration variables.
