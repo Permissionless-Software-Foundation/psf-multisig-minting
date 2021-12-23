@@ -27,7 +27,7 @@ const P2WDB_TOKEN_ID =
   '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0'
 
 // const P2WDB_SERVER = 'http://localhost:5001/entry/write'
-const P2WDB_SERVER = 'https://p2wdb.fullstack.cash/entry/write'
+// const P2WDB_SERVER = 'https://p2wdb.fullstack.cash/entry/write'
 
 class P2WDBWrite extends Command {
   constructor (argv, config) {
@@ -83,7 +83,7 @@ class P2WDBWrite extends Command {
 
       return { txid, hash }
     } catch (err) {
-      console.log('Error in p2wdb-write.js/run(): ')
+      console.log('Error in p2wdb-write.js/run(): ', err)
 
       return 0
     }
@@ -202,16 +202,14 @@ class P2WDBWrite extends Command {
         data: JSON.stringify(dataObj)
       }
 
-      // If centralized mode is selected
-      if (flags.centralize) {
-        const result = await this.axios.post(P2WDB_SERVER, bodyData)
-        // console.log(`Response from API: ${JSON.stringify(result.data, null, 2)}`)
+      const p2wdbServer = this.conf.get('p2wdbServer')
+      console.log(`p2wdbServer: ${p2wdbServer}`)
 
-        return result.data.hash
-      }
+      // Send the data to the selected P2WDB.
+      const result = await axios.post(`${p2wdbServer}/p2wdb/write`, bodyData)
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
-      // Decentralized mode.
-      const hash = await this.p2wdbService.writeEntry(bodyData)
+      const hash = result.data.hash.data
       return hash
     } catch (err) {
       console.error('Error in p2wdbWrite()')
@@ -239,8 +237,8 @@ class P2WDBWrite extends Command {
 
     const centralized = flags.centralized
     if (!centralized) {
-      const p2wdbService = this.conf.get('p2wdbService')
-      if (!p2wdbService) {
+      const p2wdbServer = this.conf.get('p2wdbServer')
+      if (!p2wdbServer) {
         throw new Error(
           'Use p2wdb-service command to select a service, or use -c argument for centralized mode.'
         )

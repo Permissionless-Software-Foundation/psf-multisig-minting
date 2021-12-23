@@ -257,43 +257,43 @@ describe('p2wdb-write', () => {
   })
 
   describe('#p2wdbWrite', () => {
-    it('should write data using centralized service', async () => {
-      // Mock test data
-      const txid = 'fakeTxid'
-      const signature = 'fakeSig'
-      const flags = {
-        appId: 'fakeAppId',
-        data: 'a message',
-        centralize: true
-      }
-
-      // Mock dependencies
-      sandbox.stub(uut.axios, 'post').resolves({ data: { hash: 'fakeHash' } })
-
-      const result = await uut.p2wdbWrite(txid, signature, flags)
-      // console.log('result: ', result)
-
-      assert.equal(result, 'fakeHash')
-    })
-
-    it('should write data using decentralized service', async () => {
-      // Mock test data
-      const txid = 'fakeTxid'
-      const signature = 'fakeSig'
-      const flags = {
-        appId: 'fakeAppId',
-        data: 'a message',
-        centralize: false
-      }
-
-      // Mock dependencies
-      sandbox.stub(uut.p2wdbService, 'writeEntry').resolves('fakeHash')
-
-      const result = await uut.p2wdbWrite(txid, signature, flags)
-      // console.log('result: ', result)
-
-      assert.equal(result, 'fakeHash')
-    })
+    // it('should write data using centralized service', async () => {
+    //   // Mock test data
+    //   const txid = 'fakeTxid'
+    //   const signature = 'fakeSig'
+    //   const flags = {
+    //     appId: 'fakeAppId',
+    //     data: 'a message',
+    //     centralize: true
+    //   }
+    //
+    //   // Mock dependencies
+    //   sandbox.stub(uut.axios, 'post').resolves({ data: { hash: 'fakeHash' } })
+    //
+    //   const result = await uut.p2wdbWrite(txid, signature, flags)
+    //   // console.log('result: ', result)
+    //
+    //   assert.equal(result, 'fakeHash')
+    // })
+    //
+    // it('should write data using decentralized service', async () => {
+    //   // Mock test data
+    //   const txid = 'fakeTxid'
+    //   const signature = 'fakeSig'
+    //   const flags = {
+    //     appId: 'fakeAppId',
+    //     data: 'a message',
+    //     centralize: false
+    //   }
+    //
+    //   // Mock dependencies
+    //   sandbox.stub(uut.p2wdbService, 'writeEntry').resolves('fakeHash')
+    //
+    //   const result = await uut.p2wdbWrite(txid, signature, flags)
+    //   // console.log('result: ', result)
+    //
+    //   assert.equal(result, 'fakeHash')
+    // })
 
     it('should catch and throw an error', async () => {
       try {

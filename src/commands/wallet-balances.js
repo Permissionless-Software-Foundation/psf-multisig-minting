@@ -62,7 +62,9 @@ class WalletBalances extends Command {
     }
   }
 
-  // Create a new wallet file.
+  // Generate a new wallet instance and update it's balance. This function returns
+  // a handle to an instance of the wallet library.
+  // This function is called by other commands in this app.
   async getBalances (filename) {
     try {
       // Load the wallet file.

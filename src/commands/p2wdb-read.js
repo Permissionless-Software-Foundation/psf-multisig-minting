@@ -9,29 +9,25 @@
 'use strict'
 
 // Public NPM libraries
-const BchWallet = require('minimal-slp-wallet/index')
+// const BchWallet = require('minimal-slp-wallet/index')
 const axios = require('axios')
 const Conf = require('conf')
 
 // Local libraries
-const WalletUtil = require('../lib/wallet-util')
-const WalletBalances = require('./wallet-balances')
-const P2wdbService = require('../lib/adapters/p2wdb-service')
+// const WalletUtil = require('../lib/wallet-util')
+// const WalletBalances = require('./wallet-balances')
 
 const { Command, flags } = require('@oclif/command')
-
-// const P2WDB_SERVER = 'http://localhost:5001/entry/write'
-const P2WDB_SERVER = 'https://p2wdb.fullstack.cash'
 
 class P2WDBRead extends Command {
   constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
-    this.walletUtil = new WalletUtil()
-    this.BchWallet = BchWallet
-    this.walletBalances = new WalletBalances()
-    this.p2wdbService = new P2wdbService()
+    // this.walletUtil = new WalletUtil()
+    // this.BchWallet = BchWallet
+    // this.walletBalances = new WalletBalances()
+    // this.p2wdbService = new P2wdbService()
     this.conf = new Conf()
   }
 
@@ -50,22 +46,25 @@ class P2WDBRead extends Command {
     }
   }
 
-  // Read an entry from the P2WDB.
   async readP2WDB (flags) {
     try {
-      // Centralized mode.
-      if (flags.centralized) {
-        const result = await axios.get(
-          `${P2WDB_SERVER}/entry/hash/${flags.hash}`
-        )
-        console.log(`data: ${JSON.stringify(result.data, null, 2)}`)
+      const p2wdbServer = this.conf.get('p2wdbServer')
+      console.log(`p2wdbServer: ${p2wdbServer}`)
 
-        return
+      // Display the raw entry.
+      const result = await axios.post(`${p2wdbServer}/p2wdb/entryFromHash`, {
+        hash: flags.hash
+      })
+      console.log(`${JSON.stringify(result.data.data, null, 2)}`)
+
+      // Attempt to parse the data payload.
+      try {
+        const data = JSON.parse(result.data.data.data.value.data)
+        console.log(`\nvalue.data: ${JSON.stringify(data, null, 2)}\n`)
+      } catch (err) {
+        /* exit quietly. */
+        // console.log(err)
       }
-
-      // Decentrlaized mode
-      const result = await this.p2wdbService.getEntry(flags.hash)
-      console.log('data: ', result)
     } catch (err) {
       console.error('Error in readP2WDB()')
       throw err
@@ -80,30 +79,16 @@ class P2WDBRead extends Command {
       throw new Error('You must specify a record hash with the -h flag.')
     }
 
-    const centralized = flags.centralized
-    if (!centralized) {
-      const p2wdbService = this.conf.get('p2wdbService')
-      if (!p2wdbService) {
-        throw new Error(
-          'Use p2wdb-service command to select a service, or use -c argument for centralized mode.'
-        )
-      }
-    }
-
     return true
   }
 }
 
-P2WDBRead.description = 'Burn a specific quantity of SLP tokens.'
+P2WDBRead.description = 'Read an entry from the P2WDB'
 
 P2WDBRead.flags = {
   hash: flags.string({
     char: 'h',
     description: 'Hash representing P2WDB entry'
-  }),
-  centralized: flags.boolean({
-    char: 'c',
-    description: 'Use centralized mode to connect to P2WDB.'
   })
 }
 
