@@ -18,7 +18,6 @@ const Conf = require('conf')
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
 const WalletBalances = require('./wallet-balances')
-const P2wdbService = require('../lib/adapters/p2wdb-service')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -38,7 +37,6 @@ class P2WDBWrite extends Command {
     this.BchWallet = BchWallet
     this.walletBalances = new WalletBalances()
     this.conf = new Conf()
-    this.p2wdbService = new P2wdbService()
     this.axios = axios
   }
 
