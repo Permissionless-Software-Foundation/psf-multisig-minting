@@ -5,7 +5,7 @@ const getPubkeyResult = {
   endpoint: 'pubkey',
   pubkey: {
     success: true,
-    publicKey: 'deedc4f82bb77d920b0c867aeaf7b410ee8d71cb76ac9367b8c6d624feff757b'
+    publicKey: '0337d09a94e10df1a1bd29d523cd496eca4da5c0cdaf0f66aa8871f5d1f9024bcf'
   }
 }
 const getPubkeyErrorResult = {
@@ -14,7 +14,14 @@ const getPubkeyErrorResult = {
   message: 'No transaction history.',
   endpoint: 'pubkey'
 }
+
+class Write {
+  postEntry () {
+    return { hash: 'QmYJXDxuNjwFuAYaUdADPnxKZJhQSsx69Ww2rGk6VmAFQu' }
+  }
+}
 module.exports = {
   getPubkeyResult,
-  getPubkeyErrorResult
+  getPubkeyErrorResult,
+  Write
 }
