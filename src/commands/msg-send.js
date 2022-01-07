@@ -2,7 +2,7 @@ const WalletService = require('../lib/adapters/wallet-consumer')
 
 const { Command, flags } = require('@oclif/command')
 const EncryptLib = require('bch-encrypt-lib/index')
-const MessagesLib = require('bch-message-lib')
+const MessagesLib = require('bch-message-lib/index')
 
 const eccrypto = require('eccrypto-js')
 const Write = require('p2wdb/index').Write
