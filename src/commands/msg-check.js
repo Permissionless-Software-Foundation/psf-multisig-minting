@@ -1,6 +1,7 @@
 /*
   Check for received messages in a wallet
 */
+
 const WalletService = require('../lib/adapters/wallet-consumer')
 
 const { Command, flags } = require('@oclif/command')
@@ -15,8 +16,12 @@ class MsgCheck extends Command {
     super(argv, config)
 
     this.walletService = new WalletService()
-    this.encryptLib = new EncryptLib({ bchjs: this.walletService.walletUtil.bchjs })
-    this.messagesLib = new MessagesLib({ bchjs: this.walletService.walletUtil.bchjs })
+    this.encryptLib = new EncryptLib({
+      bchjs: this.walletService.walletUtil.bchjs
+    })
+    this.messagesLib = new MessagesLib({
+      bchjs: this.walletService.walletUtil.bchjs
+    })
     this.Write = Write
     this.Table = Table
   }
@@ -27,8 +32,9 @@ class MsgCheck extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      const filename = `${__dirname.toString()}/../../.wallets/${flags.name
-        }.json`
+      const filename = `${__dirname.toString()}/../../.wallets/${
+        flags.name
+      }.json`
 
       const result = await this.msgCheck(filename, flags)
 
@@ -50,8 +56,11 @@ class MsgCheck extends Command {
       // Load the wallet file.
       const walletJSON = require(filename)
       const { cashAddress } = walletJSON.wallet
+      // console.log('cashAddress: ', cashAddress)
 
       const messages = await this.messagesLib.memo.readMsgSignal(cashAddress)
+      // console.log('message: ', messages)
+
       const receiveMessages = this.filterMessages(cashAddress, messages)
       if (!receiveMessages.length) {
         console.log('No Messages Found!')
