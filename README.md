@@ -69,6 +69,8 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet ipfs-peers`](#psf-bch-wallet-ipfs-peers)
 * [`psf-bch-wallet ipfs-relays`](#psf-bch-wallet-ipfs-relays)
 * [`psf-bch-wallet ipfs-status`](#psf-bch-wallet-ipfs-status)
+* [`psf-bch-wallet msg-check`](#psf-bch-wallet-msg-check)
+* [`psf-bch-wallet msg-read`](#psf-bch-wallet-msg-read)
 * [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
 * [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
 * [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
@@ -161,6 +163,35 @@ USAGE
 
 _See code: [src/commands/ipfs-status.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/ipfs-status.js)_
 
+## `psf-bch-wallet msg-check`
+
+Check signed messages
+
+```
+USAGE
+  $ psf-bch-wallet msg-check
+
+OPTIONS
+  -n, --name=name  Name of wallet
+```
+
+_See code: [src/commands/msg-check.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-check.js)_
+
+## `psf-bch-wallet msg-read`
+
+Read signed messages
+
+```
+USAGE
+  $ psf-bch-wallet msg-read
+
+OPTIONS
+  -n, --name=name  Name of wallet
+  -t, --txid=txid  Transaction ID
+```
+
+_See code: [src/commands/msg-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-read.js)_
+
 ## `psf-bch-wallet msg-send`
 
 Send encrypted messages
@@ -171,21 +202,23 @@ USAGE
 
 OPTIONS
   -b, --bchAddress=bchAddress  BCH Address
+  -m, --message=message        Message to send
+  -n, --name=name              Name of wallet
+  -s, --subject=subject        Message Subject
 ```
 
 _See code: [src/commands/msg-send.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-send.js)_
 
 ## `psf-bch-wallet p2wdb-read`
 
-Burn a specific quantity of SLP tokens.
+Read an entry from the P2WDB
 
 ```
 USAGE
   $ psf-bch-wallet p2wdb-read
 
 OPTIONS
-  -c, --centralized  Use centralized mode to connect to P2WDB.
-  -h, --hash=hash    Hash representing P2WDB entry
+  -h, --hash=hash  Hash representing P2WDB entry
 ```
 
 _See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-read.js)_
