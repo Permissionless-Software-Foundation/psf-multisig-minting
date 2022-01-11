@@ -12,8 +12,12 @@ class MsgSend extends Command {
     super(argv, config)
 
     this.walletService = new WalletService()
-    this.encryptLib = new EncryptLib({ bchjs: this.walletService.walletUtil.bchjs })
-    this.messagesLib = new MessagesLib({ bchjs: this.walletService.walletUtil.bchjs })
+    this.encryptLib = new EncryptLib({
+      bchjs: this.walletService.walletUtil.bchjs
+    })
+    this.messagesLib = new MessagesLib({
+      bchjs: this.walletService.walletUtil.bchjs
+    })
     this.eccrypto = eccrypto
     this.Write = Write
   }
@@ -24,8 +28,9 @@ class MsgSend extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      const filename = `${__dirname.toString()}/../../.wallets/${flags.name
-        }.json`
+      const filename = `${__dirname.toString()}/../../.wallets/${
+        flags.name
+      }.json`
 
       const result = await this.msgSend(filename, flags)
 
@@ -82,9 +87,14 @@ class MsgSend extends Command {
         bchAddress,
         subject
       )
+
+      // TODO: Replace messageLib.bchjs... with walletService.sendTx()
       // Broadcast Transaction
-      const txidStr = await this.messagesLib.bchjs.RawTransactions.sendRawTransaction(txHex)
+      const txidStr = await this.messagesLib.bchjs.RawTransactions.sendRawTransaction(
+        txHex
+      )
       console.log(`Transaction ID : ${JSON.stringify(txidStr, null, 2)}`)
+
       return txidStr
     } catch (error) {
       console.log('Error in msgSend()', error)
@@ -104,7 +114,10 @@ class MsgSend extends Command {
       const buff = Buffer.from(msg)
       const hex = buff.toString('hex')
 
-      const encryptedStr = await this.encryptLib.encryption.encryptFile(pubKey, hex)
+      const encryptedStr = await this.encryptLib.encryption.encryptFile(
+        pubKey,
+        hex
+      )
       // console.log(`encryptedStr: ${JSON.stringify(encryptedStr, null, 2)}`)
       return encryptedStr
     } catch (error) {
