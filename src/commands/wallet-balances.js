@@ -1,11 +1,10 @@
 /*
-
+  Update the balances of a wallet.
 */
 
 'use strict'
 
 // Public NPM libraries
-// const BCHJS = require('@psf/bch-js')
 const BchWallet = require('minimal-slp-wallet/index')
 const collect = require('collect.js')
 const Conf = require('conf')
@@ -77,8 +76,7 @@ class WalletBalances extends Command {
       // Configure the minimal-slp-wallet library.
       const advancedConfig = {
         interface: 'consumer-api',
-        bchWalletApi: restServer
-        // jsonRpcWalletService: this.walletService,
+        restURL: restServer
       }
       this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
       // console.log('bchWallet: ', this.bchWallet)
@@ -104,8 +102,9 @@ class WalletBalances extends Command {
 
         satBalance += thisUtxo.value
       }
-      const bchBalance =
-        this.bchWallet.bchjs.BitcoinCash.toBitcoinCash(satBalance)
+      const bchBalance = this.bchWallet.bchjs.BitcoinCash.toBitcoinCash(
+        satBalance
+      )
       this.bchWallet.satBalance = satBalance
       this.bchWallet.bchBalance = bchBalance
 
@@ -138,9 +137,7 @@ class WalletBalances extends Command {
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]
-        console.log(
-          `${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`
-        )
+        console.log(`${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`)
       }
 
       if (flags.verbose) {
