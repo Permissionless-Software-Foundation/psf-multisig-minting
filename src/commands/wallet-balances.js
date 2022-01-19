@@ -170,9 +170,9 @@ class WalletBalances extends Command {
       const thisUtxo = tokenUtxos[i]
 
       const thisToken = {
-        ticker: thisUtxo.tokenTicker,
+        ticker: thisUtxo.ticker,
         tokenId: thisUtxo.tokenId,
-        qty: parseFloat(thisUtxo.tokenQty)
+        qty: parseFloat(thisUtxo.qtyStr)
       }
 
       tokens.push(thisToken)
