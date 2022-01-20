@@ -130,6 +130,11 @@ class WalletBalances extends Command {
         `BCH balance: ${walletData.satBalance} satoshis or ${walletData.bchBalance} BCH`
       )
 
+      // console.log(
+      //   'walletData.utxos.utxoStore.slpUtxos.type1.tokens: ',
+      //   walletData.utxos.utxoStore.slpUtxos.type1.tokens
+      // )
+
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
       const tokens = this.getTokenBalances(

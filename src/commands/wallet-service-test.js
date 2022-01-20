@@ -76,7 +76,7 @@ class WalletServiceTest extends Command {
       // Instantiate the minimal-slp-wallet library.
       const advancedConfig = {
         interface: 'consumer-api',
-        bchWalletApi: restServer
+        restURL: restServer
       }
       this.bchWallet = new this.BchWallet(undefined, advancedConfig)
 

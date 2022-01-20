@@ -101,6 +101,7 @@ describe('send-tokens', () => {
         )
       }
     })
+
     it('should exit with error status for insufficient token qty.', async () => {
       try {
         const flags = {
