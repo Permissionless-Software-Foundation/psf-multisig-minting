@@ -24,6 +24,7 @@ class MsgCheck extends Command {
     this.encryptLib = new EncryptLib({
       bchjs: this.walletService.walletUtil.bchjs
     })
+    this.MsgLib = MessagesLib
     // this.messagesLib = new MessagesLib({
     //   bchjs: this.walletService.walletUtil.bchjs
     // })
@@ -37,11 +38,11 @@ class MsgCheck extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      const filename = `${__dirname.toString()}/../../.wallets/${
-        flags.name
-      }.json`
+      // const filename = `${__dirname.toString()}/../../.wallets/${
+      //   flags.name
+      // }.json`
 
-      const result = await this.msgCheck(filename, flags)
+      const result = await this.msgCheck(flags.name, flags)
 
       return result
     } catch (error) {
@@ -52,19 +53,19 @@ class MsgCheck extends Command {
   }
 
   // Check for messages
-  async msgCheck (filename) {
+  async msgCheck (walletName) {
     try {
       // Input validation
-      if (!filename || typeof filename !== 'string') {
-        throw new Error('filename is required.')
+      if (!walletName || typeof walletName !== 'string') {
+        throw new Error('walletName is required.')
       }
 
-      this.bchWallet = await this.walletUtil.instanceWallet(filename)
+      this.bchWallet = await this.walletUtil.instanceWallet(walletName)
 
       const cashAddress = this.bchWallet.walletInfo.cashAddress
 
       // Instantiate the bch-message-lib
-      this.msgLib = new MessagesLib({ wallet: this.bchWallet })
+      this.msgLib = new this.MsgLib({ wallet: this.bchWallet })
 
       // Get message signals from the blockchain.
       const messages = await this.msgLib.memo.readMsgSignal(cashAddress)
@@ -82,7 +83,7 @@ class MsgCheck extends Command {
 
       return true
     } catch (error) {
-      console.log('Error in msgCheck()', error)
+      console.log('Error in msgCheck()')
       throw error
     }
   }
@@ -127,7 +128,7 @@ class MsgCheck extends Command {
       }
       return filtered
     } catch (error) {
-      console.log('Error in filterMessages()', error)
+      console.log('Error in filterMessages()')
       throw error
     }
   }
