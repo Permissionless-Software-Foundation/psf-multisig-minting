@@ -70,6 +70,7 @@ class WalletBalances extends Command {
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
+      // Get the currently selected REST server from the config.
       const restServer = this.conf.get('restServer')
       console.log(`restServer: ${restServer}`)
 
@@ -98,13 +99,13 @@ class WalletBalances extends Command {
         }
       }
 
-      console.log(
-        `this.bchWallet.utxos.utxoStore: ${JSON.stringify(
-          this.bchWallet.utxos.utxoStore,
-          null,
-          2
-        )}`
-      )
+      // console.log(
+      //   `this.bchWallet.utxos.utxoStore: ${JSON.stringify(
+      //     this.bchWallet.utxos.utxoStore,
+      //     null,
+      //     2
+      //   )}`
+      // )
 
       // Loop through each BCH UTXO and add up the balance.
       let satBalance = 0

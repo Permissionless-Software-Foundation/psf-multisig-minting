@@ -1,0 +1,13 @@
+{
+  "wallet": {
+    "privateKey": "L4xjDDfzEZzEDd5Kq3LsPjZGU9yU8M918wC6dEMzVHbq7NfEDfyZ",
+    "publicKey": "039a7fbc0e2adf0af7e15c8011ab3cc5258f156a86c5ac30745c669ff433e3a7e9",
+    "mnemonic": "october rescue vacant enroll system frozen easy dentist coach muscle expose fold",
+    "cashAddress": "bitcoincash:qqq887j5apctnyw3vwz9gt3nwnl49z7ey5fzru94l6",
+    "address": "bitcoincash:qqq887j5apctnyw3vwz9gt3nwnl49z7ey5fzru94l6",
+    "legacyAddress": "113PwHQWibjPhb64df84Dz8o7Zw4rytgqV",
+    "hdPath": "m/44'/245'/0'/0/0",
+    "slpAddress": "simpleledger:qqq887j5apctnyw3vwz9gt3nwnl49z7ey59eg8s4py",
+    "description": ""
+  }
+}

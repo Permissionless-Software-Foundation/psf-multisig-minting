@@ -2,12 +2,17 @@
   Unit tests for the wallet-util.js library.
 */
 
-'use strict'
-
+// Global npm libraries
 const assert = require('chai').assert
 const sinon = require('sinon')
 const fs = require('fs')
 const cloneDeep = require('lodash.clonedeep')
+
+// Local libraries
+const WalletCreate = require('../../../src/commands/wallet-create')
+const walletCreate = new WalletCreate()
+const WalletRemove = require('../../../src/commands/wallet-remove')
+const walletRemove = new WalletRemove()
 
 // File under test.
 const WalletUtil = require('../../../src/lib/wallet-util')
@@ -110,6 +115,49 @@ describe('#Wallet-Util', () => {
       const result = uut.getEncryptionMnemonic()
 
       assert.isString(result)
+    })
+  })
+
+  describe('#instanceWallet', () => {
+    const walletName = 'test123'
+
+    it('should generate an instance of the wallet', async () => {
+      // Mock minimal-slp-wallet
+      uut.BchWallet = class BchWallet {
+        async walletInfoPromise () {
+          return true
+        }
+      }
+
+      // Create a wallet
+      const filepath = walletRemove.getFilePath(walletName)
+      await walletCreate.createWallet(filepath)
+
+      const wallet = await uut.instanceWallet(walletName)
+      // console.log(wallet)
+
+      assert.isOk(wallet)
+
+      // Delete the wallet
+      await walletRemove.removeWallet(filepath)
+    })
+
+    it('should catch, log, and throw errors', async () => {
+      try {
+        // Mock minimal-slp-wallet
+        uut.BchWallet = class BchWallet {
+          constructor () {
+            throw new Error('test error')
+          }
+        }
+
+        await uut.instanceWallet(walletName)
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+        assert.include(err.message, 'test error')
+      }
     })
   })
 })

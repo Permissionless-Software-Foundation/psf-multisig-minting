@@ -2,26 +2,31 @@
   Check for received messages in a wallet
 */
 
-const WalletService = require('../lib/adapters/wallet-consumer')
-
+// Global npm libraries
 const { Command, flags } = require('@oclif/command')
 const EncryptLib = require('bch-encrypt-lib/index')
 const MessagesLib = require('bch-message-lib/index')
-
 const Write = require('p2wdb/index').Write
 const Table = require('cli-table')
+const BchWallet = require('minimal-slp-wallet/index')
+
+// Local npm libraries
+const WalletService = require('../lib/adapters/wallet-consumer')
+const WalletUtil = require('../lib/wallet-util')
 
 class MsgCheck extends Command {
   constructor (argv, config) {
     super(argv, config)
 
+    // Encapsulate dependencies
     this.walletService = new WalletService()
+    this.walletUtil = new WalletUtil()
     this.encryptLib = new EncryptLib({
       bchjs: this.walletService.walletUtil.bchjs
     })
-    this.messagesLib = new MessagesLib({
-      bchjs: this.walletService.walletUtil.bchjs
-    })
+    // this.messagesLib = new MessagesLib({
+    //   bchjs: this.walletService.walletUtil.bchjs
+    // })
     this.Write = Write
     this.Table = Table
   }
@@ -53,20 +58,28 @@ class MsgCheck extends Command {
       if (!filename || typeof filename !== 'string') {
         throw new Error('filename is required.')
       }
-      // Load the wallet file.
-      const walletJSON = require(filename)
-      const { cashAddress } = walletJSON.wallet
-      // console.log('cashAddress: ', cashAddress)
 
-      const messages = await this.messagesLib.memo.readMsgSignal(cashAddress)
+      this.bchWallet = await this.walletUtil.instanceWallet(filename)
+
+      const cashAddress = this.bchWallet.walletInfo.cashAddress
+
+      // Instantiate the bch-message-lib
+      this.msgLib = new MessagesLib({ wallet: this.bchWallet })
+
+      // Get message signals from the blockchain.
+      const messages = await this.msgLib.memo.readMsgSignal(cashAddress)
       // console.log('message: ', messages)
 
+      // Filter out sent messages, so user only sees recieved messages.
       const receiveMessages = this.filterMessages(cashAddress, messages)
       if (!receiveMessages.length) {
         console.log('No Messages Found!')
         return false
       }
+
+      // Display the messages on the screen.
       this.displayTable(receiveMessages)
+
       return true
     } catch (error) {
       console.log('Error in msgCheck()', error)

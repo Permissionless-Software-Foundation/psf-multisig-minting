@@ -5,14 +5,22 @@
 const fs = require('fs').promises
 const BCHJS = require('@psf/bch-js')
 const Conf = require('conf')
+const BchWallet = require('minimal-slp-wallet/index')
 
 let _this // Global variable points at instance of this Class.
 
 class WalletUtil {
   constructor (localConfig = {}) {
+    // Encapsulate dependencies
     this.fs = fs
     this.bchjs = new BCHJS()
     this.conf = new Conf()
+    this.BchWallet = BchWallet
+
+    // Variables that can be controlled externally.
+    this.advancedConfig = {
+      interface: 'consumer-api'
+    }
 
     _this = this
   }
@@ -118,6 +126,43 @@ class WalletUtil {
       return p2wdbServer
     } catch (err) {
       console.log('Error in getP2wdbServer()')
+      throw err
+    }
+  }
+
+  // Takes the wallet filename as input and returns an instance of
+  // minimal-slp-wallet.
+  async instanceWallet (walletName) {
+    try {
+      // Input validation
+      if (!walletName || typeof walletName !== 'string') {
+        throw new Error('walletName is required.')
+      }
+
+      const filePath = `${__dirname.toString()}/../../.wallets/${walletName}.json`
+
+      // Load the wallet file.
+      const walletJSON = require(filePath)
+      const walletData = walletJSON.wallet
+
+      // Get the currently selected REST server from the config.
+      const restServer = this.getRestServer()
+      console.log(`restServer: ${restServer}`)
+
+      // Configure the minimal-slp-wallet library.
+      this.advancedConfig.restURL = restServer
+      const bchWallet = new this.BchWallet(
+        walletData.mnemonic,
+        this.advancedConfig
+      )
+
+      // Wait for the wallet to initialize and retrieve UTXO data from the
+      // blockchain.
+      await bchWallet.walletInfoPromise
+
+      return bchWallet
+    } catch (err) {
+      console.error('Error in wallet-util.js/instanceWallet()')
       throw err
     }
   }
