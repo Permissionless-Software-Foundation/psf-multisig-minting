@@ -90,10 +90,21 @@ class WalletBalances extends Command {
         await this.bchWallet.getUtxos()
 
         // Throw an error if UTXOs are still not updated.
-        if (!this.bchWallet.utxos.utxoStore) {
+        if (
+          !this.bchWallet.utxos.utxoStore ||
+          this.bchWallet.utxos.utxoStore.success === false
+        ) {
           throw new Error('UTXOs failed to update. Try again.')
         }
       }
+
+      console.log(
+        `this.bchWallet.utxos.utxoStore: ${JSON.stringify(
+          this.bchWallet.utxos.utxoStore,
+          null,
+          2
+        )}`
+      )
 
       // Loop through each BCH UTXO and add up the balance.
       let satBalance = 0
