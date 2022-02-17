@@ -76,7 +76,7 @@ class WalletServiceTest extends Command {
       // Instantiate the minimal-slp-wallet library.
       const advancedConfig = {
         interface: 'consumer-api',
-        bchWalletApi: restServer
+        restURL: restServer
       }
       this.bchWallet = new this.BchWallet(undefined, advancedConfig)
 
@@ -167,6 +167,19 @@ class WalletServiceTest extends Command {
       }
     } catch (err) {
       console.log('Error in getPubKey()')
+      throw err
+    }
+  }
+
+  // Test the ability to get a sorted transactions history for an address.
+  async getTxHistory () {
+    try {
+      const address = 'bitcoincash:qpdh9s677ya8tnx7zdhfrn8qfyvy22wj4qa7nwqa5v'
+
+      const result = await this.walletService.getTransactions(address)
+      console.log('result: ', result)
+    } catch (err) {
+      console.log('Error in getTxHistory()')
       throw err
     }
   }

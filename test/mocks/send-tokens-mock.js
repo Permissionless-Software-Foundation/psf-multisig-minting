@@ -19,7 +19,8 @@ const getBalancesResult = {
             '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
           tx_pos: 0,
           value: 1000,
-          txid: '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
+          txid:
+            '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
           vout: 0,
           isValid: false
         },
@@ -29,7 +30,8 @@ const getBalancesResult = {
             '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
           tx_pos: 2,
           value: 19406,
-          txid: '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
+          txid:
+            '1fc577caaff5626a8477162581e57bae1b19dc6aa6c10638013c2b1ba14dc654',
           vout: 2,
           isValid: false
         }
@@ -45,7 +47,8 @@ const getBalancesResult = {
                 'bb5691b50930816be78dad76d203a1c97ac94c03f6051b2fa0159c71c43aa3d0',
               tx_pos: 1,
               value: 546,
-              txid: 'bb5691b50930816be78dad76d203a1c97ac94c03f6051b2fa0159c71c43aa3d0',
+              txid:
+                'bb5691b50930816be78dad76d203a1c97ac94c03f6051b2fa0159c71c43aa3d0',
               vout: 1,
               utxoType: 'token',
               transactionType: 'send',
@@ -58,7 +61,9 @@ const getBalancesResult = {
               decimals: 2,
               tokenType: 1,
               isValid: true,
-              tokenQty: '4.25'
+              tokenQty: '4.25',
+              qtyStr: '4.25',
+              qty: '425'
             }
           ]
         },

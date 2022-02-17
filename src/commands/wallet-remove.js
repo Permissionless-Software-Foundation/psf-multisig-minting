@@ -11,9 +11,15 @@ class WalletRemove extends Command {
     // Validate input flags
     this.validateFlags(flags)
 
-    const filename = `${__dirname.toString()}/../../.wallets/${flags.name}.json`
+    // const filename = `${__dirname.toString()}/../../.wallets/${flags.name}.json`
+    const filename = this.getFilePath(flags.name)
 
     return this.removeWallet(filename)
+  }
+
+  getFilePath (walletName) {
+    const filename = `${__dirname.toString()}/../../.wallets/${walletName}.json`
+    return filename
   }
 
   async removeWallet (filename) {

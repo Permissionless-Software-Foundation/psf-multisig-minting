@@ -2,17 +2,28 @@
   Utility library for working with wallet files.
 */
 
+// Global npm libraries.
 const fs = require('fs').promises
 const BCHJS = require('@psf/bch-js')
 const Conf = require('conf')
+const BchWallet = require('minimal-slp-wallet/index')
+const MsgLib = require('bch-message-lib/index')
 
 let _this // Global variable points at instance of this Class.
 
 class WalletUtil {
   constructor (localConfig = {}) {
+    // Encapsulate dependencies
     this.fs = fs
     this.bchjs = new BCHJS()
     this.conf = new Conf()
+    this.BchWallet = BchWallet
+    this.MsgLib = MsgLib
+
+    // Variables that can be controlled externally.
+    this.advancedConfig = {
+      interface: 'consumer-api'
+    }
 
     _this = this
   }
@@ -120,6 +131,59 @@ class WalletUtil {
       console.log('Error in getP2wdbServer()')
       throw err
     }
+  }
+
+  // Takes the wallet filename as input and returns an instance of
+  // minimal-slp-wallet.
+  async instanceWallet (walletName) {
+    try {
+      // Input validation
+      if (!walletName || typeof walletName !== 'string') {
+        throw new Error('walletName is required.')
+      }
+
+      const filePath = `${__dirname.toString()}/../../.wallets/${walletName}.json`
+
+      // Load the wallet file.
+      const walletJSON = require(filePath)
+      const walletData = walletJSON.wallet
+
+      // Get the currently selected REST server from the config.
+      const restServer = this.getRestServer()
+      console.log(`restServer: ${restServer}`)
+
+      // Hook for unit tests, to disable network calls.
+      if (walletName === 'test123') {
+        this.advancedConfig.noUpdate = true
+      }
+
+      // Configure the minimal-slp-wallet library.
+      this.advancedConfig.restURL = restServer
+      const bchWallet = new this.BchWallet(
+        walletData.mnemonic,
+        this.advancedConfig
+      )
+
+      // Wait for the wallet to initialize and retrieve UTXO data from the
+      // blockchain.
+      await bchWallet.walletInfoPromise
+
+      return bchWallet
+    } catch (err) {
+      console.error('Error in wallet-util.js/instanceWallet()')
+      throw err
+    }
+  }
+
+  // Instantiate the bch-message-lib library with an instance of minimal-slp-wallet.
+  instanceMsgLib (wallet) {
+    if (!wallet) {
+      throw new Error('Must pass instance of minimal-slp-wallet.')
+    }
+
+    const msgLib = new this.MsgLib({ wallet })
+
+    return msgLib
   }
 }
 

@@ -70,6 +70,7 @@ class WalletBalances extends Command {
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
+      // Get the currently selected REST server from the config.
       const restServer = this.conf.get('restServer')
       console.log(`restServer: ${restServer}`)
 
@@ -90,10 +91,21 @@ class WalletBalances extends Command {
         await this.bchWallet.getUtxos()
 
         // Throw an error if UTXOs are still not updated.
-        if (!this.bchWallet.utxos.utxoStore) {
+        if (
+          !this.bchWallet.utxos.utxoStore ||
+          this.bchWallet.utxos.utxoStore.success === false
+        ) {
           throw new Error('UTXOs failed to update. Try again.')
         }
       }
+
+      // console.log(
+      //   `this.bchWallet.utxos.utxoStore: ${JSON.stringify(
+      //     this.bchWallet.utxos.utxoStore,
+      //     null,
+      //     2
+      //   )}`
+      // )
 
       // Loop through each BCH UTXO and add up the balance.
       let satBalance = 0
@@ -129,6 +141,11 @@ class WalletBalances extends Command {
       console.log(
         `BCH balance: ${walletData.satBalance} satoshis or ${walletData.bchBalance} BCH`
       )
+
+      // console.log(
+      //   'walletData.utxos.utxoStore.slpUtxos.type1.tokens: ',
+      //   walletData.utxos.utxoStore.slpUtxos.type1.tokens
+      // )
 
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
@@ -170,9 +187,9 @@ class WalletBalances extends Command {
       const thisUtxo = tokenUtxos[i]
 
       const thisToken = {
-        ticker: thisUtxo.tokenTicker,
+        ticker: thisUtxo.ticker,
         tokenId: thisUtxo.tokenId,
-        qty: parseFloat(thisUtxo.tokenQty)
+        qty: parseFloat(thisUtxo.qtyStr)
       }
 
       tokens.push(thisToken)
