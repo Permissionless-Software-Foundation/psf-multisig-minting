@@ -2,26 +2,27 @@
   Read e2e encrypted messages
 */
 
-const WalletService = require('../lib/adapters/wallet-consumer')
-
+// Global npm libraries
 const { Command, flags } = require('@oclif/command')
 const EncryptLib = require('bch-encrypt-lib/index')
-const MessagesLib = require('bch-message-lib/index')
 const Read = require('p2wdb/index').Read
+
+// Local libraries
+const WalletService = require('../lib/adapters/wallet-consumer')
+const WalletUtil = require('../lib/wallet-util')
 
 class MsgRead extends Command {
   constructor (argv, config) {
     super(argv, config)
 
+    // Encapsulate dependencies
     this.walletService = new WalletService()
     this.encryptLib = new EncryptLib({
       bchjs: this.walletService.walletUtil.bchjs
     })
-    this.messagesLib = new MessagesLib({
-      bchjs: this.walletService.walletUtil.bchjs
-    })
     this.Read = Read
     this.bchjs = this.walletService.walletUtil.bchjs
+    this.walletUtil = new WalletUtil()
   }
 
   async run () {
@@ -30,11 +31,12 @@ class MsgRead extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      const filename = `${__dirname.toString()}/../../.wallets/${
-        flags.name
-      }.json`
 
-      const result = await this.msgRead(filename, flags.txid)
+      // const filename = `${__dirname.toString()}/../../.wallets/${
+      //   flags.name
+      // }.json`
+
+      const result = await this.msgRead(flags)
 
       return result
     } catch (error) {
@@ -45,51 +47,94 @@ class MsgRead extends Command {
   }
 
   // Check for messages
-  async msgRead (filename, txid) {
+  async msgRead (flags) {
     try {
       // Input validation
-      if (!filename || typeof filename !== 'string') {
-        throw new Error('filename is required.')
+      if (!flags.name || typeof flags.name !== 'string') {
+        throw new Error('Wallet name is required.')
       }
 
-      // Load the wallet file.
-      const walletJSON = require(filename)
-      const walletData = walletJSON.wallet
-      // p2wdb config
-      const p2wdbConfig = {
-        wif: walletData.privateKey
-      }
-      this.read = new this.Read(p2wdbConfig)
-      // get tx data
-      const txDataResult = await this.bchjs.RawTransactions.getRawTransaction(
-        [txid],
-        true
-      )
+      const { name, txid } = flags
+
+      // Instatiate all the libraries orchestrated by this function.
+      await this.instanceLibs(flags)
+
+      // Get TX Data
+      const txDataResult = await this.bchWallet.getTxData([txid])
       const txData = txDataResult[0]
+      // console.log(`txData: ${JSON.stringify(txData, null, 2)}`)
+
       // get ipfs hash from tx OP_RETURN
       const hash = this.getHashFromTx(txData)
 
-      // get hash data from p2wd
-      const hashData = await this.read.getByHash(hash)
-
-      const encryptedStr = hashData.value.data
-      const encryptedObj = JSON.parse(encryptedStr)
-      const encryptedData = encryptedObj.data.data
-
-      // decrypt message
-      const messageHex = await this.encryptLib.encryption.decryptFile(
-        walletData.privateKey,
-        encryptedData
-      )
-      const buf = Buffer.from(messageHex, 'hex')
-      const decryptedMsg = buf.toString('utf8')
-      console.log('Message :', decryptedMsg)
+      const decryptedMsg = await this.getAndDecrypt(hash)
 
       return decryptedMsg
+
+      // get hash data from p2wd
+      // const hashData = await this.read.getByHash(hash)
+      //
+      // const encryptedStr = hashData.value.data
+      // const encryptedObj = JSON.parse(encryptedStr)
+      // const encryptedData = encryptedObj.data.data
+      //
+      // // decrypt message
+      // const messageHex = await this.encryptLib.encryption.decryptFile(
+      //   this.bchWallet.walletInfo.privateKey,
+      //   encryptedData
+      // )
+      // const buf = Buffer.from(messageHex, 'hex')
+      // const decryptedMsg = buf.toString('utf8')
+      // console.log('Message :', decryptedMsg)
+      //
+      // return decryptedMsg
     } catch (error) {
-      console.log('Error in msgRead()', error)
+      console.log('Error in msgRead()')
       throw error
     }
+  }
+
+  // Retrieve the encrypted data from the P2WDB and decrypt it.
+  async getAndDecrypt (hash) {
+    // get hash data from p2wd
+    const hashData = await this.read.getByHash(hash)
+    console.log(`hashData: ${JSON.stringify(hashData, null, 2)}`)
+
+    const encryptedStr = hashData.value.data
+    const encryptedObj = JSON.parse(encryptedStr)
+    const encryptedData = encryptedObj.data.data
+
+    // decrypt message
+    const messageHex = await this.encryptLib.encryption.decryptFile(
+      this.bchWallet.walletInfo.privateKey,
+      encryptedData
+    )
+    const buf = Buffer.from(messageHex, 'hex')
+    const decryptedMsg = buf.toString('utf8')
+    console.log('Message :', decryptedMsg)
+
+    return decryptedMsg
+  }
+
+  // Instatiate the various libraries used by msgSend(). These libraries are
+  // encasulated in the 'this' object.
+  async instanceLibs (flags) {
+    const { name, txid } = flags
+
+    // Instantiate minimal-slp-wallet.
+    this.bchWallet = await this.walletUtil.instanceWallet(name)
+    const walletData = this.bchWallet.walletInfo
+
+    // Instantiate the bch-message-lib library.
+    this.msgLib = this.walletUtil.instanceMsgLib(this.bchWallet)
+
+    // Instatiate the P2WDB Write library.
+    const p2wdbConfig = {
+      wif: walletData.privateKey
+    }
+    this.read = new this.Read(p2wdbConfig)
+
+    return true
   }
 
   // decode and get transaction hash from OP_RETURN
@@ -112,11 +157,11 @@ class MsgRead extends Command {
         // console.log(`asm: ${asm}`)
 
         // Decode the transactions assembly code.
-        const msg = this.messagesLib.memo.decodeTransaction(asm, '-21101')
+        const msg = this.msgLib.memo.decodeTransaction(asm, '-21101')
 
         if (msg) {
           // Filter the code to see if it contains an IPFS hash And Subject.
-          const data = this.messagesLib.memo.filterMSG(msg, 'MSG IPFS')
+          const data = this.msgLib.memo.filterMSG(msg, 'MSG IPFS')
           if (data && data.hash) {
             hash = data.hash
           }
@@ -128,7 +173,7 @@ class MsgRead extends Command {
       }
       return hash
     } catch (error) {
-      console.log('Error in getHashFromTx()', error)
+      console.log('Error in getHashFromTx()')
       throw error
     }
   }

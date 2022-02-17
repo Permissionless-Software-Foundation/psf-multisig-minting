@@ -46,6 +46,29 @@ class MsgSend extends Command {
     }
   }
 
+  // Primary function that orchistrates the workflow of sending an E2E encrypted
+  // message to a BCH address.
+  async msgSend (flags) {
+    try {
+      const { bchAddress, message, subject, name } = flags
+
+      // Instatiate all the libraries orchestrated by this function.
+      await this.instanceLibs(flags)
+
+      // Encrypt the message and upload it to the P2WDB.
+      const hash = await this.encryptAndUpload(flags)
+
+      // Broadcast a PS001 signal on the blockchain, to signal the recipient
+      // that they have a message waiting.
+      const txid = await this.sendMsgSignal(flags, hash)
+
+      return txid
+    } catch (error) {
+      console.log('Error in msgSend()')
+      throw error
+    }
+  }
+
   // Instatiate the various libraries used by msgSend(). These libraries are
   // encasulated in the 'this' object.
   async instanceLibs (flags) {
@@ -114,29 +137,6 @@ class MsgSend extends Command {
     console.log(`Transaction ID : ${JSON.stringify(txidStr, null, 2)}`)
 
     return txidStr
-  }
-
-  // Primary function that orchistrates the workflow of sending an E2E encrypted
-  // message to a BCH address.
-  async msgSend (flags) {
-    try {
-      const { bchAddress, message, subject, name } = flags
-
-      // Instatiate all the libraries orchestrated by this function.
-      await this.instanceLibs(flags)
-
-      // Encrypt the message and upload it to the P2WDB.
-      const hash = await this.encryptAndUpload(flags)
-
-      // Broadcast a PS001 signal on the blockchain, to signal the recipient
-      // that they have a message waiting.
-      const txid = await this.sendMsgSignal(flags, hash)
-
-      return txid
-    } catch (error) {
-      console.log('Error in msgSend()')
-      throw error
-    }
   }
 
   // Encrypt a message using encryptLib

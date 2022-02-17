@@ -38,15 +38,12 @@ class MsgCheck extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      // const filename = `${__dirname.toString()}/../../.wallets/${
-      //   flags.name
-      // }.json`
 
-      const result = await this.msgCheck(flags.name, flags)
+      const result = await this.msgCheck(flags.name)
 
       return result
     } catch (error) {
-      console.log('Error in msg-check.js/run(): ', error.message)
+      console.log('Error in msg-check.js/run(): ', error)
 
       return 0
     }
@@ -68,6 +65,7 @@ class MsgCheck extends Command {
       this.msgLib = new this.MsgLib({ wallet: this.bchWallet })
 
       // Get message signals from the blockchain.
+      console.log(`cashAddress ${cashAddress}`)
       const messages = await this.msgLib.memo.readMsgSignal(cashAddress)
       // console.log('message: ', messages)
 
