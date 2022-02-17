@@ -36,7 +36,11 @@ class MsgRead extends Command {
       //   flags.name
       // }.json`
 
+      // Instatiate all the libraries orchestrated by this function.
+      await this.instanceLibs(flags)
+
       const result = await this.msgRead(flags)
+      console.log(`Message:\n${result}`)
 
       return result
     } catch (error) {
@@ -54,10 +58,7 @@ class MsgRead extends Command {
         throw new Error('Wallet name is required.')
       }
 
-      const { name, txid } = flags
-
-      // Instatiate all the libraries orchestrated by this function.
-      await this.instanceLibs(flags)
+      const { txid } = flags
 
       // Get TX Data
       const txDataResult = await this.bchWallet.getTxData([txid])
@@ -67,27 +68,10 @@ class MsgRead extends Command {
       // get ipfs hash from tx OP_RETURN
       const hash = this.getHashFromTx(txData)
 
+      // Get the encrypted message from P2WDB and decrypt it.
       const decryptedMsg = await this.getAndDecrypt(hash)
 
       return decryptedMsg
-
-      // get hash data from p2wd
-      // const hashData = await this.read.getByHash(hash)
-      //
-      // const encryptedStr = hashData.value.data
-      // const encryptedObj = JSON.parse(encryptedStr)
-      // const encryptedData = encryptedObj.data.data
-      //
-      // // decrypt message
-      // const messageHex = await this.encryptLib.encryption.decryptFile(
-      //   this.bchWallet.walletInfo.privateKey,
-      //   encryptedData
-      // )
-      // const buf = Buffer.from(messageHex, 'hex')
-      // const decryptedMsg = buf.toString('utf8')
-      // console.log('Message :', decryptedMsg)
-      //
-      // return decryptedMsg
     } catch (error) {
       console.log('Error in msgRead()')
       throw error
@@ -98,7 +82,7 @@ class MsgRead extends Command {
   async getAndDecrypt (hash) {
     // get hash data from p2wd
     const hashData = await this.read.getByHash(hash)
-    console.log(`hashData: ${JSON.stringify(hashData, null, 2)}`)
+    // console.log(`hashData: ${JSON.stringify(hashData, null, 2)}`)
 
     const encryptedStr = hashData.value.data
     const encryptedObj = JSON.parse(encryptedStr)
@@ -109,9 +93,11 @@ class MsgRead extends Command {
       this.bchWallet.walletInfo.privateKey,
       encryptedData
     )
+    // console.log(`messageHex: ${messageHex}`)
+
     const buf = Buffer.from(messageHex, 'hex')
     const decryptedMsg = buf.toString('utf8')
-    console.log('Message :', decryptedMsg)
+    // console.log('Message :', decryptedMsg)
 
     return decryptedMsg
   }
@@ -119,7 +105,7 @@ class MsgRead extends Command {
   // Instatiate the various libraries used by msgSend(). These libraries are
   // encasulated in the 'this' object.
   async instanceLibs (flags) {
-    const { name, txid } = flags
+    const { name } = flags
 
     // Instantiate minimal-slp-wallet.
     this.bchWallet = await this.walletUtil.instanceWallet(name)

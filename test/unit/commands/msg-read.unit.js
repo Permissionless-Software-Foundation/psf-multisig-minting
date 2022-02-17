@@ -141,14 +141,17 @@ describe('msg-read', () => {
       await uut.instanceLibs(flags)
 
       // Mock dependencies
-      console.log('1: ', uut.read.getByHash)
       sandbox.stub(uut.read, 'getByHash').resolves(msgReadMock.hashData)
-
-      uut.read.getByHash = () => msgReadMock.hashData
-      console.log('2: ', uut.read.getByHash)
+      sandbox
+        .stub(uut.encryptLib.encryption, 'decryptFile')
+        .resolves(
+          '5468697320697320612074657374206f6620746865207265666163746f72'
+        )
 
       const result = await uut.getAndDecrypt()
-      console.log('result: ', result)
+      // console.log('result: ', result)
+
+      assert.include(result, 'This is a test of the refactor')
     })
   })
 
@@ -167,91 +170,59 @@ describe('msg-read', () => {
       }
     })
 
-    // it('should read message.', async () => {
-    //   const flags = {
-    //     txid:
-    //       '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
-    //     name: 'test123'
-    //   }
-    //
-    //   await uut.instanceLibs(flags)
-    //
-    //   // Mock methods that will be tested elsewhere.
-    //   sandbox.stub(uut, 'getHashFromTx').resolves({})
-    //   sandbox.stub(uut.read, 'getByHash').resolves({ value: { data: 'blah' } })
-    //
-    //   sandbox
-    //     .stub(uut.bchjs.RawTransactions, 'getRawTransaction')
-    //     .resolves(MsgReadMock.transactionData)
-    //
-    //   sandbox
-    //     .stub(uut.encryptLib.encryption, 'decryptFile')
-    //     .resolves(MsgReadMock.decryptedMsgHex)
-    //
-    //   const result = await uut.msgRead(filename, flags)
-    //
-    //   assert.isString(result)
-    // })
+    it('should read message.', async () => {
+      const flags = {
+        txid:
+          '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
+        name: 'test123'
+      }
 
-    // it('should handle decryption error.', async () => {
-    //   try {
-    //     const flags = {
-    //       txid:
-    //         '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
-    //       name: 'my wallet'
-    //     }
-    //     // Mock methods that will be tested elsewhere.
-    //     sandbox
-    //       .stub(uut.bchjs.RawTransactions, 'getRawTransaction')
-    //       .resolves(MsgReadMock.transactionData)
-    //
-    //     await uut.msgRead(filename, flags)
-    //     assert.fail('Unexpected result')
-    //   } catch (error) {
-    //     assert.include(error.message, 'Bad MAC', 'Should throw expected error.')
-    //   }
-    // })
+      await uut.instanceLibs(flags)
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut.bchWallet, 'getTxData').resolves([{ key: 'value' }])
+      sandbox.stub(uut, 'getHashFromTx').returns({})
+      sandbox.stub(uut, 'getAndDecrypt').resolves('test message')
+
+      const result = await uut.msgRead(flags)
+
+      assert.equal(result, 'test message')
+    })
   })
 
-  // describe('#run()', () => {
-  //   it('should return 0 and display error.message on empty flags', async () => {
-  //     sandbox.stub(uut, 'parse').returns({ flags: {} })
-  //
-  //     const result = await uut.run()
-  //
-  //     assert.equal(result, 0)
-  //   })
-  //
-  //   it('should handle an error without a message', async () => {
-  //     sandbox.stub(uut, 'parse').throws({})
-  //
-  //     const result = await uut.run()
-  //
-  //     assert.equal(result, 0)
-  //   })
-  //
-  //   it('should run the run() function', async () => {
-  //     // Mock dependencies
-  //     const flags = {
-  //       txid:
-  //         '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
-  //       name: 'test123'
-  //     }
-  //     // Mock methods that will be tested elsewhere.
-  //     sandbox
-  //       .stub(uut.bchjs.RawTransactions, 'getRawTransaction')
-  //       .resolves(MsgReadMock.transactionData)
-  //
-  //     sandbox
-  //       .stub(uut.encryptLib.encryption, 'decryptFile')
-  //       .resolves(MsgReadMock.decryptedMsgHex)
-  //
-  //     // Mock methods that will be tested elsewhere.
-  //     sandbox.stub(uut, 'parse').returns({ flags: flags })
-  //
-  //     const result = await uut.run()
-  //
-  //     assert.isString(result)
-  //   })
-  // })
+  describe('#run()', () => {
+    it('should return 0 and display error.message on empty flags', async () => {
+      sandbox.stub(uut, 'parse').returns({ flags: {} })
+
+      const result = await uut.run()
+
+      assert.equal(result, 0)
+    })
+
+    it('should handle an error without a message', async () => {
+      sandbox.stub(uut, 'parse').throws({})
+
+      const result = await uut.run()
+
+      assert.equal(result, 0)
+    })
+
+    it('should run the run() function', async () => {
+      // Mock dependencies
+      const flags = {
+        txid:
+          '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
+        name: 'test123'
+      }
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut, 'parse').returns({ flags })
+      sandbox.stub(uut, 'instanceLibs').resolves()
+      sandbox.stub(uut, 'msgRead').resolves('test message')
+
+      const result = await uut.run()
+
+      assert.equal(result, 'test message')
+    })
+  })
 })

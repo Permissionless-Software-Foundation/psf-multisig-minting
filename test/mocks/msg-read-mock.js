@@ -128,5 +128,6 @@ module.exports = {
   transactionData,
   transactionData2,
   decryptedMsgHex,
-  Read
+  Read,
+  hashData
 }

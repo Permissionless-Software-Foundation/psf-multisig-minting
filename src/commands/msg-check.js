@@ -8,7 +8,7 @@ const EncryptLib = require('bch-encrypt-lib/index')
 const MsgLib = require('bch-message-lib/index')
 const Write = require('p2wdb/index').Write
 const Table = require('cli-table')
-const BchWallet = require('minimal-slp-wallet/index')
+// const BchWallet = require('minimal-slp-wallet/index')
 
 // Local npm libraries
 const WalletService = require('../lib/adapters/wallet-consumer')

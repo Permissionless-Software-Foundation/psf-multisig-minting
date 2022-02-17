@@ -50,8 +50,6 @@ class MsgSend extends Command {
   // message to a BCH address.
   async msgSend (flags) {
     try {
-      const { bchAddress, message, subject, name } = flags
-
       // Instatiate all the libraries orchestrated by this function.
       await this.instanceLibs(flags)
 
@@ -72,7 +70,7 @@ class MsgSend extends Command {
   // Instatiate the various libraries used by msgSend(). These libraries are
   // encasulated in the 'this' object.
   async instanceLibs (flags) {
-    const { bchAddress, message, subject, name } = flags
+    const { name } = flags
 
     // Instantiate minimal-slp-wallet.
     this.bchWallet = await this.walletUtil.instanceWallet(name)
@@ -92,7 +90,7 @@ class MsgSend extends Command {
 
   // Encrypt the message and upload it to the P2WDB.
   async encryptAndUpload (flags) {
-    const { bchAddress, message, subject, name } = flags
+    const { bchAddress, message } = flags
 
     // Get public Key for reciever from the blockchain.
     const pubKey = await this.walletService.getPubKey(bchAddress)
@@ -121,7 +119,7 @@ class MsgSend extends Command {
 
   // Generate and broadcast a PS001 message signal.
   async sendMsgSignal (flags, hash) {
-    const { bchAddress, message, subject, name } = flags
+    const { bchAddress, subject } = flags
 
     // Wait a couple seconds to let the indexer update its UTXO state.
     await this.bchWallet.bchjs.Util.sleep(2000)
