@@ -1,5 +1,3 @@
-'use strict'
-
 /* Unit tests for the msg-read command. */
 
 const assert = require('chai').assert
@@ -10,7 +8,8 @@ const MsgReadMock = require('../../mocks/msg-read-mock')
 const filename = `${__dirname.toString()}/../../../.wallets/test123.json`
 const WalletCreate = require('../../../src/commands/wallet-create')
 const walletCreate = new WalletCreate()
-describe('msg-send', () => {
+
+describe('msg-read', () => {
   let uut
   let sandbox
 
@@ -46,7 +45,8 @@ describe('msg-send', () => {
 
     it('should read message.', async () => {
       const flags = {
-        txid: '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
+        txid:
+          '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
         name: 'my wallet'
       }
       // Mock methods that will be tested elsewhere.
@@ -65,7 +65,8 @@ describe('msg-send', () => {
     it('should handle decryption error.', async () => {
       try {
         const flags = {
-          txid: '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
+          txid:
+            '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
           name: 'my wallet'
         }
         // Mock methods that will be tested elsewhere.
@@ -76,11 +77,7 @@ describe('msg-send', () => {
         await uut.msgRead(filename, flags)
         assert.fail('Unexpected result')
       } catch (error) {
-        assert.include(
-          error.message,
-          'Bad MAC',
-          'Should throw expected error.'
-        )
+        assert.include(error.message, 'Bad MAC', 'Should throw expected error.')
       }
     })
   })
@@ -117,7 +114,8 @@ describe('msg-send', () => {
   describe('#validateFlags()', () => {
     it('validateFlags() should return true .', () => {
       const flags = {
-        txid: '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
+        txid:
+          '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
         name: 'my wallet'
       }
       assert.equal(uut.validateFlags(flags), true, 'return true')
@@ -139,8 +137,8 @@ describe('msg-send', () => {
     it('validateFlags() should throw error if wallet name is not supplied.', () => {
       try {
         const flags = {
-          txid: '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948'
-
+          txid:
+            '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948'
         }
         uut.validateFlags(flags)
       } catch (err) {
@@ -173,7 +171,8 @@ describe('msg-send', () => {
     it('should run the run() function', async () => {
       // Mock dependencies
       const flags = {
-        txid: '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
+        txid:
+          '36639f7c52ad385a2feeeed08240d92ebb05d7f8aa8a1e8531857bf7a9dc5948',
         name: 'test123'
       }
       // Mock methods that will be tested elsewhere.

@@ -1,5 +1,5 @@
 /*
-  Read signed messages
+  Read e2e encrypted messages
 */
 
 const WalletService = require('../lib/adapters/wallet-consumer')
@@ -30,8 +30,9 @@ class MsgRead extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      const filename = `${__dirname.toString()}/../../.wallets/${flags.name
-        }.json`
+      const filename = `${__dirname.toString()}/../../.wallets/${
+        flags.name
+      }.json`
 
       const result = await this.msgRead(filename, flags.txid)
 
@@ -76,7 +77,10 @@ class MsgRead extends Command {
       const encryptedData = encryptedObj.data.data
 
       // decrypt message
-      const messageHex = await this.encryptLib.encryption.decryptFile(walletData.privateKey, encryptedData)
+      const messageHex = await this.encryptLib.encryption.decryptFile(
+        walletData.privateKey,
+        encryptedData
+      )
       const buf = Buffer.from(messageHex, 'hex')
       const decryptedMsg = buf.toString('utf8')
       console.log('Message :', decryptedMsg)

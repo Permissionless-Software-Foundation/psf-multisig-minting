@@ -1,25 +1,29 @@
-const WalletService = require('../lib/adapters/wallet-consumer')
+/*
+  Send an e2e encrypted message to another BCH address.
+*/
 
+// Global npm libraries
 const { Command, flags } = require('@oclif/command')
 const EncryptLib = require('bch-encrypt-lib/index')
-const MessagesLib = require('bch-message-lib/index')
-
 const eccrypto = require('eccrypto-js')
 const Write = require('p2wdb/index').Write
+
+// Local libraries
+const WalletService = require('../lib/adapters/wallet-consumer')
+const WalletUtil = require('../lib/wallet-util')
 
 class MsgSend extends Command {
   constructor (argv, config) {
     super(argv, config)
 
+    // Encapsulate dependencies.
     this.walletService = new WalletService()
     this.encryptLib = new EncryptLib({
       bchjs: this.walletService.walletUtil.bchjs
     })
-    this.messagesLib = new MessagesLib({
-      bchjs: this.walletService.walletUtil.bchjs
-    })
     this.eccrypto = eccrypto
     this.Write = Write
+    this.walletUtil = new WalletUtil()
   }
 
   async run () {
@@ -28,11 +32,11 @@ class MsgSend extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
-      const filename = `${__dirname.toString()}/../../.wallets/${
-        flags.name
-      }.json`
+      // const filename = `${__dirname.toString()}/../../.wallets/${
+      //   flags.name
+      // }.json`
 
-      const result = await this.msgSend(filename, flags)
+      const result = await this.msgSend(flags)
 
       return result
     } catch (error) {
@@ -42,67 +46,100 @@ class MsgSend extends Command {
     }
   }
 
-  async msgSend (filename, flags) {
+  // Instatiate the various libraries used by msgSend(). These libraries are
+  // encasulated in the 'this' object.
+  async instanceLibs (flags) {
+    const { bchAddress, message, subject, name } = flags
+
+    // Instantiate minimal-slp-wallet.
+    this.bchWallet = await this.walletUtil.instanceWallet(name)
+    const walletData = this.bchWallet.walletInfo
+
+    // Instantiate the bch-message-lib library.
+    this.msgLib = this.walletUtil.instanceMsgLib(this.bchWallet)
+
+    // Instatiate the P2WDB Write library.
+    const p2wdbConfig = {
+      wif: walletData.privateKey
+    }
+    this.write = new this.Write(p2wdbConfig)
+
+    return true
+  }
+
+  // Encrypt the message and upload it to the P2WDB.
+  async encryptAndUpload (flags) {
+    const { bchAddress, message, subject, name } = flags
+
+    // Get public Key for reciever from the blockchain.
+    const pubKey = await this.walletService.getPubKey(bchAddress)
+    const publicKey = pubKey.pubkey.publicKey
+    console.log(`publicKey: ${JSON.stringify(publicKey, null, 2)}`)
+
+    // Encrypt the message using the recievers public key.
+    const encryptedMsg = await this.encryptMsg(publicKey, message)
+    console.log(`encryptedMsg: ${JSON.stringify(encryptedMsg, null, 2)}`)
+
+    // Upload the encrypted message to the P2WDB.
+    const appId = 'psf-bch-wallet'
+    const data = {
+      now: new Date(),
+      data: encryptedMsg
+    }
+
+    const result = await this.write.postEntry(data, appId)
+    console.log(`Data about P2WDB write: ${JSON.stringify(result, null, 2)}`)
+
+    const hash = result.hash
+
+    // Return the hash used to uniquly identify this entry in the P2WDB.
+    return hash
+  }
+
+  // Generate and broadcast a PS001 message signal.
+  async sendMsgSignal (flags, hash) {
+    const { bchAddress, message, subject, name } = flags
+
+    // Wait a couple seconds to let the indexer update its UTXO state.
+    await this.bchWallet.bchjs.Util.sleep(2000)
+
+    // Update the UTXO store in the wallet.
+    await this.bchWallet.getUtxos()
+
+    // Sign Message
+    const txHex = await this.signalMessage(hash, bchAddress, subject)
+
+    // Broadcast Transaction
+    const txidStr = await this.bchWallet.ar.sendTx(txHex)
+    console.log(`Transaction ID : ${JSON.stringify(txidStr, null, 2)}`)
+
+    return txidStr
+  }
+
+  // Primary function that orchistrates the workflow of sending an E2E encrypted
+  // message to a BCH address.
+  async msgSend (flags) {
     try {
-      // Input validation
-      if (!filename || typeof filename !== 'string') {
-        throw new Error('filename is required.')
-      }
+      const { bchAddress, message, subject, name } = flags
 
-      const { bchAddress, message, subject } = flags
-      // Load the wallet file.
-      const walletJSON = require(filename)
-      const walletData = walletJSON.wallet
+      // Instatiate all the libraries orchestrated by this function.
+      await this.instanceLibs(flags)
 
-      // p2wdb config
-      const p2wdbConfig = {
-        wif: walletData.privateKey
-      }
-      this.write = new this.Write(p2wdbConfig)
+      // Encrypt the message and upload it to the P2WDB.
+      const hash = await this.encryptAndUpload(flags)
 
-      // Get public Key
-      const pubKey = await this.walletService.getPubKey(bchAddress)
-      const publicKey = pubKey.pubkey.publicKey
-      console.log(`publicKey: ${JSON.stringify(publicKey, null, 2)}`)
+      // Broadcast a PS001 signal on the blockchain, to signal the recipient
+      // that they have a message waiting.
+      const txid = await this.sendMsgSignal(flags, hash)
 
-      const encryptedMsg = await this.encryptMsg(publicKey, message)
-      console.log(`encryptedMsg: ${JSON.stringify(encryptedMsg, null, 2)}`)
-
-      // Write into p2wdb
-      const appId = 'psf-bch-wallet'
-      const data = {
-        now: new Date(),
-        data: encryptedMsg
-      }
-
-      const result = await this.write.postEntry(data, appId)
-      console.log(`Data about P2WDB write: ${JSON.stringify(result, null, 2)}`)
-
-      const hash = result.hash
-
-      // Sign Message
-      const txHex = await this.signalMessage(
-        walletData.privateKey,
-        hash,
-        bchAddress,
-        subject
-      )
-
-      // TODO: Replace messageLib.bchjs... with walletService.sendTx()
-      // Broadcast Transaction
-      const txidStr = await this.messagesLib.bchjs.RawTransactions.sendRawTransaction(
-        txHex
-      )
-      console.log(`Transaction ID : ${JSON.stringify(txidStr, null, 2)}`)
-
-      return txidStr
+      return txid
     } catch (error) {
-      console.log('Error in msgSend()', error)
+      console.log('Error in msgSend()')
       throw error
     }
   }
 
-  // Encrypt using encryptLib
+  // Encrypt a message using encryptLib
   async encryptMsg (pubKey, msg) {
     try {
       if (!pubKey || typeof pubKey !== 'string') {
@@ -121,16 +158,15 @@ class MsgSend extends Command {
       // console.log(`encryptedStr: ${JSON.stringify(encryptedStr, null, 2)}`)
       return encryptedStr
     } catch (error) {
-      console.log('Error in encryptMsg()', error)
+      console.log('Error in encryptMsg()')
       throw error
     }
   }
 
-  async signalMessage (privateKey, hash, bchAddress, subject) {
+  // Generate a PS001 signal message to write to the blockchain.
+  // https://github.com/Permissionless-Software-Foundation/specifications/blob/master/ps001-media-sharing.md
+  async signalMessage (hash, bchAddress, subject) {
     try {
-      if (!privateKey || typeof privateKey !== 'string') {
-        throw new Error('privateKey must be a string')
-      }
       if (!hash || typeof hash !== 'string') {
         throw new Error('hash must be a string')
       }
@@ -140,12 +176,14 @@ class MsgSend extends Command {
       if (!subject || typeof subject !== 'string') {
         throw new Error('subject must be a string')
       }
-      const txHex = await this.messagesLib.memo.writeMsgSignal(
-        privateKey,
+
+      // Generate the hex transaction containing the PS001 message signal.
+      const txHex = await this.msgLib.memo.writeMsgSignal(
         hash,
         [bchAddress],
         subject
       )
+
       if (!txHex) {
         throw new Error('Could not build a hex transaction')
       }

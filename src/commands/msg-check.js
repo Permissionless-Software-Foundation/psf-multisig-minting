@@ -5,7 +5,7 @@
 // Global npm libraries
 const { Command, flags } = require('@oclif/command')
 const EncryptLib = require('bch-encrypt-lib/index')
-const MessagesLib = require('bch-message-lib/index')
+const MsgLib = require('bch-message-lib/index')
 const Write = require('p2wdb/index').Write
 const Table = require('cli-table')
 const BchWallet = require('minimal-slp-wallet/index')
@@ -24,7 +24,7 @@ class MsgCheck extends Command {
     this.encryptLib = new EncryptLib({
       bchjs: this.walletService.walletUtil.bchjs
     })
-    this.MsgLib = MessagesLib
+    this.MsgLib = MsgLib
     // this.messagesLib = new MessagesLib({
     //   bchjs: this.walletService.walletUtil.bchjs
     // })

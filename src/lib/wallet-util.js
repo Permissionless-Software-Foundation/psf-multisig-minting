@@ -2,10 +2,12 @@
   Utility library for working with wallet files.
 */
 
+// Global npm libraries.
 const fs = require('fs').promises
 const BCHJS = require('@psf/bch-js')
 const Conf = require('conf')
 const BchWallet = require('minimal-slp-wallet/index')
+const MsgLib = require('bch-message-lib/index')
 
 let _this // Global variable points at instance of this Class.
 
@@ -16,6 +18,7 @@ class WalletUtil {
     this.bchjs = new BCHJS()
     this.conf = new Conf()
     this.BchWallet = BchWallet
+    this.MsgLib = MsgLib
 
     // Variables that can be controlled externally.
     this.advancedConfig = {
@@ -149,6 +152,11 @@ class WalletUtil {
       const restServer = this.getRestServer()
       console.log(`restServer: ${restServer}`)
 
+      // Hook for unit tests, to disable network calls.
+      if (walletName === 'test123') {
+        this.advancedConfig.noUpdate = true
+      }
+
       // Configure the minimal-slp-wallet library.
       this.advancedConfig.restURL = restServer
       const bchWallet = new this.BchWallet(
@@ -165,6 +173,17 @@ class WalletUtil {
       console.error('Error in wallet-util.js/instanceWallet()')
       throw err
     }
+  }
+
+  // Instantiate the bch-message-lib library with an instance of minimal-slp-wallet.
+  instanceMsgLib (wallet) {
+    if (!wallet) {
+      throw new Error('Must pass instance of minimal-slp-wallet.')
+    }
+
+    const msgLib = new this.MsgLib({ wallet })
+
+    return msgLib
   }
 }
 
