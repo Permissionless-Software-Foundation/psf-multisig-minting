@@ -86,7 +86,7 @@ class SendTokens extends Command {
       const result = await walletData.sendTokens(receiver, 5.0)
       // console.log('result: ', result)
 
-      return result.txid
+      return result
     } catch (err) {
       console.error('Error in sendTokens()')
       throw err
