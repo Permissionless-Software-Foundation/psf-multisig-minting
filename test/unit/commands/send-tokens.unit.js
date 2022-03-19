@@ -22,6 +22,7 @@ describe('send-tokens', () => {
   before(async () => {
     await walletCreate.createWallet(filename)
   })
+
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
 
@@ -31,6 +32,7 @@ describe('send-tokens', () => {
   afterEach(() => {
     sandbox.restore()
   })
+
   after(async () => {
     await fs.rm(filename)
   })
@@ -49,6 +51,7 @@ describe('send-tokens', () => {
         )
       }
     })
+
     it('should exit with error status if the wallet has no tokens.', async () => {
       try {
         const flags = {
@@ -76,6 +79,7 @@ describe('send-tokens', () => {
         )
       }
     })
+
     it('should exit with error status if no tokens in the wallet matched.', async () => {
       try {
         const flags = {
@@ -142,6 +146,7 @@ describe('send-tokens', () => {
         .resolves(SendTokensMock.getBalancesResult)
 
       const result = await uut.sendTokens(filename, flags)
+      console.log('result: ', result)
 
       assert.isString(result)
     })
