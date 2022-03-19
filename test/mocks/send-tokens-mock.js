@@ -3,11 +3,7 @@ const BCHJS = require('@psf/bch-js')
 
 const getBalancesResult = {
   bchBalance: 2,
-  sendTokens: () => {
-    return {
-      txid: '4aee846d3ef9bd70d36359c842dd6f4f278eaa794de4143456d23e862488a87e'
-    }
-  },
+  sendTokens: () => '887d7fd97569b4e16958f8f6ecd704f322e2ce5afb36178c1ae90b15661829ff',
   bchjs: new BCHJS(),
   utxos: {
     utxoStore: {

@@ -9,7 +9,6 @@ const BchWallet = require('minimal-slp-wallet/index')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
-// const WalletService = require('../lib/adapters/wallet-service')
 const WalletBalances = require('./wallet-balances')
 
 const { Command, flags } = require('@oclif/command')
@@ -56,10 +55,16 @@ class SendTokens extends Command {
         throw new Error('filename required.')
       }
 
+      // Get the balances of the wallet.
       const walletData = await this.walletBalances.getBalances(filename)
+      // console.log(`walletData.utxos.utxoStore: ${JSON.stringify(walletData.utxos.utxoStore, null, 2)}`)
+
+      // Isolate the token balances.
       const tokens = this.walletBalances.getTokenBalances(
         walletData.utxos.utxoStore.slpUtxos.type1.tokens
       )
+      // console.log(`tokens: ${JSON.stringify(tokens, null, 2)}`)
+
       if (!tokens.length) {
         throw new Error('No tokens found on this wallet.')
       }
@@ -71,6 +76,7 @@ class SendTokens extends Command {
       if (!tokenToSend) {
         throw new Error('No tokens in the wallet matched the given token ID.')
       }
+
       if (tokenToSend.qty < flags.qty) {
         throw new Error(
           `Insufficient funds. You are trying to send ${flags.qty}, but the wallet only has ${tokenToSend.qty}`
