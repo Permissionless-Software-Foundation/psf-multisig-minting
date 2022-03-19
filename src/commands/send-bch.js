@@ -37,13 +37,13 @@ class SendBch extends Command {
 
       const result = await this.sendBch(filename, flags)
       // console.log('result: ', result)
+      //
+      // if (!result.success) {
+      //   console.log('Error sending BCH: ', result)
+      //   return 0
+      // }
 
-      if (!result.success) {
-        console.log('Error sending BCH: ', result)
-        return 0
-      }
-
-      const txid = result.txid
+      const txid = result
 
       console.log(`TXID: ${txid}`)
       console.log('\nView this transaction on a block explorer:')

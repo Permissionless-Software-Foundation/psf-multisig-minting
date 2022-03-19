@@ -163,25 +163,27 @@ describe('send-bch', () => {
 
       assert.equal(result, 0)
     })
-    it('should return 0 , if the response return success property as false', async () => {
-      // Mock dependencies
-      const flags = {
-        name: 'test123',
-        qty: 1,
-        sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
-      }
-      // Mock methods that will be tested elsewhere.
-      sandbox
-        .stub(uut.walletBalances, 'getBalances')
-        .resolves(SendBCHMock.getBalancesResult2)
 
-      // Mock methods that will be tested elsewhere.
-      sandbox.stub(uut, 'parse').returns({ flags: flags })
+    // it('should return 0, if the response return success property as false', async () => {
+    //   // Mock dependencies
+    //   const flags = {
+    //     name: 'test123',
+    //     qty: 1,
+    //     sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
+    //   }
+    //   // Mock methods that will be tested elsewhere.
+    //   sandbox
+    //     .stub(uut.walletBalances, 'getBalances')
+    //     .resolves(SendBCHMock.getBalancesResult2)
+    //
+    //   // Mock methods that will be tested elsewhere.
+    //   sandbox.stub(uut, 'parse').returns({ flags: flags })
+    //
+    //   const result = await uut.run()
+    //
+    //   assert.equal(result, 0)
+    // })
 
-      const result = await uut.run()
-
-      assert.equal(result, 0)
-    })
     it('should run the run() function', async () => {
       // Mock dependencies
       const flags = {
@@ -190,9 +192,7 @@ describe('send-bch', () => {
         sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
       }
       // Mock methods that will be tested elsewhere.
-      sandbox
-        .stub(uut.walletBalances, 'getBalances')
-        .resolves(SendBCHMock.getBalancesResult)
+      sandbox.stub(uut, 'sendBch').resolves('fake-txid')
 
       // Mock methods that will be tested elsewhere.
       sandbox.stub(uut, 'parse').returns({ flags: flags })

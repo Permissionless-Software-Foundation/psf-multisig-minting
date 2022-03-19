@@ -9,7 +9,7 @@ const sinon = require('sinon')
 const fs = require('fs').promises
 
 const SendTokens = require('../../../src/commands/send-tokens')
-const SendTokensMock = require('../../mocks/send-tokens-mock')
+const sendTokensMock = require('../../mocks/send-tokens-mock')
 const WalletCreate = require('../../../src/commands/wallet-create')
 const walletCreate = new WalletCreate()
 
@@ -22,6 +22,7 @@ describe('send-tokens', () => {
   before(async () => {
     await walletCreate.createWallet(filename)
   })
+
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
 
@@ -31,6 +32,7 @@ describe('send-tokens', () => {
   afterEach(() => {
     sandbox.restore()
   })
+
   after(async () => {
     await fs.rm(filename)
   })
@@ -49,8 +51,15 @@ describe('send-tokens', () => {
         )
       }
     })
+
     it('should exit with error status if the wallet has no tokens.', async () => {
       try {
+        // Mock methods that will be tested elsewhere.
+        sandbox
+          .stub(uut.walletBalances, 'getBalances')
+          .resolves(sendTokensMock.getBalancesResult)
+        sandbox.stub(uut.walletBalances, 'getTokenBalances').returns([])
+
         const flags = {
           name: 'test123',
           qty: 10,
@@ -58,12 +67,6 @@ describe('send-tokens', () => {
             'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
           sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
         }
-        // Mock methods that will be tested elsewhere.
-        sandbox
-          .stub(uut.walletBalances, 'getBalances')
-          .resolves(SendTokensMock.getBalancesResult)
-
-        sandbox.stub(uut.walletBalances, 'getTokenBalances').returns([])
 
         await uut.sendTokens(filename, flags)
 
@@ -76,6 +79,7 @@ describe('send-tokens', () => {
         )
       }
     })
+
     it('should exit with error status if no tokens in the wallet matched.', async () => {
       try {
         const flags = {
@@ -88,7 +92,7 @@ describe('send-tokens', () => {
         // Mock methods that will be tested elsewhere.
         sandbox
           .stub(uut.walletBalances, 'getBalances')
-          .resolves(SendTokensMock.getBalancesResult)
+          .resolves(sendTokensMock.getBalancesResult)
 
         await uut.sendTokens(filename, flags)
 
@@ -104,6 +108,11 @@ describe('send-tokens', () => {
 
     it('should exit with error status for insufficient token qty.', async () => {
       try {
+        // Mock methods that will be tested elsewhere.
+        sandbox
+          .stub(uut.walletBalances, 'getBalances')
+          .resolves(sendTokensMock.getBalancesResult)
+
         const flags = {
           name: 'test123',
           qty: 10,
@@ -111,10 +120,6 @@ describe('send-tokens', () => {
             'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
           sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
         }
-        // Mock methods that will be tested elsewhere.
-        sandbox
-          .stub(uut.walletBalances, 'getBalances')
-          .resolves(SendTokensMock.getBalancesResult)
 
         await uut.sendTokens(filename, flags)
 
@@ -128,7 +133,12 @@ describe('send-tokens', () => {
       }
     })
 
-    it('should send tokens.', async () => {
+    it('should send tokens', async () => {
+      // Mock methods that will be tested elsewhere.
+      sandbox
+        .stub(uut.walletBalances, 'getBalances')
+        .resolves(sendTokensMock.getBalancesResult)
+
       const flags = {
         name: 'test123',
         qty: 1,
@@ -136,12 +146,9 @@ describe('send-tokens', () => {
           'a4fb5c2da1aa064e25018a43f9165040071d9e984ba190c222a7f59053af84b2',
         sendAddr: 'bitcoincash:qpufm97hppty67chexq4p53vc29mzg437vwp7huaa3'
       }
-      // Mock methods that will be tested elsewhere.
-      sandbox
-        .stub(uut.walletBalances, 'getBalances')
-        .resolves(SendTokensMock.getBalancesResult)
 
       const result = await uut.sendTokens(filename, flags)
+      console.log('result: ', result)
 
       assert.isString(result)
     })
@@ -264,7 +271,7 @@ describe('send-tokens', () => {
       // Mock methods that will be tested elsewhere.
       sandbox
         .stub(uut.walletBalances, 'getBalances')
-        .resolves(SendTokensMock.getBalancesResult)
+        .resolves(sendTokensMock.getBalancesResult)
 
       // Mock methods that will be tested elsewhere.
       sandbox.stub(uut, 'parse').returns({ flags: flags })
