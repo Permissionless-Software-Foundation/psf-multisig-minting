@@ -78,6 +78,7 @@
     "posttest": "npm run lint",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "test": "nyc mocha --exit --timeout 15000 --recursive test/unit/",
+    "test:integration": "mocha --exit --timeout 30000 --recursive test/integration/",
     "version": "oclif-dev readme && git add README.md",
     "lint": "standard --env mocha --fix",
     "coverage:report": "nyc --reporter=html mocha --exit --timeout 15000 --recursive test/unit/"

@@ -14,7 +14,7 @@ const WalletScan = require('../../../src/commands/wallet-scan')
 
 // const filename = `${__dirname.toString()}/../../../.wallets/test123.json`
 
-describe('wallet-balances', () => {
+describe('#wallet-scan', () => {
   let uut
   let sandbox
   let bchjs, bchWallet
@@ -74,6 +74,40 @@ describe('wallet-balances', () => {
       const result = uut.deriveAddress(masterHDNode, derivationPath)
 
       assert.equal(result, 'bitcoincash:qrjne8fhaxk8llvaf9ee2schf5llp8w9gg6rvqla9z')
+    })
+  })
+
+  describe('#addrTxHistory', () => {
+    it('should return true for address with tx history', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.bchWallet, 'getTransactions').resolves([
+        {
+          height: 646894,
+          tx_hash: '4c695fae636f3e8e2edc571d11756b880ccaae744390f3950d798ce7b5e25754'
+        }]
+      )
+      sandbox.stub(uut.bchWallet, 'getBalance').resolves(1600)
+
+      const addr = 'bitcoincash:qr69kyzha07dcecrsvjwsj4s6slnlq4r8c30lxnur3'
+
+      const result = await uut.addrTxHistory(addr)
+      // console.log('result: ', result)
+
+      assert.equal(result.hasHistory, true)
+      assert.isAbove(result.balance, 1000)
+    })
+
+    it('should return false for address with no tx history or balance', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.bchWallet, 'getTransactions').resolves([])
+
+      const addr = 'bitcoincash:qp5024nypt06fsw9x6cylh96xnzd0tvkyvuxvrt7dc'
+
+      const result = await uut.addrTxHistory(addr)
+      // console.log('result: ', result)
+
+      assert.equal(result.hasHistory, false)
+      assert.equal(result.balance, 0)
     })
   })
 })

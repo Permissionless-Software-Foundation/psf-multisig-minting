@@ -134,7 +134,7 @@ class ScanMnemonic extends Command {
         console.log(`Scanning ${derivedChildPath} at address ${derivedChildAddress}`)
 
         // Check for a transaction history for the address.
-        const historyBalanceData = await this.addressHasTransactionHistoryBalance(
+        const historyBalanceData = await this.addrTxHistory(
           derivedChildAddress
         )
         console.log(`historyBalanceData: ${JSON.stringify(historyBalanceData, null, 2)}`)
@@ -190,45 +190,30 @@ class ScanMnemonic extends Command {
 
   // Queries ElectrumX for transaction history of address, if existed, gets
   // address balance too.
-  async addressHasTransactionHistoryBalance (address) {
+  async addrTxHistory (address) {
     try {
-      // let balance = { confirmed: 0, unconfirmed: 0 }
       let balance = 0
 
-      // Get transaction history for the address.
-      // const transactions = await this.bchjs.Electrumx.transactions(
-      //   address
-      // ).catch(err => {
-      //   console.log(err)
-      // })
       const transactions = await this.bchWallet.getTransactions(address)
       // console.log(`transactions: ${JSON.stringify(transactions, null, 2)}`)
 
       let hasHistory = false
       if (transactions && transactions.length) {
-        // hasHistory =
-        //   transactions.success && transactions.transactions.length > 0
         hasHistory = true
       }
-      console.log(`hasHistory: ${hasHistory}`)
+      // console.log(`hasHistory: ${hasHistory}`)
 
       // If a transaction history is detected, get the balance for the address.
       if (hasHistory) {
-        // const balanceData = await this.BCHJS.Electrumx.balance(address).catch(
-        //   err => {
-        //     console.log(err)
-        //   }
-        // )
-
         const balanceData = await this.bchWallet.getBalance(address)
-        console.log(`balanceData: ${JSON.stringify(balanceData, null, 2)}`)
+        // console.log(`balanceData: ${JSON.stringify(balanceData, null, 2)}`)
 
         balance = balanceData
       }
 
       return { hasHistory: hasHistory, balance: balance }
     } catch (err) {
-      console.log('Error in addressHasTransactionHistoryBalance()')
+      console.log('Error in addrTxHistory()')
       throw err
     }
   }
