@@ -231,7 +231,9 @@ class ScanMnemonic extends Command {
   }
 }
 
-ScanMnemonic.description = `Scans first 20 addresses of each derivation path for
+ScanMnemonic.description = `Scan different derivation paths of a 12 word mnemonic for tx history.
+
+Scans the first 20 addresses of each derivation path for
 history and balance of the given mnemonic. If any of them had a history, scans
 the next 20, until it reaches a batch of 20 addresses with no history. The -m
 flag is used to pass it a mnemonic phrase. Be sure to enclose the words in
