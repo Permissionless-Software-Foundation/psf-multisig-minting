@@ -35,9 +35,9 @@ class ScanMnemonic extends Command {
 
     // An array of common derivation paths used by BCH wallets.
     this.derivationPaths = [
+      "m/44'/245'/0'/0", // SLP BIP44 standard
       "m/44'/145'/0'/0", // BCH BIP 44 standard
-      "m/44'/0'/0'/0", // Bitcoin.com wallet
-      "m/44'/245'/0'/0" // SLP BIP44 standard
+      "m/44'/0'/0'/0" // Bitcoin.com wallet
     ]
   }
 
@@ -55,55 +55,60 @@ class ScanMnemonic extends Command {
       // Configure the minimal-slp-wallet library.
       const advancedConfig = {
         interface: 'consumer-api',
-        restURL: restServer
+        restURL: restServer,
+        noUpdate: true
       }
       this.bchWallet = new this.BchWallet(undefined, advancedConfig)
       await this.bchWallet.walletInfoPromise
       this.bchjs = this.bchWallet.bchjs
 
-      await this.scanDerivationPaths()
+      await this.scanDerivationPaths(flags)
+
+      return true
     } catch (err) {
-      // if (err.message) console.log(err.message)
-      // else console.log('Error in .run: ', err)
-      console.log('Error in scan-funds.js/run: ', err)
+      if (err.message) console.log(err.message)
+      else console.log('Error in .run: ', err)
+      // console.log('Error in scan-funds.js/run: ', err)
       throw err
     }
   }
 
   // Primary function of this library that orchestrates the other functions
   // to scan the array of derivation paths.
-  async scanDerivationPaths () {
+  async scanDerivationPaths (flags) {
     try {
       // Initialize the HD wallet 'node'
       const rootSeed = await this.bchjs.Mnemonic.toSeed(flags.mnemonic)
       const masterHDNode = this.bchjs.HDNode.fromSeed(rootSeed)
+
+      let finalReport = '\nFinal Report:'
 
       // Loop through each derivation path.
       for (let i = 0; i < this.derivationPaths.length; i++) {
         const thisDerivationPath = this.derivationPaths[i]
 
         const addressesWithHistory = await this.scanDerivationPath(masterHDNode, thisDerivationPath)
-        console.log('addressesWithHistory: ', addressesWithHistory)
+        // console.log('addressesWithHistory: ', addressesWithHistory)
+
+        let result
+        if (addressesWithHistory.length) {
+          let total = 0
+          addressesWithHistory.map(x => {
+            total = total + x.balance
+            return x
+          })
+
+          const totalBch = this.bchjs.BitcoinCash.toBitcoinCash(total)
+
+          result = `Derivation path ${thisDerivationPath} has a transaction history and currently controls ${totalBch} BCH (${total} satoshis).`
+        } else {
+          result = `Derivation path ${thisDerivationPath} does not have any transaction history.`
+        }
+        console.log(result)
+        finalReport = finalReport + '\n' + result
       }
 
-      // Loop through each derivation in the array.
-      // this.derivePathes.forEach(derivePath => {
-      //   // Scan each derivation path for addresses with a transaction history.
-      //   this.scanDerivationPath(masterHDNode, derivePath).then(
-      //     addressesWithHistory => {
-      //       if (addressesWithHistory.length === 0) {
-      //         console.log(`No history found on derivation path ${derivePath}`)
-      //       } else {
-      //         // Display each address found with a transaction history.
-      //         addressesWithHistory.forEach(element => {
-      //           console.log(
-      //             `${element.address} - confirmed balance: ${element.balance.confirmed} unconfirmed balance: ${element.balance.unconfirmed}`
-      //           )
-      //         })
-      //       }
-      //     }
-      //   )
-      // })
+      console.log(finalReport)
     } catch (err) {
       console.error('Error in scanDerivationPaths()')
       throw err
@@ -116,15 +121,18 @@ class ScanMnemonic extends Command {
   // transaction history and balance.
   async scanDerivationPath (masterHDNode, derivePath) {
     try {
-      console.log(`Scanning derivation path ${derivePath}...`)
+      console.log(`\nScanning derivation path ${derivePath}...`)
 
       const addressesWithHistory = []
 
+      // Gap limit. BIP standard is 20
+      const GAP = 3
+
       // Scan 20 addresses for balances.
-      let limit = 20
+      let limit = GAP
       for (let index = 0; index <= limit; index++) {
         const derivedChildPath = `${derivePath}/${index}`
-        console.log(`derivedChildPath: ${derivedChildPath}`)
+        // console.log(`derivedChildPath: ${derivedChildPath}`)
 
         // Generate a BCH address.
         const derivedChildAddress = this.deriveAddress(
@@ -137,17 +145,21 @@ class ScanMnemonic extends Command {
         const historyBalanceData = await this.addrTxHistory(
           derivedChildAddress
         )
-        console.log(`historyBalanceData: ${JSON.stringify(historyBalanceData, null, 2)}`)
+        // console.log(`historyBalanceData: ${JSON.stringify(historyBalanceData, null, 2)}`)
 
-        // If a history is found, increase the limit by another 20 addresses.
+        // If a history is found, increase the limit by 20 addresses.
         if (historyBalanceData.hasHistory) {
+          console.log(`  TX History found for ${derivedChildAddress}`)
+
           addressesWithHistory.push({
             address: derivedChildAddress,
             balance: historyBalanceData.balance
           })
-          limit += 20
+          limit = index + GAP
         }
       }
+
+      // console.log(`addressesWithHistory: ${JSON.stringify(addressesWithHistory, null, 2)}`)
 
       return addressesWithHistory
     } catch (err) {
@@ -171,22 +183,6 @@ class ScanMnemonic extends Command {
       throw err
     }
   }
-
-  // Generates a child HDNode from masterHDNode using derivePath.
-  // Returns the BCH address for that child HDNode.
-  // old
-  // generateDerivedAddress (masterHDNode, derivePath) {
-  //   try {
-  //     const derivedHDNode = this.bchjs.HDNode.derivePath(
-  //       masterHDNode,
-  //       derivePath
-  //     )
-  //     return this.bchjs.HDNode.toCashAddress(derivedHDNode)
-  //   } catch (err) {
-  //     console.log('Error in generateDerivedAddress()')
-  //     throw err
-  //   }
-  // }
 
   // Queries ElectrumX for transaction history of address, if existed, gets
   // address balance too.
@@ -238,7 +234,12 @@ class ScanMnemonic extends Command {
 ScanMnemonic.description = `Scans first 20 addresses of each derivation path for
 history and balance of the given mnemonic. If any of them had a history, scans
 the next 20, until it reaches a batch of 20 addresses with no history. The -m
-flag is used to pass it a mnemonic phrase.
+flag is used to pass it a mnemonic phrase. Be sure to enclose the words in
+quotes.
+
+This command is handy for people who maintain multiple wallets. This allows easy
+scanning to see if a mnemonic holds any funds on any of the commonly used
+derivation paths.
 
 Derivation pathes used:
 145 - BIP44 standard path for Bitcoin Cash
