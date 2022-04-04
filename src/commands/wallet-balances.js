@@ -2,20 +2,17 @@
   Update the balances of a wallet.
 */
 
-'use strict'
-
 // Public NPM libraries
 const BchWallet = require('minimal-slp-wallet/index')
 const collect = require('collect.js')
 const Conf = require('conf')
+const fs = require('fs')
 
 // Local libraries
 const WalletUtil = require('../lib/wallet-util')
 const WalletConsumer = require('../lib/adapters/wallet-consumer')
 
 const { Command, flags } = require('@oclif/command')
-
-const fs = require('fs')
 
 class WalletBalances extends Command {
   constructor (argv, config) {
