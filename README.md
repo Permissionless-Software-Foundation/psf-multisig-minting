@@ -83,6 +83,7 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
 * [`psf-bch-wallet wallet-list`](#psf-bch-wallet-wallet-list)
 * [`psf-bch-wallet wallet-remove`](#psf-bch-wallet-wallet-remove)
+* [`psf-bch-wallet wallet-scan`](#psf-bch-wallet-wallet-scan)
 * [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
 * [`psf-bch-wallet wallet-service-test`](#psf-bch-wallet-wallet-service-test)
 
@@ -371,6 +372,35 @@ OPTIONS
 ```
 
 _See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-remove.js)_
+
+## `psf-bch-wallet wallet-scan`
+
+Scans first 20 addresses of each derivation path for
+
+```
+USAGE
+  $ psf-bch-wallet wallet-scan
+
+OPTIONS
+  -m, --mnemonic=mnemonic  mnemonic phrase to generate addresses, wrapped in quotes
+
+DESCRIPTION
+  history and balance of the given mnemonic. If any of them had a history, scans
+  the next 20, until it reaches a batch of 20 addresses with no history. The -m
+  flag is used to pass it a mnemonic phrase. Be sure to enclose the words in
+  quotes.
+
+  This command is handy for people who maintain multiple wallets. This allows easy
+  scanning to see if a mnemonic holds any funds on any of the commonly used
+  derivation paths.
+
+  Derivation pathes used:
+  145 - BIP44 standard path for Bitcoin Cash
+  245 - BIP44 standard path for SLP tokens
+  0 - Used by common software like the Bitcoin.com wallet and Honest.cash
+```
+
+_See code: [src/commands/wallet-scan.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-scan.js)_
 
 ## `psf-bch-wallet wallet-service`
 
