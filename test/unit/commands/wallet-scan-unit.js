@@ -145,6 +145,8 @@ describe('#wallet-scan', () => {
         balance: 0
       })
 
+      uut.GAP = 3
+
       const mnemonic = 'assist field wrist ridge violin visa mango minor vibrant this scorpion asthma'
 
       // Initialize the HD wallet 'node'
@@ -168,6 +170,8 @@ describe('#wallet-scan', () => {
         hasHistory: false,
         balance: 0
       })
+
+      uut.GAP = 3
 
       const mnemonic = 'assist field wrist ridge violin visa mango minor vibrant this scorpion asthma'
 

@@ -86,6 +86,7 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet wallet-scan`](#psf-bch-wallet-wallet-scan)
 * [`psf-bch-wallet wallet-service`](#psf-bch-wallet-wallet-service)
 * [`psf-bch-wallet wallet-service-test`](#psf-bch-wallet-wallet-service-test)
+* [`psf-bch-wallet wallet-sweep`](#psf-bch-wallet-wallet-sweep)
 
 ## `psf-bch-wallet conf [KEY] [VALUE]`
 
@@ -375,7 +376,7 @@ _See code: [src/commands/wallet-remove.js](https://github.com/Permissionless-Sof
 
 ## `psf-bch-wallet wallet-scan`
 
-Scans first 20 addresses of each derivation path for
+Scan different derivation paths of a 12 word mnemonic for tx history.
 
 ```
 USAGE
@@ -385,6 +386,7 @@ OPTIONS
   -m, --mnemonic=mnemonic  mnemonic phrase to generate addresses, wrapped in quotes
 
 DESCRIPTION
+  Scans the first 20 addresses of each derivation path for
   history and balance of the given mnemonic. If any of them had a history, scans
   the next 20, until it reaches a batch of 20 addresses with no history. The -m
   flag is used to pass it a mnemonic phrase. Be sure to enclose the words in
@@ -432,4 +434,31 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/wallet-service-test.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-service-test.js)_
+
+## `psf-bch-wallet wallet-sweep`
+
+Sweep funds from one wallet into another
+
+```
+USAGE
+  $ psf-bch-wallet wallet-sweep
+
+OPTIONS
+  -d, --derivation=derivation  Derivation path. Will default to 245 if not specified. Common values are 245, 145, and 0
+  -m, --mnemonic=mnemonic      12-word mnemonic phrase, wrapped in quotes
+  -n, --name=name              name of receiving wallet
+  -w, --wif=wif                WIF private key controlling funds of a single address
+
+DESCRIPTION
+  Sweep funds from a single private key (WIF) or a whole HD wallet (mnemonic)
+  into another wallet. Works for both BCH and tokens.
+
+  If the target wallet does not have enough funds to pay transaction fees, fees
+  are paid from the receiving wallet. In the case of a mnemonic, a derivation path
+  can be specified.
+
+  Either a WIF or a mnemonic must be specified.
+```
+
+_See code: [src/commands/wallet-sweep.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/wallet-sweep.js)_
 <!-- commandsstop -->
