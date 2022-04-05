@@ -1,22 +1,7 @@
 /*
-  This command is used to scan a wallet to see if holds any BCH.
-
-  Since many wallets implement different standards around derivation paths,
-  this command scans several common derivation paths.
-
-  Scans first 20 addresses of each derivation path for tx history and balance.
-  If any of them had a history, scans the next 20, until it reaches a batch of 20
-  addresses with no history.
-
-  derivation settings:
-  145 - BIP44 standard path for Bitcoin Cash
-  245 - BIP44 standard path for SLP tokens
-  0 - Used by common software like the Bitcoin.com wallet and Honest.cash
-
-  TODO:
-  - Currently makes one API call to Electrumx API endpoint per address. This
-  command would be greatly improved if the bulk endpoint was used to retrieve
-  20 addresses at a time.
+  This command is used to traverse an HD wallet and sweep any BCH and tokens
+  to a given wallet. The receiving wallet must have some BCH to pay for
+  transaction fees.
 */
 
 // Public NPM libraries
@@ -50,8 +35,8 @@ class WalletSweep extends Command {
 
       if (flags.wif) {
         // Sweep a single WIF private key
-        const hex = await this.sweepWif(flags, receiverWif)
-        console.log('hex: ', hex)
+        const txid = await this.sweepWif(flags, receiverWif)
+        console.log('txid: ', txid)
       } else {
         // Sweep a series of WIF private keys generated from the mnemonic
         console.log('Sweeping mnemonic')
@@ -72,12 +57,16 @@ class WalletSweep extends Command {
       const sweeper = new this.BchTokenSweep(
         flags.wif,
         receiverWif,
-        this.bchWallet.bchjs
+        this.bchWallet
       )
       await sweeper.populateObjectFromNetwork()
 
       const hex = await sweeper.sweepTo(this.bchWallet.walletInfo.slpAddress)
-      return hex
+      // return hex
+
+      const txid = await this.bchWallet.ar.sendTx(hex)
+
+      return txid
     } catch (err) {
       console.error('Error in sweepWif()')
       throw err
@@ -110,7 +99,7 @@ class WalletSweep extends Command {
       // blockchain.
       await this.bchWallet.walletInfoPromise
 
-      console.log(`walletInfo: ${JSON.stringify(this.bchWallet.walletInfo, null, 2)}`)
+      // console.log(`walletInfo: ${JSON.stringify(this.bchWallet.walletInfo, null, 2)}`)
 
       return this.bchWallet.walletInfo.privateKey
     } catch (err) {
