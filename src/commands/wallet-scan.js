@@ -39,6 +39,9 @@ class ScanMnemonic extends Command {
       "m/44'/145'/0'/0", // BCH BIP 44 standard
       "m/44'/0'/0'/0" // Bitcoin.com wallet
     ]
+
+    // Gap limit. BIP standard is 20
+    this.GAP = 20
   }
 
   async run () {
@@ -66,8 +69,9 @@ class ScanMnemonic extends Command {
 
       return true
     } catch (err) {
-      if (err.message) console.log(err.message)
-      else console.log('Error in .run: ', err)
+      console.log(err.message)
+      // if (err.message) console.log(err.message)
+      // else console.log('Error in .run: ', err)
       // console.log('Error in scan-funds.js/run: ', err)
       throw err
     }
@@ -125,11 +129,8 @@ class ScanMnemonic extends Command {
 
       const addressesWithHistory = []
 
-      // Gap limit. BIP standard is 20
-      const GAP = 3
-
       // Scan 20 addresses for balances.
-      let limit = GAP
+      let limit = this.GAP
       for (let index = 0; index <= limit; index++) {
         const derivedChildPath = `${derivePath}/${index}`
         // console.log(`derivedChildPath: ${derivedChildPath}`)
@@ -155,7 +156,7 @@ class ScanMnemonic extends Command {
             address: derivedChildAddress,
             balance: historyBalanceData.balance
           })
-          limit = index + GAP
+          limit = index + this.GAP
         }
       }
 

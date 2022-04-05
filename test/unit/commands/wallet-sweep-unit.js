@@ -126,6 +126,18 @@ describe('#wallet-sweep', () => {
       assert.equal(result, true)
       assert.equal(flags.derivation, 145)
     })
+
+    it('should default to 245 derivation if not specified', () => {
+      const flags = {
+        name: 'test',
+        mnemonic: 'one two three four five six seven eight nine ten eleven twelve'
+      }
+
+      const result = uut.validateFlags(flags)
+
+      assert.equal(result, true)
+      assert.equal(flags.derivation, 245)
+    })
   })
 
   describe('#getReceiverWif', () => {
@@ -165,7 +177,7 @@ describe('#wallet-sweep', () => {
       const result = await uut.sweepWif({}, 'in-wif')
       // console.log('result: ', result)
 
-      assert.equal(result, 'fake-hex')
+      assert.equal(result, 'fake-txid')
     })
 
     it('should catch and throw errors', async () => {
@@ -176,6 +188,151 @@ describe('#wallet-sweep', () => {
       } catch (err) {
         // console.log(err)
 
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+  })
+
+  describe('#deriveKey', () => {
+    it('should return a WIF', async () => {
+      const mnemonic = 'fly impulse raise urban sun patch course diary witness plastic giant tired'
+      const rootSeed = await uut.bchWallet.bchjs.Mnemonic.toSeed(mnemonic)
+      const masterHDNode = uut.bchWallet.bchjs.HDNode.fromSeed(rootSeed)
+      const derivationPath = 'm/44\'/145\'/0\'/0/0'
+
+      const { addr, wif } = await uut.deriveKey(masterHDNode, derivationPath)
+
+      assert.equal(addr, 'bitcoincash:qrqp2s098ene2mgf99v5audkdwlupvthsu3rn8wpzu')
+      assert.equal(wif, 'L3Qx1gg4f7mq2Tbgw1okzkobJxe1DgpvRxdUyMdUmPAvPFXRke6p')
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        await uut.deriveKey()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+  })
+
+  describe('#scanMnemonic', () => {
+    it('should return an array of keys with balances', async () => {
+      // Mock dependencies
+      sandbox.stub(uut.bchWallet, 'getBalance')
+        .onCall(0).resolves(1600)
+        .resolves(0)
+      uut.GAP = 3
+
+      const flags = {
+        mnemonic: 'fly impulse raise urban sun patch course diary witness plastic giant tired',
+        derivation: 145
+      }
+
+      const result = await uut.scanMnemonic(flags)
+      // console.log('result: ', result)
+
+      assert.isArray(result)
+      assert.equal(result.length, 1)
+      assert.equal(result[0].addr, 'bitcoincash:qrqp2s098ene2mgf99v5audkdwlupvthsu3rn8wpzu')
+      assert.equal(result[0].wif, 'L3Qx1gg4f7mq2Tbgw1okzkobJxe1DgpvRxdUyMdUmPAvPFXRke6p')
+      assert.equal(result[0].index, 0)
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        await uut.scanMnemonic()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+
+        assert.include(err.message, 'Cannot read')
+      }
+    })
+  })
+
+  describe('#sweepMnemonic', () => {
+    it('should sweep a mnemonic', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'scanMnemonic').resolves([
+        {
+          addr: 'bitcoincash:qrqp2s098ene2mgf99v5audkdwlupvthsu3rn8wpzu',
+          wif: 'L3Qx1gg4f7mq2Tbgw1okzkobJxe1DgpvRxdUyMdUmPAvPFXRke6p',
+          index: 0
+        }
+      ])
+      sandbox.stub(uut, 'sweepWif').resolves('fake-txid')
+      sandbox.stub(uut.bchWallet.bchjs.Util, 'sleep').resolves()
+
+      const flags = {
+        mnemonic: 'fly impulse raise urban sun patch course diary witness plastic giant tired',
+        derivation: 145
+      }
+
+      const result = await uut.sweepMnemonic(flags)
+
+      assert.equal(result, true)
+    })
+
+    it('should catch and throw errors', async () => {
+      try {
+        // Force an error
+        sandbox.stub(uut, 'scanMnemonic').rejects(new Error('test error'))
+
+        await uut.sweepMnemonic()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
+        // console.log(err)
+
+        assert.include(err.message, 'test error')
+      }
+    })
+  })
+
+  describe('#run', () => {
+    it('should scan a mnemonic', async () => {
+      const flags = {
+        mnemonic: 'assist field wrist ridge violin visa mango minor vibrant this scorpion asthma'
+      }
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
+      sandbox.stub(uut, 'validateFlags').returns()
+      sandbox.stub(uut, 'getReceiverWif').resolves()
+      sandbox.stub(uut, 'sweepMnemonic').resolves()
+
+      const result = await uut.run()
+
+      assert.equal(result, true)
+    })
+
+    it('should scan a single WIF', async () => {
+      const flags = {
+        wif: 'fake-wif'
+      }
+
+      // Mock methods that will be tested elsewhere.
+      sandbox.stub(uut, 'parse').returns({ flags: flags })
+      sandbox.stub(uut, 'validateFlags').returns()
+      sandbox.stub(uut, 'getReceiverWif').resolves()
+      sandbox.stub(uut, 'sweepWif').resolves()
+
+      const result = await uut.run()
+
+      assert.equal(result, true)
+    })
+
+    it('should catch and throw and error', async () => {
+      try {
+        await uut.run()
+
+        assert.fail('Unexpected code path')
+      } catch (err) {
         assert.include(err.message, 'Cannot read')
       }
     })

@@ -21,6 +21,9 @@ class WalletSweep extends Command {
     this.BchWallet = BchWallet
     this.conf = new Conf()
     this.BchTokenSweep = BchTokenSweep
+
+    // Gap limit. BIP standard is 20
+    this.GAP = 20
   }
 
   async run () {
@@ -40,13 +43,109 @@ class WalletSweep extends Command {
       } else {
         // Sweep a series of WIF private keys generated from the mnemonic
         console.log('Sweeping mnemonic')
+        await this.sweepMnemonic(flags, receiverWif)
       }
 
       return true
     } catch (err) {
+      console.log(err.message)
       // if (err.message) console.log(err.message)
-      // else console.log('Error in .run: ', err)
-      console.log('Error in scan-funds.js/run: ', err)
+      // else console.log('Error in run(): ', err)
+      // console.log('Error in scan-funds.js/run: ', err)
+      throw err
+    }
+  }
+
+  // Sweep an HD wallet by crawling each address it controlls, until a gap of
+  // 20 addresses is found with no balance.
+  async sweepMnemonic (flags, receiverWif) {
+    try {
+      // Collect all the addresses that need to be swept.
+      const wifsToSweep = await this.scanMnemonic(flags)
+      // console.log(`wifsToSweep: ${JSON.stringify(wifsToSweep, null, 2)}`)
+
+      console.log('\nStarting to sweep funds...')
+
+      // Loop through each address that needs to be swept.
+      for (let i = 0; i < wifsToSweep.length; i++) {
+        const thisKey = wifsToSweep[i]
+
+        const inObj = { wif: thisKey.wif }
+        const txid = await this.sweepWif(inObj, receiverWif)
+
+        console.log(`Swept funds from ${thisKey.addr}. TXID: ${txid}`)
+        console.log(`https://blockchair.com/bitcoin-cash/transaction/${txid}`)
+
+        // Wait for indexer state to update
+        await this.bchWallet.bchjs.Util.sleep(2000)
+      }
+
+      return true
+    } catch (err) {
+      console.error('Error in sweepMnemonic()')
+      throw err
+    }
+  }
+
+  // Scan a mnemonic for address with a balance. This function returns an array
+  // of objects. Each object contains an address, WIF, and HD index. The array
+  // is populated when an address is detected with a balance.
+  async scanMnemonic (flags) {
+    try {
+      const outArray = []
+
+      console.log(`\nScanning derivation path ${flags.derivation}...`)
+
+      // Initialize the HD wallet 'node'
+      const rootSeed = await this.bchWallet.bchjs.Mnemonic.toSeed(flags.mnemonic)
+      const masterHDNode = this.bchWallet.bchjs.HDNode.fromSeed(rootSeed)
+      const derivationPath = `m/44'/${flags.derivation}'/0'/0`
+
+      let limit = this.GAP
+      for (let index = 0; index <= limit; index++) {
+        const derivedChildPath = `${derivationPath}/${index}`
+
+        // Generate a BCH address.
+        const { addr, wif } = this.deriveKey(
+          masterHDNode,
+          derivedChildPath
+        )
+        console.log(`Scanning ${derivedChildPath} at address ${addr}`)
+
+        const balance = await this.bchWallet.getBalance(addr)
+        // console.log('balance: ', balance)
+
+        if (balance) {
+          const addrObj = { addr, wif, index }
+          outArray.push(addrObj)
+          console.log(`  ..balance of ${balance} sats found.`)
+
+          limit = index + this.GAP
+        }
+      }
+
+      return outArray
+    } catch (err) {
+      console.error('Error in scanMnemonic()')
+      throw err
+    }
+  }
+
+  // Generates a BCH address from the HD node and the derivation path.
+  // Returns an object containing the BCH address and WIF private key.
+  deriveKey (masterHDNode, derivePath) {
+    try {
+      const derivedHDNode = this.bchWallet.bchjs.HDNode.derivePath(
+        masterHDNode,
+        derivePath
+      )
+
+      const addr = this.bchWallet.bchjs.HDNode.toCashAddress(derivedHDNode)
+      const wif = this.bchWallet.bchjs.HDNode.toWIF(derivedHDNode)
+
+      return { addr, wif }
+    } catch (err) {
+      console.log('Error in deriveAddress()')
       throw err
     }
   }
