@@ -1,7 +1,7 @@
 {
-  "name": "psf-bch-wallet",
-  "description": "A command line (CLI) wallet app for working with Bitcoin Cash and SLP tokens. Uses services over IPFS.",
-  "version": "v2.14.2",
+  "name": "psf-multisig-minting",
+  "description": "A fork of psf-bch-wallet for minting SLP tokens with a multisig wallet",
+  "version": "v1.0.0",
   "author": "Chris Troutner <chris.troutner@gmail.com>",
   "bin": {
     "bin-cli-boilerplate": "./bin/run"

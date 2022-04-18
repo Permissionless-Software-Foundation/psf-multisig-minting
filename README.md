@@ -1,12 +1,8 @@
-# psf-bch-wallet
+# psf-multisig-minting
 
 This is a command-line (CLI) app for working with the Bitcoin Cash (BCH) blockchain, and SLP tokens.
 
-This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-service) over [IPFS](https://ipfs.io), using the [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) library. This app uses the [oclif CLI framework](https://oclif.io/).
-
-This app is intended for developers who want to work with the BCH blockchain. To see how this software fits in with the Cash Stack architecture, devs should read this blog post on [Realizing the Web 3 Cash Stack](https://bafybeie3w6ykd3ur6b6ytxoopi6p7vipmyvdyq7s2aw5ngsenhtjvyp4d4.ipfs.dweb.link/blog/realizing-the-web-3-cash-stack).
-
-- [(Video) How to Install and Use](https://youtu.be/45YEeZi_8Kc)
+This app is forked from [psf-bch-wallet](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet). It adds specialized commands for minting SLP tokens using a multisig wallet.
 
 ## Install
 
@@ -15,33 +11,9 @@ This app is intended for developers who want to work with the BCH blockchain. To
 - `./bin/run help` to see a list of available commands.
 - `./bin/run wallet-create` to create a wallet. Wallet files are stored in the `.wallets` directory.
 
-## Configuration
-
-By default, this app uses [free-bch.fullstack.cash](https://free-bch.fullstack.cash) as its back end service for working with the BCH blockchain. That back-end service is simply a copy of [ipfs-bch-wallet-consumer](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-consumer). By running your own copy of ipfs-bch-wallet-consumer, you can have greater reliability and can use this app to switch between different [global back ends](https://bafybeie3w6ykd3ur6b6ytxoopi6p7vipmyvdyq7s2aw5ngsenhtjvyp4d4.ipfs.dweb.link/blog/realizing-the-web-3-cash-stack). If `free-bch.fullstack.cash` goes down for some reason, running your own instance of `ipfs-bch-wallet-consumer` allows you to easily switch to any functional back end on the internet.
-
-Switch to a local instance of `ipfs-bch-wallet-consumer`:
-
-- `./bin/run conf -k restServer -v http://localhost:5001`
-
-Switch back to [free-bch.fullstack.cash](https://free-bch.fullstack.cash):
-
-- `./bin/run conf -k restServer -v https://free-bch.fullstack.cash`
-
-Explore the other configuration settings:
-
-- `./bin/run conf`
-
 ## License
 
 [MIT](./LICENSE.md)
-
-## Credit
-
-- [js-ipfs](https://www.npmjs.com/package/ipfs) - The IPFS node software.
-- [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) - IPFS subnet coordination library.
-- [bch-js](https://github.com/Permissionless-Software-Foundation/bch-js) - BCH toolkit.
-- [oclif](https://oclif.io/) - CLI framework.
-- [conf-cli](https://github.com/natzcam/conf-cli) - oclif config plugin.
 
 ## Table of Contents
 
