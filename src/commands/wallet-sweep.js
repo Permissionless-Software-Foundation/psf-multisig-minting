@@ -48,9 +48,9 @@ class WalletSweep extends Command {
 
       return true
     } catch (err) {
-      console.log(err.message)
+      // console.log(err.message)
       // if (err.message) console.log(err.message)
-      // else console.log('Error in run(): ', err)
+      console.log('Error in run(): ', err)
       // console.log('Error in scan-funds.js/run: ', err)
       throw err
     }
@@ -71,10 +71,15 @@ class WalletSweep extends Command {
         const thisKey = wifsToSweep[i]
 
         const inObj = { wif: thisKey.wif }
-        const txid = await this.sweepWif(inObj, receiverWif)
 
-        console.log(`Swept funds from ${thisKey.addr}. TXID: ${txid}`)
-        console.log(`https://blockchair.com/bitcoin-cash/transaction/${txid}`)
+        try {
+          const txid = await this.sweepWif(inObj, receiverWif)
+
+          console.log(`Swept funds from ${thisKey.addr}. TXID: ${txid}`)
+          console.log(`https://blockchair.com/bitcoin-cash/transaction/${txid}`)
+        } catch (err) {
+          console.log(`Error trying to sweep ${thisKey.addr}: ${err.message}`)
+        }
 
         // Wait for indexer state to update
         await this.bchWallet.bchjs.Util.sleep(2000)
