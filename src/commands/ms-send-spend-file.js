@@ -1,22 +1,24 @@
 /*
-  Create a JSON file for the purpose of spending a minting baton
+  Create a JSON file for the purpose of spending a minting baton. Encrypt the
+  file and send it to a BCH address.
 */
 
 'use strict'
 
+// Global npm libraries
 const fs = require('fs').promises
-// const shelljs = require('shelljs')
-// const Table = require('cli-table')
-
 const { Command, flags } = require('@oclif/command')
+
+// Local libraries
+const MsgSend = require('./msg-send')
 
 class CreateSpendFile extends Command {
   constructor (argv, config) {
     super(argv, config)
 
     // Encapsulate dependencies.
-    // this.shelljs = shelljs
     this.fs = fs
+    this.msgSend = new MsgSend()
   }
 
   async run () {
@@ -26,7 +28,9 @@ class CreateSpendFile extends Command {
       // Validate input flags
       this.validateFlags(flags)
 
-      await this.createSpendFile(flags)
+      const spendFileObj = await this.createSpendFile(flags)
+
+      await this.sendSpendFile(flags, spendFileObj)
 
       return true
     } catch (err) {
@@ -35,6 +39,28 @@ class CreateSpendFile extends Command {
     }
   }
 
+  // Send an encrypted spend file to a BCH address.
+  async sendSpendFile (flags, spendFileObj) {
+    try {
+      const sendFlags = {
+        name: flags.name,
+        bchAddress: flags.address,
+        subject: `spend file: ${spendFileObj.currentAddress}`,
+        message: JSON.stringify(spendFileObj, null, 2)
+      }
+
+      const txid = await this.msgSend.msgSend(sendFlags)
+      console.log(`File sent with TXID: ${txid}`)
+
+      return txid
+    } catch (err) {
+      console.error('Error in sendSpendFile()')
+      throw err
+    }
+  }
+
+  // Generate a 'spend file' object, which contains the information needed to
+  // spend the minting baton from the multisignature wallet.
   async createSpendFile (flags) {
     try {
       const filename1 = `${__dirname.toString()}/../../.wallets/${
@@ -52,18 +78,19 @@ class CreateSpendFile extends Command {
       const spendFileObj = {
         currentPublicKey: oldWallet.wallet.publicKey,
         currentPrivateKey: oldWallet.wallet.privateKey,
+        currentAddress: oldWallet.wallet.cashAddress,
         newPublicKey: newWallet.wallet.publicKey,
         newAddress: newWallet.wallet.cashAddress
       }
 
-      const outFilename = `${__dirname.toString()}/../../spend-file-${
-        flags.name
-      }.json`
-      await this.fs.writeFile(outFilename, JSON.stringify(spendFileObj, null, 2))
+      // const outFilename = `${__dirname.toString()}/../../spend-file-${
+      //   flags.name
+      // }.json`
+      // await this.fs.writeFile(outFilename, JSON.stringify(spendFileObj, null, 2))
+      //
+      // console.log(`spend-file-${flags.name}.json created.`)
 
-      console.log(`spend-file-${flags.name}.json created.`)
-
-      return true
+      return spendFileObj
     } catch (err) {
       console.error('Error in createSpendFile()')
       throw err
@@ -81,6 +108,11 @@ class CreateSpendFile extends Command {
     const newWallet = flags.newWallet
     if (!newWallet || newWallet === '') {
       throw new Error('You must specify a *new* wallet with the -m flag.')
+    }
+
+    const address = flags.address
+    if (!address || address === '') {
+      throw new Error('You must specify an address to send the file to with the -a flag.')
     }
 
     return true
@@ -103,7 +135,8 @@ transaction is broadcasted.
 
 CreateSpendFile.flags = {
   name: flags.string({ char: 'n', description: 'Name of current wallet' }),
-  newWallet: flags.string({ char: 'm', description: 'Name of new wallet' })
+  newWallet: flags.string({ char: 'm', description: 'Name of new wallet' }),
+  address: flags.string({ char: 'a', description: 'BCH Address to send file to' })
 }
 
 module.exports = CreateSpendFile
