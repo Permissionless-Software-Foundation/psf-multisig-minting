@@ -9,3 +9,4 @@
 /.wallets
 node_modules
 /.ipfsdata
+*.json
