@@ -1,5 +1,5 @@
 /*
-  Unit tests for the send-bch command.
+  Unit tests for the p2wdb-write command.
 */
 
 'use strict'
