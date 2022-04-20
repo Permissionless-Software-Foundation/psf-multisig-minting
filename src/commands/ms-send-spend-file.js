@@ -12,7 +12,7 @@ const { Command, flags } = require('@oclif/command')
 // Local libraries
 const MsgSend = require('./msg-send')
 
-class CreateSpendFile extends Command {
+class SendSpendFile extends Command {
   constructor (argv, config) {
     super(argv, config)
 
@@ -23,7 +23,7 @@ class CreateSpendFile extends Command {
 
   async run () {
     try {
-      const { flags } = this.parse(CreateSpendFile)
+      const { flags } = this.parse(SendSpendFile)
 
       // Validate input flags
       this.validateFlags(flags)
@@ -119,7 +119,7 @@ class CreateSpendFile extends Command {
   }
 }
 
-CreateSpendFile.description = `Generate a spend file for minting new tokens
+SendSpendFile.description = `Generate a spend file for minting new tokens
 
 This command generates a spend-file-<wallet name>.json file, which can be
 submitted to the minting council for the purpose of minting new tokens with
@@ -133,10 +133,10 @@ wallet, which is where the minting baton will be tranfered to after the minting
 transaction is broadcasted.
 `
 
-CreateSpendFile.flags = {
+SendSpendFile.flags = {
   name: flags.string({ char: 'n', description: 'Name of current wallet' }),
   newWallet: flags.string({ char: 'm', description: 'Name of new wallet' }),
   address: flags.string({ char: 'a', description: 'BCH Address to send file to' })
 }
 
-module.exports = CreateSpendFile
+module.exports = SendSpendFile

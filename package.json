@@ -16,6 +16,7 @@
     "bch-encrypt-lib": "2.0.0",
     "bch-message-lib": "2.2.0",
     "bch-token-sweep": "2.1.1",
+    "bitcore-lib-cash": "8.25.25",
     "cli-table": "0.3.6",
     "collect.js": "4.29.0",
     "conf-cli": "0.1.9",
