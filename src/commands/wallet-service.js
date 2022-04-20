@@ -34,25 +34,25 @@ class WalletService extends Command {
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       const providers = result.data.status.serviceProviders
-     //const selectedProvider = result.data.status.selectedProvider
-      const defaultProvider = result.data.status.selectedProvider;
+      // const selectedProvider = result.data.status.selectedProvider
+      const defaultProvider = result.data.status.selectedProvider
 
       if (!flags.select) {
-          //Remove all objects that don't contain ipfsId of selected provider
-          const currProv = providers.filter(
-            (el) => el.ipfsId == defaultProvider
-          );
-          const providerName = currProv[0].name;
+        // Remove all objects that don't contain ipfsId of selected provider
+        const currProv = providers.filter(
+          (el) => el.ipfsId === defaultProvider
+        )
+        const providerName = currProv[0].name
 
-          console.log(
+        console.log(
             `Available service providers: ${JSON.stringify(providers, null, 2)}`
-          );
-          console.log(
-            `\nSelected service provider: 
+        )
+        console.log(
+            `\nSelected service provider:
              \nname: ${providerName} \nipfsId: ${defaultProvider}`
-          );
+        )
       } else {
-        await this.selectService(flags);
+        await this.selectService(flags)
       }
 
       return true
@@ -74,19 +74,18 @@ class WalletService extends Command {
         provider: chosenPeer
       }
       const request = await this.axios.post(`${server}/bch/provider`, body)
-      const result = await this.axios.get(`${server}/bch`);
-  
-      const chosenProv = request.config.data.slice(13,-2)
-      const providers = result.data.status.serviceProviders;
-      
-	    const currProv = await providers.filter(
-               (el) => el.ipfsId == chosenProv
-          );
-           const providerName = currProv[0].name;
-     		console.log(
-     		`\nService provider switched to:
-     		 \nname: ${providerName} \nipfsId: ${currProv[0].ipfsId}`);
-     		
+      const result = await this.axios.get(`${server}/bch`)
+
+      const chosenProv = request.config.data.slice(13, -2)
+      const providers = result.data.status.serviceProviders
+
+      const currProv = await providers.filter(
+        (el) => el.ipfsId === chosenProv
+      )
+      const providerName = currProv[0].name
+      console.log(
+          `\nService provider switched to:
+          \nname: ${providerName} \nipfsId: ${currProv[0].ipfsId}`)
 
       return true
 
