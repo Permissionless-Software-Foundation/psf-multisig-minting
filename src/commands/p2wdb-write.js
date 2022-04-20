@@ -6,8 +6,6 @@
   It leverages the p2wdb npm library
 */
 
-'use strict'
-
 // Public NPM libraries
 const Conf = require('conf')
 const { Write } = require('p2wdb/index')
