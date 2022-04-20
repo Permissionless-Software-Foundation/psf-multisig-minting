@@ -111,6 +111,10 @@ class BchWallet {
         }
       }
     }
+
+    this.ar = {
+      sendTx: async () => 'fake-txid'
+    }
   }
 
   async getUtxos () {
