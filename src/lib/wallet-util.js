@@ -77,6 +77,8 @@ class WalletUtil {
 
   // Retrieves the 12-word menomnic used for e2e encryption with the wallet
   // service. If it doesn't exist in the config, then it will be created.
+  // CT 4/20/22: Should this be deprecated? Might be leftover from when this
+  // app ran an internal IPFS node with the 'daemon' command.
   getEncryptionMnemonic () {
     let e2eeMnemonic = this.conf.get('e2eeMnemonic', false)
 
