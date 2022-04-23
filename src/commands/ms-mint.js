@@ -17,6 +17,8 @@ const BCHJS = require('@psf/bch-js')
 
 // Local libraries
 const MsgRead = require('./msg-read')
+const P2WDBWrite = require('./p2wdb-write')
+const P2WDBRead = require('./p2wdb-read')
 
 class MSMint extends Command {
   constructor (argv, config) {
@@ -26,6 +28,8 @@ class MSMint extends Command {
     this.bitcore = bitcore
     this.msgRead = new MsgRead()
     this.bchjs = new BCHJS()
+    this.p2wdbWrite = new P2WDBWrite()
+    this.p2wdbRead = new P2WDBRead()
 
     this.p2shAddr = 'bitcoincash:pptlq79p0r7q52f7n2kr367nhs3g60gq3g6xucu3da'
   }
@@ -37,14 +41,86 @@ class MSMint extends Command {
       // Validate input flags
       this.validateFlags(flags)
 
+      // Get old multisig wallet data from P2WDB.
+      const msWalletData = await this.getMsWalletData(flags)
+      console.log('msWalletData: ', msWalletData)
+
       const spendObjs = await this.gatherSpendFiles(flags)
       console.log('spendObjs: ', spendObjs)
+
+      const cid = await this.createNewWallet(spendObjs, flags)
+      console.log(`New wallet created and uploaded to P2WDB. CID: ${cid}`)
+      console.log(`https://p2wdb.fullstack.cash/entry/hash/${cid}`)
 
       await this.generateTx(spendObjs)
 
       return true
     } catch (err) {
       console.log(err)
+      throw err
+    }
+  }
+
+  // Get data about the existing multisig wallet from the P2WDB.
+  async getMsWalletData (flags) {
+    try {
+      const readFlag = { hash: flags.walletCid }
+
+      const data = await this.p2wdbRead.readP2WDB(readFlag)
+      console.log('data: ', data)
+
+      return data
+    } catch (err) {
+      console.error('Error in getMsWalletData()')
+      throw err
+    }
+  }
+
+  // Create a new P2SH wallet to send the minting baton to once it's spent. The
+  // information used to create the P2SH wallet is written to the P2WDB.
+  async createNewWallet (spendObjs, flags) {
+    try {
+      // Collect all public keys and addresses
+      const pubKeys = []
+      for (let i = 0; i < spendObjs.length; i++) {
+        const entry = {
+          publicKey: spendObjs[i].newPublicKey,
+          addr: spendObjs[i].newAddress
+        }
+
+        pubKeys.push(entry)
+      }
+
+      // Calculate the required keys. This is half the number of signers
+      // participating in the current minting round. e.g. 6 people participating
+      // will create a 3-of-6 wallet.
+      let requiredSigs = Math.floor(pubKeys.length / 2)
+
+      // Ensure that at least 2 signatures are required.
+      if (requiredSigs <= 1) requiredSigs = 2
+
+      const bitcorePubKeys = pubKeys.map(x => new this.bitcore.PublicKey(x.publicKey))
+
+      // Generate the multisignature wallet address.
+      const p2shAddr = new this.bitcore.Address(bitcorePubKeys, requiredSigs)
+
+      // Collect data for writing to the P2WDB.
+      const p2wdbData = {
+        pubKeys,
+        requiredSigs,
+        address: p2shAddr.toString()
+      }
+      console.log(`Writing this data to the P2WDB: ${JSON.stringify(p2wdbData, null, 2)}`)
+
+      flags.data = p2wdbData
+      flags.appId = 'mint-test-001'
+
+      await this.p2wdbWrite.instantiateWrite(flags)
+      const cid = await this.p2wdbWrite.writeData(flags)
+
+      return cid
+    } catch (err) {
+      console.error('Error in createnewWallet()')
       throw err
     }
   }
@@ -96,8 +172,8 @@ class MSMint extends Command {
       console.log('hex: ', txHex)
 
       // Broadcast the transaction to the network.
-      const txid = await this.bchjs.RawTransactions.sendRawTransaction(txHex)
-      console.log(`txid: ${txid}`)
+      // const txid = await this.bchjs.RawTransactions.sendRawTransaction(txHex)
+      // console.log(`txid: ${txid}`)
     } catch (err) {
       console.error('Error in generateTx()')
       throw err
@@ -165,7 +241,8 @@ multisig wallet generated from the spend files.
 
 MSMint.flags = {
   name: flags.string({ char: 'n', description: 'Name of current wallet' }),
-  txs: flags.string({ char: 't', description: 'comma-separate list of TXIDs pointing to spend files' })
+  txs: flags.string({ char: 't', description: 'comma-separate list of TXIDs pointing to spend files' }),
+  walletCid: flags.string({ char: 'w', description: 'P2WDB CID containing information about the multisig wallet' })
 }
 
 module.exports = MSMint
