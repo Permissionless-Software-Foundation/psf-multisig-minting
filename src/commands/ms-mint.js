@@ -19,6 +19,7 @@ const BCHJS = require('@psf/bch-js')
 const MsgRead = require('./msg-read')
 const P2WDBWrite = require('./p2wdb-write')
 const P2WDBRead = require('./p2wdb-read')
+const WalletUtil = require('../lib/wallet-util')
 
 class MSMint extends Command {
   constructor (argv, config) {
@@ -30,6 +31,7 @@ class MSMint extends Command {
     this.bchjs = new BCHJS()
     this.p2wdbWrite = new P2WDBWrite()
     this.p2wdbRead = new P2WDBRead()
+    this.walletUtil = new WalletUtil()
 
     this.p2shAddr = 'bitcoincash:pptlq79p0r7q52f7n2kr367nhs3g60gq3g6xucu3da'
   }
@@ -40,6 +42,9 @@ class MSMint extends Command {
 
       // Validate input flags
       this.validateFlags(flags)
+
+      // Instantiate the wallet.
+      this.wallet = await this.walletUtil.instanceWallet(flags.name)
 
       // Get old multisig wallet data from P2WDB.
       const msWalletData = await this.getMsWalletData(flags)
@@ -55,7 +60,10 @@ class MSMint extends Command {
       console.log(`https://p2wdb.fullstack.cash/entry/hash/${cid}`)
 
       const hex = await this.generateTx(spendObjs, newWalletData)
-      console.log('hex: ', hex)
+      // console.log('hex: ', hex)
+
+      const txid = await this.wallet.ar.sendTx(hex)
+      console.log(`https://blockchair.com/bitcoin-cash/transaction/${txid}`)
 
       return true
     } catch (err) {
@@ -120,7 +128,7 @@ class MSMint extends Command {
         requiredSigs,
         address: p2shAddr.toString()
       }
-      console.log(`Writing this data to the P2WDB: ${JSON.stringify(newWalletData, null, 2)}`)
+      console.log(`New multi-sig wallet data written to P2WDB: ${JSON.stringify(newWalletData, null, 2)}`)
 
       // Add the data to the flags variable.
       flags.data = newWalletData
@@ -137,7 +145,8 @@ class MSMint extends Command {
     }
   }
 
-  // Generate a transaction for spending from the multisig wallet.
+  // Generate a transaction for spending from the old multisig wallet and
+  // sending the minting baton to the new multisig wallet.
   async generateTx (spendObjs, newWalletData) {
     try {
       // Regenerate the multisig Script
@@ -147,9 +156,9 @@ class MSMint extends Command {
         thisPubKey = new this.bitcore.PublicKey(thisPubKey)
         allPublicKeys.push(thisPubKey)
       }
-      const requiredSignatures = 2
+      const requiredSignatures = newWalletData.requiredSigs
       const address = new this.bitcore.Address(allPublicKeys, requiredSignatures)
-      console.log(`address: ${address.toString()}`)
+      console.log(`new wallet address: ${address.toString()}`)
 
       // Collect private keys
       const privateKeys = []
@@ -158,8 +167,11 @@ class MSMint extends Command {
         privateKeys.push(new this.bitcore.PrivateKey(thisPrivKey))
       }
 
-      // Get the UTXO
-      const utxos = await this.bchjs.Utxo.get(address.toString())
+      // Get the UTXOs
+      const utxos = await this.wallet.getUtxos(address.toString())
+      console.log(`utxos: ${JSON.stringify(utxos, null, 2)}`)
+
+      // Get the BCH UTXO
       const utxo = utxos.bchUtxos[0]
 
       // Add properties to the UTXO expected by bitcore
@@ -172,7 +184,7 @@ class MSMint extends Command {
       // Temporary recieve address.
       const txObj = new this.bitcore.Transaction()
         .from(utxo, allPublicKeys, requiredSignatures)
-        .to('bitcoincash:qqk5hmgsjxyylp4dn63397ar7rssf5sl3gcrj5tgz8', 1500)
+        .to(newWalletData.address, 1500)
         .feePerByte(1)
         .change(address)
         .sign(privateKeys)
@@ -181,7 +193,7 @@ class MSMint extends Command {
       // const txHex = txObj.toString()
       let txHex = txObj.toBuffer()
       txHex = txHex.toString('hex')
-      console.log('hex: ', txHex)
+      // console.log('hex: ', txHex)
 
       return txHex
     } catch (err) {
