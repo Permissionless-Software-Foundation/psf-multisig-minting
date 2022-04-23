@@ -1,21 +1,13 @@
 /*
   Read data from the P2WDB.
-
-  TODO: This command should be refactored to use REST API endpoints of
-  ipfs-bch-wallet-consumer. ipfs-bch-wallet-consumer needs additional REST API
-  endpoints for interfacing with the p2wdb library.
 */
 
-'use strict'
-
 // Public NPM libraries
-// const BchWallet = require('minimal-slp-wallet/index')
-const axios = require('axios')
 const Conf = require('conf')
+const { Read } = require('p2wdb/index')
 
 // Local libraries
-// const WalletUtil = require('../lib/wallet-util')
-// const WalletBalances = require('./wallet-balances')
+const WalletUtil = require('../lib/wallet-util')
 
 const { Command, flags } = require('@oclif/command')
 
@@ -24,11 +16,12 @@ class P2WDBRead extends Command {
     super(argv, config)
 
     // Encapsulate dependencies.
-    // this.walletUtil = new WalletUtil()
-    // this.BchWallet = BchWallet
-    // this.walletBalances = new WalletBalances()
-    // this.p2wdbService = new P2wdbService()
     this.conf = new Conf()
+    this.walletUtil = new WalletUtil()
+
+    // Instantiate the read library.
+    const p2wdbServer = this.walletUtil.getP2wdbServer()
+    this.read = new Read({ serverURL: p2wdbServer })
   }
 
   async run () {
@@ -38,9 +31,13 @@ class P2WDBRead extends Command {
       // Validate input flags
       this.validateFlags(flags)
 
-      await this.readP2WDB(flags)
+      const result = await this.readP2WDB(flags)
+
+      console.log(result)
+
+      return result
     } catch (err) {
-      console.log('Error in p2wdb-read.js/run(): ', err)
+      console.log('Error in p2wdb-read.js/run(): ', err.message)
 
       return 0
     }
@@ -48,28 +45,39 @@ class P2WDBRead extends Command {
 
   async readP2WDB (flags) {
     try {
-      const p2wdbServer = this.conf.get('p2wdbServer')
-      console.log(`p2wdbServer: ${p2wdbServer}`)
+      const result = await this.read.getByHash(flags.hash)
 
-      // Display the raw entry.
-      const result = await axios.post(`${p2wdbServer}/p2wdb/entryFromHash`, {
-        hash: flags.hash
-      })
-      console.log(`${JSON.stringify(result.data.data, null, 2)}`)
-
-      // Attempt to parse the data payload.
-      try {
-        const data = JSON.parse(result.data.data.data.value.data)
-        console.log(`\nvalue.data: ${JSON.stringify(data, null, 2)}\n`)
-      } catch (err) {
-        /* exit quietly. */
-        // console.log(err)
-      }
+      return result
     } catch (err) {
       console.error('Error in readP2WDB()')
       throw err
     }
   }
+
+  // async readP2WDB (flags) {
+  //   try {
+  //     const p2wdbServer = this.conf.get('p2wdbServer')
+  //     console.log(`p2wdbServer: ${p2wdbServer}`)
+  //
+  //     // Display the raw entry.
+  //     const result = await axios.post(`${p2wdbServer}/p2wdb/entryFromHash`, {
+  //       hash: flags.hash
+  //     })
+  //     console.log(`${JSON.stringify(result.data.data, null, 2)}`)
+  //
+  //     // Attempt to parse the data payload.
+  //     try {
+  //       const data = JSON.parse(result.data.data.data.value.data)
+  //       console.log(`\nvalue.data: ${JSON.stringify(data, null, 2)}\n`)
+  //     } catch (err) {
+  //       /* exit quietly. */
+  //       // console.log(err)
+  //     }
+  //   } catch (err) {
+  //     console.error('Error in readP2WDB()')
+  //     throw err
+  //   }
+  // }
 
   // Validate the proper flags are passed in.
   validateFlags (flags) {
@@ -88,7 +96,7 @@ P2WDBRead.description = 'Read an entry from the P2WDB'
 P2WDBRead.flags = {
   hash: flags.string({
     char: 'h',
-    description: 'Hash representing P2WDB entry'
+    description: 'Hash CID representing P2WDB entry'
   })
 }
 
