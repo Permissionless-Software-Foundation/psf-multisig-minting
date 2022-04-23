@@ -43,7 +43,7 @@ class MSMint extends Command {
 
       // Get old multisig wallet data from P2WDB.
       const msWalletData = await this.getMsWalletData(flags)
-      console.log('msWalletData: ', msWalletData)
+      console.log(`msWalletData: ${JSON.stringify(msWalletData, null, 2)}`)
 
       const spendObjs = await this.gatherSpendFiles(flags)
       console.log('spendObjs: ', spendObjs)
@@ -66,10 +66,13 @@ class MSMint extends Command {
     try {
       const readFlag = { hash: flags.walletCid }
 
+      // Get raw data from the P2WDB.
       const data = await this.p2wdbRead.readP2WDB(readFlag)
-      console.log('data: ', data)
 
-      return data
+      // Parse the raw JSON data
+      const msWalletData = JSON.parse(data.value.data)
+
+      return msWalletData
     } catch (err) {
       console.error('Error in getMsWalletData()')
       throw err
