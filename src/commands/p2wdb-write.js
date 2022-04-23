@@ -58,10 +58,15 @@ class P2WDBWrite extends Command {
       // Get the P2WDB server.
       const p2wdbServer = this.walletUtil.getP2wdbServer()
 
+      // Get the REST URL
+      const restURL = this.walletUtil.getRestServer()
+
       // Instantiate the Write library.
       this.write = new this.Write({
         wif: wallet.walletInfo.privateKey,
-        serverURL: p2wdbServer
+        serverURL: p2wdbServer,
+        interface: 'consumer-api',
+        restURL
       })
 
       return true
@@ -80,7 +85,7 @@ class P2WDBWrite extends Command {
 
       return result.hash
     } catch (err) {
-      console.error('Error in writeData()')
+      console.error('Error in writeData(): ', err)
       throw err
     }
   }
