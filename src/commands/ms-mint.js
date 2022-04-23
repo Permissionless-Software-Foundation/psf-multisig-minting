@@ -45,14 +45,17 @@ class MSMint extends Command {
       const msWalletData = await this.getMsWalletData(flags)
       console.log(`msWalletData: ${JSON.stringify(msWalletData, null, 2)}`)
 
+      // Collect the spending files sumbmitted by the other signers.
       const spendObjs = await this.gatherSpendFiles(flags)
       console.log('spendObjs: ', spendObjs)
 
-      const cid = await this.createNewWallet(spendObjs, flags)
+      // Generate a new multisig wallet and upload the public data to the P2WDB.
+      const { cid, newWalletData } = await this.createNewWallet(spendObjs, flags)
       console.log(`New wallet created and uploaded to P2WDB. CID: ${cid}`)
       console.log(`https://p2wdb.fullstack.cash/entry/hash/${cid}`)
 
-      await this.generateTx(spendObjs)
+      const hex = await this.generateTx(spendObjs, newWalletData)
+      console.log('hex: ', hex)
 
       return true
     } catch (err) {
@@ -94,12 +97,16 @@ class MSMint extends Command {
         pubKeys.push(entry)
       }
 
+      if (pubKeys.length <= 2) {
+        throw new Error('Two or less signers found. Can not continue. Must have a minimum of 3 signers.')
+      }
+
       // Calculate the required keys. This is half the number of signers
       // participating in the current minting round. e.g. 6 people participating
       // will create a 3-of-6 wallet.
       let requiredSigs = Math.floor(pubKeys.length / 2)
 
-      // Ensure that at least 2 signatures are required.
+      // Ensure that at least 2-of-N signatures are required.
       if (requiredSigs <= 1) requiredSigs = 2
 
       const bitcorePubKeys = pubKeys.map(x => new this.bitcore.PublicKey(x.publicKey))
@@ -108,20 +115,22 @@ class MSMint extends Command {
       const p2shAddr = new this.bitcore.Address(bitcorePubKeys, requiredSigs)
 
       // Collect data for writing to the P2WDB.
-      const p2wdbData = {
+      const newWalletData = {
         pubKeys,
         requiredSigs,
         address: p2shAddr.toString()
       }
-      console.log(`Writing this data to the P2WDB: ${JSON.stringify(p2wdbData, null, 2)}`)
+      console.log(`Writing this data to the P2WDB: ${JSON.stringify(newWalletData, null, 2)}`)
 
-      flags.data = p2wdbData
+      // Add the data to the flags variable.
+      flags.data = newWalletData
       flags.appId = 'mint-test-001'
 
+      // Leverage the p2wdb-write command to write the data to the P2WDB.
       await this.p2wdbWrite.instantiateWrite(flags)
       const cid = await this.p2wdbWrite.writeData(flags)
 
-      return cid
+      return { cid, newWalletData }
     } catch (err) {
       console.error('Error in createnewWallet()')
       throw err
@@ -129,7 +138,7 @@ class MSMint extends Command {
   }
 
   // Generate a transaction for spending from the multisig wallet.
-  async generateTx (spendObjs) {
+  async generateTx (spendObjs, newWalletData) {
     try {
       // Regenerate the multisig Script
       const allPublicKeys = []
@@ -174,9 +183,7 @@ class MSMint extends Command {
       txHex = txHex.toString('hex')
       console.log('hex: ', txHex)
 
-      // Broadcast the transaction to the network.
-      // const txid = await this.bchjs.RawTransactions.sendRawTransaction(txHex)
-      // console.log(`txid: ${txid}`)
+      return txHex
     } catch (err) {
       console.error('Error in generateTx()')
       throw err
