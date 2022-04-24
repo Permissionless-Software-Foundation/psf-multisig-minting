@@ -180,11 +180,28 @@ class MSMint extends Command {
       utxo.satoshis = utxo.value
       console.log(`utxo: ${JSON.stringify(utxo, null, 2)}`)
 
+      // Get the UTXO representing the mint baton.
+      const slpUtxo = utxos.slpUtxos.type1.mintBatons[0]
+      if (!slpUtxo) throw new Error('No token mint baton UTXO found!')
+
+      // Get the SLP Utxo
+      slpUtxo.outputIndex = slpUtxo.tx_pos
+      slpUtxo.script = new this.bitcore.Script(address).toHex()
+      slpUtxo.satoshis = slpUtxo.value
+      console.log(`slpUtxo: ${JSON.stringify(slpUtxo, null, 2)}`)
+
+      // Generate the mint baton OP_RETURN data.
+      const qty = parseInt(flags.qty)
+      const opReturnData = this.bchjs.SLP.TokenType1.generateMintOpReturn([slpUtxo], qty)
+
       // Generate the transaction object.
       // Temporary recieve address.
       const txObj = new this.bitcore.Transaction()
-        .from(utxo, allPublicKeys, requiredSignatures)
-        .to(newWalletData.address, 1500)
+        .from([utxo, slpUtxo], allPublicKeys, requiredSignatures)
+        // .from(slpUtxo, allPublicKeys, requiredSignatures)
+        .addData(opReturnData)
+        .to('bitcoincash:qqsrke9lh257tqen99dkyy2emh4uty0vky9y0z0lsr', 546)
+        .addOutput(newWalletData.address, 546)
         .feePerByte(1)
         .change(address)
         .sign(privateKeys)
@@ -249,6 +266,11 @@ class MSMint extends Command {
       throw new Error('You must specify a comma-separated list of message txs with the -t flag.')
     }
 
+    const qty = parseInt(flags.qty)
+    if (!qty || isNaN(qty)) {
+      throw new Error('You must specify the quantity of tokens to mint with the -q flag.')
+    }
+
     return true
   }
 }
@@ -264,7 +286,8 @@ multisig wallet generated from the spend files.
 MSMint.flags = {
   name: flags.string({ char: 'n', description: 'Name of current wallet' }),
   txs: flags.string({ char: 't', description: 'comma-separate list of TXIDs pointing to spend files' }),
-  walletCid: flags.string({ char: 'w', description: 'P2WDB CID containing information about the multisig wallet' })
+  walletCid: flags.string({ char: 'w', description: 'P2WDB CID containing information about the multisig wallet' }),
+  qty: flags.string({ char: 'q', description: 'Quantity of tokens to mint' })
 }
 
 module.exports = MSMint
