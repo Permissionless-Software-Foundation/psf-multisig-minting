@@ -12,7 +12,7 @@
 
 // Public npm libraries
 const { Command, flags } = require('@oclif/command')
-const bitcore = require('bitcore-lib-cash')
+const bitcore = require('@chris.troutner/bitcore-lib-cash')
 const BCHJS = require('@psf/bch-js')
 
 // Local libraries
@@ -59,8 +59,8 @@ class MSMint extends Command {
       console.log(`New wallet created and uploaded to P2WDB. CID: ${cid}`)
       console.log(`https://p2wdb.fullstack.cash/entry/hash/${cid}`)
 
-      const hex = await this.generateTx(spendObjs, newWalletData)
-      // console.log('hex: ', hex)
+      const hex = await this.generateTx(spendObjs, newWalletData, flags)
+      console.log('hex: ', hex)
 
       const txid = await this.wallet.ar.sendTx(hex)
       console.log(`https://blockchair.com/bitcoin-cash/transaction/${txid}`)
@@ -136,7 +136,8 @@ class MSMint extends Command {
 
       // Leverage the p2wdb-write command to write the data to the P2WDB.
       await this.p2wdbWrite.instantiateWrite(flags)
-      const cid = await this.p2wdbWrite.writeData(flags)
+      // const cid = await this.p2wdbWrite.writeData(flags)
+      const cid = 'fake-cid'
 
       return { cid, newWalletData }
     } catch (err) {
@@ -147,7 +148,7 @@ class MSMint extends Command {
 
   // Generate a transaction for spending from the old multisig wallet and
   // sending the minting baton to the new multisig wallet.
-  async generateTx (spendObjs, newWalletData) {
+  async generateTx (spendObjs, newWalletData, flags) {
     try {
       // Regenerate the multisig Script
       const allPublicKeys = []
@@ -184,7 +185,12 @@ class MSMint extends Command {
       const slpUtxo = utxos.slpUtxos.type1.mintBatons[0]
       if (!slpUtxo) throw new Error('No token mint baton UTXO found!')
 
-      // Get the SLP Utxo
+      // Get Genesis data.
+      const genesisData = await this.bchjs.PsfSlpIndexer.tokenStats(slpUtxo.tokenId)
+      console.log(`genesisData: ${JSON.stringify(genesisData, null, 2)}`)
+      slpUtxo.decimals = genesisData.tokenData.decimals
+
+      // Hydrate the SLP Utxo with properties expected by bitcore
       slpUtxo.outputIndex = slpUtxo.tx_pos
       slpUtxo.script = new this.bitcore.Script(address).toHex()
       slpUtxo.satoshis = slpUtxo.value
@@ -192,19 +198,38 @@ class MSMint extends Command {
 
       // Generate the mint baton OP_RETURN data.
       const qty = parseInt(flags.qty)
+      console.log(`qty: ${qty}`)
       const opReturnData = this.bchjs.SLP.TokenType1.generateMintOpReturn([slpUtxo], qty)
+      console.log('opReturnData: ', opReturnData.toString('hex'))
+
+      // bitcore messes up the SLP OP_RETURN. So I need to generate a tx with an
+      // SLP output with bch-js, then import that tx into bitcore.
+      const txBuilder = new this.bchjs.TransactionBuilder()
+      txBuilder.addOutput(opReturnData, 0)
+      const tx = txBuilder.transaction.buildIncomplete()
+      const hex = tx.toHex()
 
       // Generate the transaction object.
       // Temporary recieve address.
-      const txObj = new this.bitcore.Transaction()
+      const txObj = new this.bitcore.Transaction(hex)
         .from([utxo, slpUtxo], allPublicKeys, requiredSignatures)
         // .from(slpUtxo, allPublicKeys, requiredSignatures)
-        .addData(opReturnData)
+        // .addData(opReturnData)
         .to('bitcoincash:qqsrke9lh257tqen99dkyy2emh4uty0vky9y0z0lsr', 546)
-        .addOutput(newWalletData.address, 546)
+        // .addOutput(newWalletData.address, 546)
+        .to(newWalletData.address, 546)
         .feePerByte(1)
         .change(address)
         .sign(privateKeys)
+
+      // console.log('txObj.outputs[0]._script: ', txObj.outputs[0]._script)
+
+      // Replace bitcore OP_RETURN script with the one from bch-js
+      txObj.outputs[0]._scriptBuffer = opReturnData
+      txObj.outputs[0]._script.chunks[1].buf = opReturnData
+
+      // console.log('txObj: ', txObj)
+      console.log(`txObj: ${JSON.stringify(txObj, null, 2)}`)
 
       // Serialize the transaction to a hex string, ready to broadcast to the network.
       // const txHex = txObj.toString()
@@ -270,6 +295,7 @@ class MSMint extends Command {
     if (!qty || isNaN(qty)) {
       throw new Error('You must specify the quantity of tokens to mint with the -q flag.')
     }
+    console.log(`validate qty: ${qty}`)
 
     return true
   }
