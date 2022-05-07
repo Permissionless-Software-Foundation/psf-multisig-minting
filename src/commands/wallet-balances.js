@@ -144,10 +144,17 @@ class WalletBalances extends Command {
       //   walletData.utxos.utxoStore.slpUtxos.type1.tokens
       // )
 
+      // Combine token UTXOs
+      const tokenUtxos = walletData.utxos.utxoStore.slpUtxos.type1.tokens.concat(
+        walletData.utxos.utxoStore.slpUtxos.group.tokens,
+        walletData.utxos.utxoStore.slpUtxos.nft.tokens
+      )
+
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
       const tokens = this.getTokenBalances(
-        walletData.utxos.utxoStore.slpUtxos.type1.tokens
+        // walletData.utxos.utxoStore.slpUtxos.type1.tokens
+        tokenUtxos
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]

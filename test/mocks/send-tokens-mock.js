@@ -64,9 +64,11 @@ const getBalancesResult = {
           ]
         },
         nft: {
-          groupMintBatons: [],
-          groupTokens: [],
           tokens: []
+        },
+        group: {
+          tokens: [],
+          mintBatons: []
         }
       }
     }
