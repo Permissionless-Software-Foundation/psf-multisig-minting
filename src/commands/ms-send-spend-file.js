@@ -1,6 +1,6 @@
 /*
   Create a JSON file for the purpose of spending a minting baton. Encrypt the
-  file and send it to a BCH address.
+  file and send it to the BCH address of an aggregator.
 */
 
 'use strict'
