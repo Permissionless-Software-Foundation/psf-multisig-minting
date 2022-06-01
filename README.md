@@ -72,8 +72,9 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet msg-check`](#psf-bch-wallet-msg-check)
 * [`psf-bch-wallet msg-read`](#psf-bch-wallet-msg-read)
 * [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
+* [`psf-bch-wallet msg-sign`](#psf-bch-wallet-msg-sign)
+* [`psf-bch-wallet msg-verify`](#psf-bch-wallet-msg-verify)
 * [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
-* [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
 * [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
 * [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
 * [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
@@ -211,6 +212,44 @@ OPTIONS
 
 _See code: [src/commands/msg-send.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-send.js)_
 
+## `psf-bch-wallet msg-sign`
+
+Cryptographically sign a message.
+
+```
+USAGE
+  $ psf-bch-wallet msg-sign
+
+OPTIONS
+  -m, --msg=msg    Cleartext message to sign
+  -n, --name=name  Name of wallet
+
+DESCRIPTION
+  Generate a signature from a clear-text message and the private key of your wallet.
+  The system verifying the signature will also need the BCH address of the walllet.
+```
+
+_See code: [src/commands/msg-sign.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-sign.js)_
+
+## `psf-bch-wallet msg-verify`
+
+Verify a signed message
+
+```
+USAGE
+  $ psf-bch-wallet msg-verify
+
+OPTIONS
+  -b, --bchAddr=bchAddr  BCH address of signer.
+  -m, --msg=msg          Cleartext message used to generate the signature.
+  -s, --sig=sig          Signature to verify.
+
+DESCRIPTION
+  Verify the authenticity of a signed message.
+```
+
+_See code: [src/commands/msg-verify.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-verify.js)_
+
 ## `psf-bch-wallet p2wdb-read`
 
 Read an entry from the P2WDB
@@ -220,28 +259,14 @@ USAGE
   $ psf-bch-wallet p2wdb-read
 
 OPTIONS
-  -h, --hash=hash  Hash representing P2WDB entry
+  -h, --hash=hash  Hash CID representing P2WDB entry
 ```
 
 _See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-read.js)_
 
-## `psf-bch-wallet p2wdb-service`
-
-List and/or select a P2WDB service provider.
-
-```
-USAGE
-  $ psf-bch-wallet p2wdb-service
-
-OPTIONS
-  -s, --select=select  Switch to a given IPFS ID for P2WDB service.
-```
-
-_See code: [src/commands/p2wdb-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-service.js)_
-
 ## `psf-bch-wallet p2wdb-write`
 
-Burn a specific quantity of SLP tokens.
+Write an entry to the pay-to-write database (P2WDB)
 
 ```
 USAGE
@@ -249,9 +274,12 @@ USAGE
 
 OPTIONS
   -a, --appId=appId  appId string to categorize data
-  -c, --centralized  Use centralized mode to connect to P2WDB.
   -d, --data=data    String of data to write to the P2WDB
   -n, --name=name    Name of wallet
+
+DESCRIPTION
+  In order to execute this command, the wallet must contain some BCH and some PSF
+  token, in order to pay for the write to the P2WDB.
 ```
 
 _See code: [src/commands/p2wdb-write.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-write.js)_
