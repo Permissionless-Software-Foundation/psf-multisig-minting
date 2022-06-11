@@ -70,14 +70,8 @@ class WalletServiceTest extends Command {
   // Initialize the wallet library.
   async initWallet () {
     try {
-      const restServer = this.conf.get('restServer')
-      console.log(`restServer: ${restServer}`)
-
       // Instantiate the minimal-slp-wallet library.
-      const advancedConfig = {
-        interface: 'consumer-api',
-        restURL: restServer
-      }
+      const advancedConfig = this.walletUtil.getRestServer()
       this.bchWallet = new this.BchWallet(undefined, advancedConfig)
 
       // Wait for the wallet to initialize and retrieve UTXO data from the

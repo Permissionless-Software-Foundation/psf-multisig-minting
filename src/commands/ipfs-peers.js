@@ -2,8 +2,6 @@
   Query the state of the IPFS subnet Peers this IPFS node is connected to.
 */
 
-// const SERVER = 'http://localhost:5001/ipfs'
-
 // Public NPM libraries
 const axios = require('axios')
 
@@ -27,7 +25,7 @@ class IpfsPeers extends Command {
 
       const server = this.walletUtil.getRestServer()
 
-      const result = await this.axios.post(`${server}/ipfs/peers`, {
+      const result = await this.axios.post(`${server.restURL}/ipfs/peers`, {
         showAll: flags.all
       })
       // console.log("result.data: ", result.data);

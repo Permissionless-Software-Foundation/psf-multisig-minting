@@ -22,8 +22,10 @@
 // Public NPM libraries
 const BchWallet = require('minimal-slp-wallet/index')
 const Conf = require('conf')
-
 const { Command, flags } = require('@oclif/command')
+
+// Local libraries
+const WalletUtil = require('../lib/wallet-util')
 
 class ScanMnemonic extends Command {
   constructor (argv, config) {
@@ -32,6 +34,7 @@ class ScanMnemonic extends Command {
     // Encapsulate dependencies
     this.BchWallet = BchWallet
     this.conf = new Conf()
+    this.walletUtil = new WalletUtil()
 
     // An array of common derivation paths used by BCH wallets.
     this.derivationPaths = [
@@ -52,15 +55,9 @@ class ScanMnemonic extends Command {
       this.validateFlags(flags)
 
       // Get the currently selected REST server from the config.
-      const restServer = this.conf.get('restServer')
-      console.log(`restServer: ${restServer}`)
+      const advancedConfig = this.walletUtil.getRestServer()
+      advancedConfig.noUpdate = true
 
-      // Configure the minimal-slp-wallet library.
-      const advancedConfig = {
-        interface: 'consumer-api',
-        restURL: restServer,
-        noUpdate: true
-      }
       this.bchWallet = new this.BchWallet(undefined, advancedConfig)
       await this.bchWallet.walletInfoPromise
       this.bchjs = this.bchWallet.bchjs

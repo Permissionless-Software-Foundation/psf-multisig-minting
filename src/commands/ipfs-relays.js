@@ -25,7 +25,7 @@ class IpfsRelays extends Command {
     try {
       const server = this.walletUtil.getRestServer()
 
-      const result = await this.axios.post(`${server}/ipfs/relays`, {})
+      const result = await this.axios.post(`${server.restURL}/ipfs/relays`, {})
       console.log(`Circuit Relays: ${JSON.stringify(result.data, null, 2)}`)
 
       return true
