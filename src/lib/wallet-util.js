@@ -97,19 +97,28 @@ class WalletUtil {
     return e2eeMnemonic
   }
 
-  // Retrieve the REST API server address from the config. Generate the default
-  // if it has not yet been set.
+  // Retrieve the interface and server URL from the config.
+  // Generate the default of web3 public server if the values have not been set.
   getRestServer () {
     try {
-      let restServer = this.conf.get('restServer', false)
-
-      if (!restServer) {
-        restServer = 'https://free-bch.fullstack.cash'
-
-        this.conf.set('restServer', restServer)
+      const outObj = {
+        restURL: this.conf.get('restURL', false),
+        interface: this.conf.get('interface', false)
       }
 
-      return restServer
+      if (!outObj.restURL) {
+        outObj.restURL = 'https://free-bch.fullstack.cash'
+
+        this.conf.set('restURL', outObj.restURL)
+      }
+
+      if (!outObj.interface) {
+        outObj.interface = 'consumer-api'
+
+        this.conf.set('interface', outObj.interface)
+      }
+
+      return outObj
     } catch (err) {
       console.log('Error in getRestServer()')
       throw err
