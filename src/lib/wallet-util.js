@@ -160,8 +160,9 @@ class WalletUtil {
       const walletData = walletJSON.wallet
 
       // Get the currently selected REST server from the config.
-      const restServer = this.getRestServer()
-      console.log(`restServer: ${restServer}`)
+      const server = this.getRestServer()
+      console.log(`restServer: ${server.restURL}`)
+      console.log(`interface: ${server.interface}`)
 
       // Hook for unit tests, to disable network calls.
       if (walletName === 'test123') {
@@ -169,7 +170,7 @@ class WalletUtil {
       }
 
       // Configure the minimal-slp-wallet library.
-      this.advancedConfig.restURL = restServer
+      this.advancedConfig.restURL = server.restURL
       const bchWallet = new this.BchWallet(
         walletData.mnemonic,
         this.advancedConfig

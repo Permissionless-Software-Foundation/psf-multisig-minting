@@ -51,7 +51,7 @@ class WalletService {
       const body = {
         addresses: addrs
       }
-      const result = await this.axios.post(`${server}/bch/balance`, body)
+      const result = await this.axios.post(`${server.restURL}/bch/balance`, body)
 
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
       return result.data
@@ -75,7 +75,7 @@ class WalletService {
         address: addr
       }
 
-      const result = await this.axios.post(`${server}/bch/utxos`, body)
+      const result = await this.axios.post(`${server.restURL}/bch/utxos`, body)
 
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
       return result.data
@@ -99,7 +99,7 @@ class WalletService {
         hex
       }
 
-      const result = await this.axios.post(`${server}/bch/broadcast`, body)
+      const result = await this.axios.post(`${server.restURL}/bch/broadcast`, body)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       return result.data
@@ -123,7 +123,7 @@ class WalletService {
         address: bchAddress
       }
 
-      const result = await this.axios.post(`${server}/bch/pubkey`, body)
+      const result = await this.axios.post(`${server.restURL}/bch/pubkey`, body)
       // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
 
       return result.data

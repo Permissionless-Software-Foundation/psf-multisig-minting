@@ -67,15 +67,6 @@ class WalletBalances extends Command {
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
-      // Get the currently selected REST server from the config.
-      // const restServer = this.conf.get('restServer')
-      // console.log(`restServer: ${restServer}`)
-
-      // Configure the minimal-slp-wallet library.
-      // const advancedConfig = {
-      //   interface: 'consumer-api',
-      //   restURL: restServer
-      // }
       const advancedConfig = this.walletUtil.getRestServer()
       this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
       // console.log('bchWallet: ', this.bchWallet)
