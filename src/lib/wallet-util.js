@@ -197,6 +197,13 @@ class WalletUtil {
 
     return msgLib
   }
+
+  // Wrapper for broadcasting a transaction.
+  async broadcastTx (wallet, hex) {
+    const txid = await wallet.ar.sendTx(hex)
+
+    return txid
+  }
 }
 
 module.exports = WalletUtil

@@ -36,7 +36,7 @@ class TokenBurn extends Command {
       }.json`
 
       const result = await this.tokenBurn(filename, flags)
-      // console.log('result: ', result)
+      console.log('result: ', result)
 
       if (!result.success) {
         console.log('Error burning tokens: ', result)
