@@ -161,7 +161,7 @@ class WalletUtil {
 
       // Get the currently selected REST server from the config.
       const server = this.getRestServer()
-      console.log(`restServer: ${server.restURL}`)
+      console.log(`restURL: ${server.restURL}`)
       console.log(`interface: ${server.interface}`)
 
       // Hook for unit tests, to disable network calls.
