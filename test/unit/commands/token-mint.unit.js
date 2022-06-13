@@ -256,7 +256,7 @@ describe('#token-create-fungible', () => {
               tx_hash: '227354c9827f4e3c9ce24dd9197b314f7da8a2224f4874ca11104c8fdc58f684',
               tx_pos: 4,
               value: 546,
-              tokenType: 65,
+              tokenType: 129,
               utxoType: 'minting-baton',
               decimals: 2
             }]

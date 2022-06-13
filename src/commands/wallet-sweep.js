@@ -54,7 +54,7 @@ class WalletSweep extends Command {
     } catch (err) {
       // console.log(err.message)
       // if (err.message) console.log(err.message)
-      console.log('Error in run(): ', err)
+      console.log('Error in run(): ', err.message)
       // console.log('Error in scan-funds.js/run: ', err)
       throw err
     }
