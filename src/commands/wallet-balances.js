@@ -167,7 +167,7 @@ class WalletBalances extends Command {
           let type = 'Fungible'
           if (thisBaton.tokenType === 129) type = 'Group'
 
-          console.log(`${thisBaton.ticker} (${type})`)
+          console.log(`${thisBaton.ticker} (${type}) ${thisBaton.tokenId}`)
         }
       }
 
