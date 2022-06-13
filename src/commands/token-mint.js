@@ -44,7 +44,7 @@ class TokenMint extends Command {
 
       return txid
     } catch (err) {
-      console.log('Error in token-create-fungible.js/run(): ', err)
+      console.log('Error in token-mint.js/run(): ', err.message)
 
       return 0
     }
@@ -93,7 +93,7 @@ class TokenMint extends Command {
       }
 
       const mintBaton = filteredBatons[0]
-      console.log(`mintBaton: ${JSON.stringify(mintBaton, null, 2)}`)
+      // console.log(`mintBaton: ${JSON.stringify(mintBaton, null, 2)}`)
 
       // add the mint baton as an input.
       transactionBuilder.addInput(mintBaton.tx_hash, mintBaton.tx_pos)
