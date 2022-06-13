@@ -292,6 +292,28 @@ describe('#wallet-sweep', () => {
         assert.include(err.message, 'test error')
       }
     })
+
+    it('should continue despite sweep errors', async () => {
+      // Mock dependencies
+      sandbox.stub(uut, 'scanMnemonic').resolves([
+        {
+          addr: 'bitcoincash:qrqp2s098ene2mgf99v5audkdwlupvthsu3rn8wpzu',
+          wif: 'L3Qx1gg4f7mq2Tbgw1okzkobJxe1DgpvRxdUyMdUmPAvPFXRke6p',
+          index: 0
+        }
+      ])
+      sandbox.stub(uut, 'sweepWif').rejects(new Error('test error'))
+      sandbox.stub(uut.bchWallet.bchjs.Util, 'sleep').resolves()
+
+      const flags = {
+        mnemonic: 'fly impulse raise urban sun patch course diary witness plastic giant tired',
+        derivation: 145
+      }
+
+      const result = await uut.sweepMnemonic(flags)
+
+      assert.equal(result, true)
+    })
   })
 
   describe('#run', () => {

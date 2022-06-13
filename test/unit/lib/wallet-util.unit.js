@@ -197,4 +197,22 @@ describe('#Wallet-Util', () => {
       }
     })
   })
+
+  describe('#broadcastTx', () => {
+    it('should broadcast a hex tx', async () => {
+      // Mock minimal-slp-wallet
+      const Wallet = class BchWallet {
+        constructor () {
+          this.ar = {
+            sendTx: async () => { return 'fake-txid' }
+          }
+        }
+      }
+      const wallet = new Wallet()
+
+      const result = await uut.broadcastTx(wallet, 'fake-hex')
+
+      assert.equal(result, 'fake-txid')
+    })
+  })
 })

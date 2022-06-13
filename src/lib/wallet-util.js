@@ -161,7 +161,7 @@ class WalletUtil {
 
       // Get the currently selected REST server from the config.
       const server = this.getRestServer()
-      console.log(`restServer: ${server.restURL}`)
+      console.log(`restURL: ${server.restURL}`)
       console.log(`interface: ${server.interface}`)
 
       // Hook for unit tests, to disable network calls.
@@ -196,6 +196,13 @@ class WalletUtil {
     const msgLib = new this.MsgLib({ wallet })
 
     return msgLib
+  }
+
+  // Wrapper for broadcasting a transaction.
+  async broadcastTx (wallet, hex) {
+    const txid = await wallet.ar.sendTx(hex)
+
+    return txid
   }
 }
 

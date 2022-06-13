@@ -153,6 +153,25 @@ class WalletBalances extends Command {
         console.log(`${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`)
       }
 
+      // Print out minting batons
+      const mintBatons = walletData.utxos.utxoStore.slpUtxos.type1.mintBatons.concat(
+        walletData.utxos.utxoStore.slpUtxos.group.mintBatons
+      )
+      if (mintBatons.length > 0) {
+        console.log('\nMinting Batons: ')
+        // console.log(`walletData.utxos.utxoStore: ${JSON.stringify(walletData.utxos.utxoStore, null, 2)}`)
+
+        for (let i = 0; i < mintBatons.length; i++) {
+          const thisBaton = mintBatons[i]
+
+          let type = 'Fungible'
+          if (thisBaton.tokenType === 129) type = 'Group'
+
+          console.log(`${thisBaton.ticker} (${type}) ${thisBaton.tokenId}`)
+        }
+      }
+
+      // If verbose flag is set, display UTXO information.
       if (flags.verbose) {
         console.log(
           `\nUTXO information:\n${JSON.stringify(
