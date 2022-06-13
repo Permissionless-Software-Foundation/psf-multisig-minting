@@ -39,7 +39,7 @@ class TokenCreateFungible extends Command {
       const txid = await this.walletUtil.broadcastTx(this.wallet, hex)
 
       console.log(`New token ${flags.ticker} created! Token ID: ${txid}`)
-      console.log(`https://token.fullstack.cash/?tokenid=${txid}`)
+      console.log(`https://token.fullstack.cash/transactions/?txid=${txid}`)
 
       return txid
     } catch (err) {

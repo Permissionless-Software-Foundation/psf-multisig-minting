@@ -1,6 +1,6 @@
 /*
-  Mint additional fungible (Type 1) or Group tokens if the wallet has a minting
-  baton.
+  This command is used to create a new SLP Group tokens.
+  These tokens are used to create NFTs.
 */
 
 // Public NPM libraries
@@ -11,7 +11,7 @@ const { Command, flags } = require('@oclif/command')
 const WalletUtil = require('../lib/wallet-util')
 const WalletBalances = require('./wallet-balances')
 
-class TokenMint extends Command {
+class TokenCreateGroup extends Command {
   constructor (argv, config) {
     super(argv, config)
 
@@ -23,7 +23,7 @@ class TokenMint extends Command {
 
   async run () {
     try {
-      const { flags } = this.parse(TokenMint)
+      const { flags } = this.parse(TokenCreateGroup)
       // console.log('flags: ', flags)
 
       // Validate input flags
@@ -32,19 +32,19 @@ class TokenMint extends Command {
       // Instantiate the wallet and bch-js
       await this.openWallet(flags)
 
-      const hex = await this.generateMintTx(flags)
+      const hex = await this.generateTokenTx(flags)
       // console.log('hex: ', hex)
 
       // Broadcast the transaction to the blockchain network.
       // const txid = await this.wallet.ar.sendTx(hex)
       const txid = await this.walletUtil.broadcastTx(this.wallet, hex)
 
-      console.log('\nNew tokens minted!')
+      console.log(`New token ${flags.ticker} created! Token ID: ${txid}`)
       console.log(`https://token.fullstack.cash/transactions/?txid=${txid}`)
 
       return txid
     } catch (err) {
-      console.log('Error in token-mint.js/run(): ', err.message)
+      console.log('Error in token-create-fungible.js/run(): ', err)
 
       return 0
     }
@@ -52,7 +52,7 @@ class TokenMint extends Command {
 
   async openWallet (flags) {
     // Instantiate the wallet and bch-js
-    const wallet = await this.walletUtil.instanceWallet(flags.name)
+    const wallet = await this.walletUtil.instanceWallet(flags.walletName)
     this.wallet = wallet
     const bchjs = wallet.bchjs
     this.bchjs = bchjs
@@ -61,7 +61,7 @@ class TokenMint extends Command {
   }
 
   // Generate a hex string transaction that will bring the token into existence.
-  async generateMintTx (flags) {
+  async generateTokenTx (flags) {
     try {
       // Get a UTXO to pay for the transaction
       const bchUtxos = this.wallet.utxos.utxoStore.bchUtxos
@@ -81,23 +81,6 @@ class TokenMint extends Command {
       // add input with txid and index of vout
       transactionBuilder.addInput(txid, vout)
 
-      // Get mint batons.
-      const mintBatons = this.wallet.utxos.utxoStore.slpUtxos.type1.mintBatons.concat(
-        this.wallet.utxos.utxoStore.slpUtxos.group.mintBatons
-      )
-
-      // Filter out the batons for the selected token.
-      const filteredBatons = mintBatons.filter(x => x.tokenId === flags.tokenId)
-      if (filteredBatons.length === 0) {
-        throw new Error(`A minting baton for token ID ${flags.tokenId} could not be found in the wallet.`)
-      }
-
-      const mintBaton = filteredBatons[0]
-      // console.log(`mintBaton: ${JSON.stringify(mintBaton, null, 2)}`)
-
-      // add the mint baton as an input.
-      transactionBuilder.addInput(mintBaton.tx_hash, mintBaton.tx_pos)
-
       // Set the transaction fee. Manually set for ease of example.
       const txFee = 550
 
@@ -105,18 +88,29 @@ class TokenMint extends Command {
       // Subtract two dust transactions for minting baton and tokens.
       const remainder = originalAmount - 546 * 2 - txFee
 
-      // Destroy the baton?
-      let destroyBaton = false
-      if (flags.receiver === 'null') destroyBaton = true
+      // Determine setting for document URL
+      let documentUrl = ''
+      if (flags.url) documentUrl = flags.url
 
-      // Generate the OP_RETURN entry for an SLP MINT transaction.
-      let script
-      if (mintBaton.tokenType === 129) {
-        script = this.bchjs.SLP.NFT1.mintNFTGroupOpReturn([mintBaton], flags.qty, destroyBaton)
-      } else {
-        // tokenType === 1 (fungible token)
-        script = this.bchjs.SLP.TokenType1.generateMintOpReturn([mintBaton], flags.qty, destroyBaton)
+      // Determine setting for document hash
+      let documentHash = ''
+      if (flags.hash) documentHash = flags.hash
+
+      let initialQty = 1
+      if (flags.qty) initialQty = parseInt(flags.qty)
+
+      // Generate SLP config object
+      const configObj = {
+        name: flags.tokenName,
+        ticker: flags.ticker,
+        documentUrl,
+        initialQty,
+        documentHash,
+        mintBatonVout: 2
       }
+
+      // Generate the OP_RETURN entry for an SLP GENESIS transaction.
+      const script = this.bchjs.SLP.NFT1.newNFTGroupOpReturn(configObj)
 
       // OP_RETURN needs to be the first output in the transaction.
       transactionBuilder.addOutput(script, 0)
@@ -129,19 +123,10 @@ class TokenMint extends Command {
       )
 
       // Send dust transaction representing minting baton.
-      if (!destroyBaton) {
-        if (flags.receiver) {
-          transactionBuilder.addOutput(
-            this.bchjs.Address.toLegacyAddress(flags.receiver),
-            546
-          )
-        } else {
-          transactionBuilder.addOutput(
-            this.bchjs.Address.toLegacyAddress(cashAddress),
-            546
-          )
-        }
-      }
+      transactionBuilder.addOutput(
+        this.bchjs.Address.toLegacyAddress(cashAddress),
+        546
+      )
 
       // add output to send BCH remainder of UTXO.
       transactionBuilder.addOutput(cashAddress, remainder)
@@ -150,7 +135,7 @@ class TokenMint extends Command {
       // const keyPair = bchjs.HDNode.toKeyPair(change)
       const keyPair = this.bchjs.ECPair.fromWIF(this.wallet.walletInfo.privateKey)
 
-      // Sign the first input
+      // Sign the transaction with the HD node.
       let redeemScript
       transactionBuilder.sign(
         0,
@@ -158,15 +143,6 @@ class TokenMint extends Command {
         redeemScript,
         transactionBuilder.hashTypes.SIGHASH_ALL,
         originalAmount
-      )
-
-      // Sign the second input
-      transactionBuilder.sign(
-        1,
-        keyPair,
-        redeemScript,
-        transactionBuilder.hashTypes.SIGHASH_ALL,
-        mintBaton.value
       )
 
       // build tx
@@ -184,43 +160,38 @@ class TokenMint extends Command {
   // Validate the proper flags are passed in.
   validateFlags (flags) {
     // Exit if wallet not specified.
-    const name = flags.name
-    if (!name || name === '') {
+    const walletName = flags.walletName
+    if (!walletName || walletName === '') {
       throw new Error('You must specify a wallet with the -n flag.')
     }
 
-    const qty = flags.qty
-    if (isNaN(Number(qty))) {
-      throw new TypeError(
-        'You must specify a quantity of tokens to create with the -q flag.'
-      )
+    const tokenName = flags.tokenName
+    if (!tokenName || tokenName === '') {
+      throw new Error('You must specify a name for the token with the -m flag.')
     }
 
-    const tokenId = flags.tokenId
-    if (!tokenId || tokenId === '') {
-      throw new Error('You must specifcy the SLP token ID.')
+    const ticker = flags.ticker
+    if (!ticker || ticker === '') {
+      throw new Error('You must specify a ticker for the token with the -t flag.')
     }
 
     return true
   }
 }
 
-TokenMint.description = `Mint new Fungible (Type 1) or Group tokens
+TokenCreateGroup.description = `Create a new SLP Group token.
 
-If the wallet contains a minting baton from creating a Fungible or Group token,
-this command can be used to mint new tokens into existence.
-
-The '-r' flag is optional. By default the minting baton will be sent back to the
-origionating wallet. A different address can be specified by the -r flag. Passing
-a value of 'null' will burn the minting baton, removing the ability to mint
-new tokens.
+Group tokens are used to generate NFTs. Read more about the relationship:
+https://github.com/Permissionless-Software-Foundation/bch-js-examples/tree/master/bch/applications/slp/nft
 `
 
-TokenMint.flags = {
-  name: flags.string({ char: 'n', description: 'Name of wallet to pay for transaction' }),
-  qty: flags.string({ char: 'q', description: 'Quantity of tokens to create' }),
-  tokenId: flags.string({ char: 't', description: 'Token ID' }),
-  receiver: flags.string({ char: 'r', description: '(optional) Receiver of new baton. Defaults to same wallet. null burns baton.' })
+TokenCreateGroup.flags = {
+  walletName: flags.string({ char: 'n', description: 'Name of wallet to pay for transaction' }),
+  ticker: flags.string({ char: 't', description: 'Ticker of the group' }),
+  tokenName: flags.string({ char: 'm', description: 'Name of token' }),
+  qty: flags.string({ char: 'q', description: '(optional) Quantity of tokens to create. Defaults to 1' }),
+  url: flags.string({ char: 'u', description: '(optional) Document URL of the group' }),
+  hash: flags.string({ char: 'h', description: '(optional) Document hash of the group' })
 }
 
-module.exports = TokenMint
+module.exports = TokenCreateGroup
