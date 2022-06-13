@@ -44,7 +44,7 @@ class TokenCreateGroup extends Command {
 
       return txid
     } catch (err) {
-      console.log('Error in token-create-fungible.js/run(): ', err)
+      console.log('Error in token-create-fungible.js/run(): ', err.message)
 
       return 0
     }
@@ -187,8 +187,8 @@ https://github.com/Permissionless-Software-Foundation/bch-js-examples/tree/maste
 
 TokenCreateGroup.flags = {
   walletName: flags.string({ char: 'n', description: 'Name of wallet to pay for transaction' }),
-  ticker: flags.string({ char: 't', description: 'Ticker of the group' }),
   tokenName: flags.string({ char: 'm', description: 'Name of token' }),
+  ticker: flags.string({ char: 't', description: 'Ticker of the group' }),
   qty: flags.string({ char: 'q', description: '(optional) Quantity of tokens to create. Defaults to 1' }),
   url: flags.string({ char: 'u', description: '(optional) Document URL of the group' }),
   hash: flags.string({ char: 'h', description: '(optional) Document hash of the group' })

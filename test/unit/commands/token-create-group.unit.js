@@ -8,14 +8,14 @@ const sinon = require('sinon')
 const fs = require('fs').promises
 
 // Local libraries
-const TokenCreateFungible = require('../../../src/commands/token-create-fungible')
+const TokenCreateGroup = require('../../../src/commands/token-create-group')
 const WalletCreate = require('../../../src/commands/wallet-create')
 // const MockWallet = require('../../mocks/msw-mock')
 
 const walletCreate = new WalletCreate()
 const filename = `${__dirname.toString()}/../../../.wallets/test123.json`
 
-describe('#token-create-fungible', () => {
+describe('#token-create-group', () => {
   let uut
   let sandbox
   // let mockWallet
@@ -27,7 +27,7 @@ describe('#token-create-fungible', () => {
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
 
-    uut = new TokenCreateFungible()
+    uut = new TokenCreateGroup()
     // mockWallet = new MockWallet()
   })
 
@@ -95,41 +95,6 @@ describe('#token-create-fungible', () => {
         )
       }
     })
-
-    it('should throw error if token decimals are not supplied.', () => {
-      try {
-        const flags = {
-          walletName: 'test123',
-          tokenName: 'test',
-          ticker: 'TST'
-        }
-        uut.validateFlags(flags)
-      } catch (err) {
-        assert.include(
-          err.message,
-          'You must specify the decimals of the token the -d flag.',
-          'Expected error message.'
-        )
-      }
-    })
-
-    it('should throw error if token quantity are not supplied.', () => {
-      try {
-        const flags = {
-          walletName: 'test123',
-          tokenName: 'test',
-          ticker: 'TST',
-          decimals: 2
-        }
-        uut.validateFlags(flags)
-      } catch (err) {
-        assert.include(
-          err.message,
-          'You must specify a quantity of tokens to create with the -q flag.',
-          'Expected error message.'
-        )
-      }
-    })
   })
 
   describe('#openWallet', () => {
@@ -163,9 +128,7 @@ describe('#token-create-fungible', () => {
       const flags = {
         walletName: 'test123',
         tokenName: 'test',
-        ticker: 'TST',
-        decimals: '2',
-        qty: 100
+        ticker: 'TST'
       }
 
       // Instantiate the wallet and bch-js
@@ -219,8 +182,7 @@ describe('#token-create-fungible', () => {
         tokenName: 'test',
         ticker: 'TST',
         decimals: '2',
-        qty: 100,
-        baton: 2,
+        qty: 1,
         url: 'test url',
         hash: '7a427a156fe70f83d3ccdd17e75804cc0df8c95c64ce04d256b3851385002a0b'
       }
@@ -254,8 +216,7 @@ describe('#token-create-fungible', () => {
           walletName: 'test123',
           tokenName: 'test',
           ticker: 'TST',
-          decimals: '2',
-          qty: 100
+          qty: 1
         }
       })
       sandbox.stub(uut, 'generateTokenTx').resolves('fake-hex')
