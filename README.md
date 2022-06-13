@@ -4,7 +4,7 @@ This is a command-line (CLI) app for working with the Bitcoin Cash (BCH) blockch
 
 This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionless-Software-Foundation/ipfs-bch-wallet-service) over [IPFS](https://ipfs.io), using the [ipfs-coord](https://github.com/Permissionless-Software-Foundation/ipfs-coord) library. This app uses the [oclif CLI framework](https://oclif.io/).
 
-This app is intended for developers who want to work with the BCH blockchain. To see how this software fits in with the Cash Stack architecture, devs should read this blog post on [Realizing the Web 3 Cash Stack](https://bafybeie3w6ykd3ur6b6ytxoopi6p7vipmyvdyq7s2aw5ngsenhtjvyp4d4.ipfs.dweb.link/blog/realizing-the-web-3-cash-stack).
+This app is intended for developers who want to work with the BCH blockchain. It's an integral part of the [Cash Stack](https://cashstack.info).
 
 - [(Video) How to Install and Use](https://youtu.be/45YEeZi_8Kc)
 
@@ -21,11 +21,16 @@ By default, this app uses [free-bch.fullstack.cash](https://free-bch.fullstack.c
 
 Switch to a local instance of `ipfs-bch-wallet-consumer`:
 
-- `./bin/run conf -k restServer -v http://localhost:5001`
+- `./bin/run conf -k restURL -v http://localhost:5005`
+- `./bin/run conf -k interface -v consumer-api`
 
 Switch back to [free-bch.fullstack.cash](https://free-bch.fullstack.cash):
 
-- `./bin/run conf -k restServer -v https://free-bch.fullstack.cash`
+- `./bin/run conf -k restURL -v https://free-bch.fullstack.cash`
+
+Switch to using the web2 infrastructure with [FullStack.cash](https://fullstack.cash):
+- `./bin/run conf -k restURL -v http://api.fullstack.cash/v5/`
+- `./bin/run conf -k interface -v rest-api`
 
 Explore the other configuration settings:
 
@@ -79,6 +84,10 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
 * [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
 * [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
+* [`psf-bch-wallet token-create-fungible`](#psf-bch-wallet-token-create-fungible)
+* [`psf-bch-wallet token-create-group`](#psf-bch-wallet-token-create-group)
+* [`psf-bch-wallet token-create-nft`](#psf-bch-wallet-token-create-nft)
+* [`psf-bch-wallet token-mint`](#psf-bch-wallet-token-mint)
 * [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
 * [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
 * [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
@@ -327,11 +336,108 @@ USAGE
 
 OPTIONS
   -n, --name=name        Name of wallet
-  -q, --qty=qty          Quantity of tokens to burn
+  -q, --qty=qty          Quantity of tokens to burn. If quantity is 0, all tokens will be burned.
   -t, --tokenId=tokenId  tokenId of token to burn
 ```
 
 _See code: [src/commands/token-burn.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-burn.js)_
+
+## `psf-bch-wallet token-create-fungible`
+
+Create a new SLP Type1 fugible token.
+
+```
+USAGE
+  $ psf-bch-wallet token-create-fungible
+
+OPTIONS
+  -b, --baton                  (optional) create a minting baton
+  -d, --decimals=decimals      Decimals used by the token
+  -h, --hash=hash              (optional) Document hash of the group
+  -m, --tokenName=tokenName    Name of token
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+  -q, --qty=qty                Quantity of tokens to create
+  -t, --ticker=ticker          Ticker of the group
+  -u, --url=url                (optional) Document URL of the group
+
+DESCRIPTION
+  Creating a minting baton is optional. If a baton address is not specified, then the
+  baton is burned and makes the it a 'fixed supply' token.
+```
+
+_See code: [src/commands/token-create-fungible.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-fungible.js)_
+
+## `psf-bch-wallet token-create-group`
+
+Create a new SLP Group token.
+
+```
+USAGE
+  $ psf-bch-wallet token-create-group
+
+OPTIONS
+  -h, --hash=hash              (optional) Document hash of the group
+  -m, --tokenName=tokenName    Name of token
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+  -q, --qty=qty                (optional) Quantity of tokens to create. Defaults to 1
+  -t, --ticker=ticker          Ticker of the group
+  -u, --url=url                (optional) Document URL of the group
+
+DESCRIPTION
+  Group tokens are used to generate NFTs. Read more about the relationship:
+  https://github.com/Permissionless-Software-Foundation/bch-js-examples/tree/master/bch/applications/slp/nft
+```
+
+_See code: [src/commands/token-create-group.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-group.js)_
+
+## `psf-bch-wallet token-create-nft`
+
+Create a new SLP Group token.
+
+```
+USAGE
+  $ psf-bch-wallet token-create-nft
+
+OPTIONS
+  -h, --hash=hash              (optional) Document hash of the group
+  -i, --tokenId=tokenId        Token ID of Group token to burn, to generate the NFT
+  -m, --tokenName=tokenName    Name of token
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+  -t, --ticker=ticker          Ticker of the group
+  -u, --url=url                (optional) Document URL of the group
+
+DESCRIPTION
+  Group tokens are used to generate NFTs. Read more about the relationship:
+  https://github.com/Permissionless-Software-Foundation/bch-js-examples/tree/master/bch/applications/slp/nft
+```
+
+_See code: [src/commands/token-create-nft.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-nft.js)_
+
+## `psf-bch-wallet token-mint`
+
+Mint new Fungible (Type 1) or Group tokens
+
+```
+USAGE
+  $ psf-bch-wallet token-mint
+
+OPTIONS
+  -n, --name=name          Name of wallet to pay for transaction
+  -q, --qty=qty            Quantity of tokens to create
+  -r, --receiver=receiver  (optional) Receiver of new baton. Defaults to same wallet. null burns baton.
+  -t, --tokenId=tokenId    Token ID
+
+DESCRIPTION
+  If the wallet contains a minting baton from creating a Fungible or Group token,
+  this command can be used to mint new tokens into existence.
+
+  The '-r' flag is optional. By default the minting baton will be sent back to the
+  origionating wallet. A different address can be specified by the -r flag. Passing
+  a value of 'null' will burn the minting baton, removing the ability to mint
+  new tokens.
+```
+
+_See code: [src/commands/token-mint.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-mint.js)_
 
 ## `psf-bch-wallet wallet-addrs`
 
