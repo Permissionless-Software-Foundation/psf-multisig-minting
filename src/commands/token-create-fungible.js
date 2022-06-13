@@ -210,7 +210,7 @@ TokenCreateFungible.flags = {
   qty: flags.string({ char: 'q', description: 'Quantity of tokens to create' }),
   url: flags.string({ char: 'u', description: '(optional) Document URL of the group' }),
   hash: flags.string({ char: 'h', description: '(optional) Document hash of the group' }),
-  baton: flags.string({ char: 'b', description: '(optional) address to send minting baton' })
+  baton: flags.boolean({ char: 'b', description: '(optional) create a minting baton', default: false })
 }
 
 module.exports = TokenCreateFungible
