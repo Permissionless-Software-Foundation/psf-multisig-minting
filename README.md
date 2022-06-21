@@ -6,7 +6,9 @@ This app connects to a [ipfs-bch-wallet-service](https://github.com/Permissionle
 
 This app is intended for developers who want to work with the BCH blockchain. It's an integral part of the [Cash Stack](https://cashstack.info).
 
-- [(Video) How to Install and Use](https://youtu.be/45YEeZi_8Kc)
+## How-To Videos
+- [Part 1: How to Install and Use](https://www.youtube.com/watch?v=nsExL0Hb7bQ)
+- [Part 2: Configuration](https://www.youtube.com/watch?v=Bu8KqUJSvvc)
 
 ## Install
 
