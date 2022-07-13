@@ -89,7 +89,9 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet token-create-fungible`](#psf-bch-wallet-token-create-fungible)
 * [`psf-bch-wallet token-create-group`](#psf-bch-wallet-token-create-group)
 * [`psf-bch-wallet token-create-nft`](#psf-bch-wallet-token-create-nft)
+* [`psf-bch-wallet token-info`](#psf-bch-wallet-token-info)
 * [`psf-bch-wallet token-mint`](#psf-bch-wallet-token-mint)
+* [`psf-bch-wallet token-tx-history`](#psf-bch-wallet-token-tx-history)
 * [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
 * [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
 * [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
@@ -415,6 +417,24 @@ DESCRIPTION
 
 _See code: [src/commands/token-create-nft.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-nft.js)_
 
+## `psf-bch-wallet token-info`
+
+Get information on a token
+
+```
+USAGE
+  $ psf-bch-wallet token-info
+
+OPTIONS
+  -t, --tokenId=tokenId  The ID of the token to lookup
+
+DESCRIPTION
+  Retrieves the Genesis data for a token. If PS002 mutable and immutable data is
+  attached to the token, it is retrieved from IPFS.
+```
+
+_See code: [src/commands/token-info.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-info.js)_
+
 ## `psf-bch-wallet token-mint`
 
 Mint new Fungible (Type 1) or Group tokens
@@ -440,6 +460,25 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/token-mint.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-mint.js)_
+
+## `psf-bch-wallet token-tx-history`
+
+Get transaction history for a token
+
+```
+USAGE
+  $ psf-bch-wallet token-tx-history
+
+OPTIONS
+  -t, --tokenId=tokenId  The ID of the token to lookup
+
+DESCRIPTION
+  Retrieves the transaction history for a token. This is every transaction that
+  has involved the token. The data is more informative for an NFT than it is for
+  a fungible token.
+```
+
+_See code: [src/commands/token-tx-history.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-tx-history.js)_
 
 ## `psf-bch-wallet wallet-addrs`
 
