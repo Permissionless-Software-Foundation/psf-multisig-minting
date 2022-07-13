@@ -52,7 +52,7 @@ class TokenInfo extends Command {
 
       return true
     } catch (err) {
-      console.log('Error in token-create-fungible.js/run(): ', err)
+      console.log('Error in token-info.js/run(): ', err.message)
 
       return 0
     }
