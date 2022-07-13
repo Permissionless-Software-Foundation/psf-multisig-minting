@@ -90,6 +90,7 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet token-create-group`](#psf-bch-wallet-token-create-group)
 * [`psf-bch-wallet token-create-nft`](#psf-bch-wallet-token-create-nft)
 * [`psf-bch-wallet token-info`](#psf-bch-wallet-token-info)
+* [`psf-bch-wallet token-mda-tx`](#psf-bch-wallet-token-mda-tx)
 * [`psf-bch-wallet token-mint`](#psf-bch-wallet-token-mint)
 * [`psf-bch-wallet token-tx-history`](#psf-bch-wallet-token-tx-history)
 * [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
@@ -434,6 +435,32 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/token-info.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-info.js)_
+
+## `psf-bch-wallet token-mda-tx`
+
+Create TXID for token mutable data
+
+```
+USAGE
+  $ psf-bch-wallet token-mda-tx
+
+OPTIONS
+  -a, --mda=mda                Mutable data address
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+
+DESCRIPTION
+  MDA is an acrynym for 'Mutable Data Address'
+
+  This command is used to generate a TXID for attaching mutable data to a token.
+  Given a BCH address, it generates a transaction to turn that address into
+  the controller of mutable data for a token. This generates a TXID which is
+  used in the tokens 'documentHash' field when creating the token.
+
+  PS002 specification for mutable data:
+  https://github.com/Permissionless-Software-Foundation/specifications/blob/master/ps002-slp-mutable-data.md
+```
+
+_See code: [src/commands/token-mda-tx.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-mda-tx.js)_
 
 ## `psf-bch-wallet token-mint`
 
