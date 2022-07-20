@@ -38,7 +38,7 @@ class SendTokens extends Command {
       console.log('txid: ', txid)
 
       console.log('\nView this transaction on a block explorer:')
-      console.log(`https://simpleledger.info/#tx/${txid}`)
+      console.log(`https://slp-explorer.salemkode.com/tx/${txid}`)
 
       return txid
     } catch (err) {
@@ -59,9 +59,15 @@ class SendTokens extends Command {
       const walletData = await this.walletBalances.getBalances(filename)
       // console.log(`walletData.utxos.utxoStore: ${JSON.stringify(walletData.utxos.utxoStore, null, 2)}`)
 
+      // Combine token UTXOs
+      const tokenUtxos = walletData.utxos.utxoStore.slpUtxos.type1.tokens.concat(
+        walletData.utxos.utxoStore.slpUtxos.group.tokens,
+        walletData.utxos.utxoStore.slpUtxos.nft.tokens
+      )
+
       // Isolate the token balances.
       const tokens = this.walletBalances.getTokenBalances(
-        walletData.utxos.utxoStore.slpUtxos.type1.tokens
+        tokenUtxos
       )
       // console.log(`tokens: ${JSON.stringify(tokens, null, 2)}`)
 

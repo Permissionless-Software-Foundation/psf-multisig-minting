@@ -97,19 +97,28 @@ class WalletUtil {
     return e2eeMnemonic
   }
 
-  // Retrieve the REST API server address from the config. Generate the default
-  // if it has not yet been set.
+  // Retrieve the interface and server URL from the config.
+  // Generate the default of web3 public server if the values have not been set.
   getRestServer () {
     try {
-      let restServer = this.conf.get('restServer', false)
-
-      if (!restServer) {
-        restServer = 'https://free-bch.fullstack.cash'
-
-        this.conf.set('restServer', restServer)
+      const outObj = {
+        restURL: this.conf.get('restURL', false),
+        interface: this.conf.get('interface', false)
       }
 
-      return restServer
+      if (!outObj.restURL) {
+        outObj.restURL = 'https://free-bch.fullstack.cash'
+
+        this.conf.set('restURL', outObj.restURL)
+      }
+
+      if (!outObj.interface) {
+        outObj.interface = 'consumer-api'
+
+        this.conf.set('interface', outObj.interface)
+      }
+
+      return outObj
     } catch (err) {
       console.log('Error in getRestServer()')
       throw err
@@ -151,8 +160,9 @@ class WalletUtil {
       const walletData = walletJSON.wallet
 
       // Get the currently selected REST server from the config.
-      const restServer = this.getRestServer()
-      console.log(`restServer: ${restServer}`)
+      const server = this.getRestServer()
+      console.log(`restURL: ${server.restURL}`)
+      console.log(`interface: ${server.interface}`)
 
       // Hook for unit tests, to disable network calls.
       if (walletName === 'test123') {
@@ -160,7 +170,7 @@ class WalletUtil {
       }
 
       // Configure the minimal-slp-wallet library.
-      this.advancedConfig.restURL = restServer
+      this.advancedConfig.restURL = server.restURL
       const bchWallet = new this.BchWallet(
         walletData.mnemonic,
         this.advancedConfig
@@ -186,6 +196,13 @@ class WalletUtil {
     const msgLib = new this.MsgLib({ wallet })
 
     return msgLib
+  }
+
+  // Wrapper for broadcasting a transaction.
+  async broadcastTx (wallet, hex) {
+    const txid = await wallet.ar.sendTx(hex)
+
+    return txid
   }
 }
 

@@ -160,4 +160,59 @@ describe('#Wallet-Util', () => {
       }
     })
   })
+
+  describe('#getRestServer', () => {
+    it('should return default values', () => {
+      // Force conf.get to return false.
+      sandbox.stub(uut.conf, 'get').returns(false)
+
+      const result = uut.getRestServer()
+
+      assert.equal(result.restURL, 'https://free-bch.fullstack.cash')
+      assert.equal(result.interface, 'consumer-api')
+    })
+
+    it('should return saved values', () => {
+      // Force desired code paths
+      sandbox.stub(uut.conf, 'get')
+        .onCall(0).returns('test-restURL')
+        .onCall(1).returns('test-interface')
+
+      const result = uut.getRestServer()
+
+      assert.equal(result.restURL, 'test-restURL')
+      assert.equal(result.interface, 'test-interface')
+    })
+
+    it('should catch and throw an error', () => {
+      // Force an error
+      sandbox.stub(uut.conf, 'get').throws(new Error('test error'))
+
+      try {
+        uut.getRestServer()
+
+        assert.fail('Unexpected result')
+      } catch (err) {
+        assert.include(err.message, 'test error')
+      }
+    })
+  })
+
+  describe('#broadcastTx', () => {
+    it('should broadcast a hex tx', async () => {
+      // Mock minimal-slp-wallet
+      const Wallet = class BchWallet {
+        constructor () {
+          this.ar = {
+            sendTx: async () => { return 'fake-txid' }
+          }
+        }
+      }
+      const wallet = new Wallet()
+
+      const result = await uut.broadcastTx(wallet, 'fake-hex')
+
+      assert.equal(result, 'fake-txid')
+    })
+  })
 })

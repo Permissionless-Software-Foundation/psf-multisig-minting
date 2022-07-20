@@ -25,7 +25,7 @@ class IpfsStatus extends Command {
     try {
       const server = this.walletUtil.getRestServer()
 
-      const result = await this.axios.get(`${server}/ipfs`)
+      const result = await this.axios.get(`${server.restURL}/ipfs`)
       console.log(`IPFS status: ${JSON.stringify(result.data, null, 2)}`)
 
       return true

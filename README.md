@@ -44,12 +44,20 @@ In the commands below, replace `psf-bch-wallet` with `./bin/run`.
 * [`psf-bch-wallet msg-check`](#psf-bch-wallet-msg-check)
 * [`psf-bch-wallet msg-read`](#psf-bch-wallet-msg-read)
 * [`psf-bch-wallet msg-send`](#psf-bch-wallet-msg-send)
+* [`psf-bch-wallet msg-sign`](#psf-bch-wallet-msg-sign)
+* [`psf-bch-wallet msg-verify`](#psf-bch-wallet-msg-verify)
 * [`psf-bch-wallet p2wdb-read`](#psf-bch-wallet-p2wdb-read)
-* [`psf-bch-wallet p2wdb-service`](#psf-bch-wallet-p2wdb-service)
 * [`psf-bch-wallet p2wdb-write`](#psf-bch-wallet-p2wdb-write)
 * [`psf-bch-wallet send-bch`](#psf-bch-wallet-send-bch)
 * [`psf-bch-wallet send-tokens`](#psf-bch-wallet-send-tokens)
 * [`psf-bch-wallet token-burn`](#psf-bch-wallet-token-burn)
+* [`psf-bch-wallet token-create-fungible`](#psf-bch-wallet-token-create-fungible)
+* [`psf-bch-wallet token-create-group`](#psf-bch-wallet-token-create-group)
+* [`psf-bch-wallet token-create-nft`](#psf-bch-wallet-token-create-nft)
+* [`psf-bch-wallet token-info`](#psf-bch-wallet-token-info)
+* [`psf-bch-wallet token-mda-tx`](#psf-bch-wallet-token-mda-tx)
+* [`psf-bch-wallet token-mint`](#psf-bch-wallet-token-mint)
+* [`psf-bch-wallet token-tx-history`](#psf-bch-wallet-token-tx-history)
 * [`psf-bch-wallet wallet-addrs`](#psf-bch-wallet-wallet-addrs)
 * [`psf-bch-wallet wallet-balances`](#psf-bch-wallet-wallet-balances)
 * [`psf-bch-wallet wallet-create`](#psf-bch-wallet-wallet-create)
@@ -183,6 +191,44 @@ OPTIONS
 
 _See code: [src/commands/msg-send.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-send.js)_
 
+## `psf-bch-wallet msg-sign`
+
+Cryptographically sign a message.
+
+```
+USAGE
+  $ psf-bch-wallet msg-sign
+
+OPTIONS
+  -m, --msg=msg    Cleartext message to sign
+  -n, --name=name  Name of wallet
+
+DESCRIPTION
+  Generate a signature from a clear-text message and the private key of your wallet.
+  The system verifying the signature will also need the BCH address of the walllet.
+```
+
+_See code: [src/commands/msg-sign.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-sign.js)_
+
+## `psf-bch-wallet msg-verify`
+
+Verify a signed message
+
+```
+USAGE
+  $ psf-bch-wallet msg-verify
+
+OPTIONS
+  -b, --bchAddr=bchAddr  BCH address of signer.
+  -m, --msg=msg          Cleartext message used to generate the signature.
+  -s, --sig=sig          Signature to verify.
+
+DESCRIPTION
+  Verify the authenticity of a signed message.
+```
+
+_See code: [src/commands/msg-verify.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/msg-verify.js)_
+
 ## `psf-bch-wallet p2wdb-read`
 
 Read an entry from the P2WDB
@@ -192,28 +238,14 @@ USAGE
   $ psf-bch-wallet p2wdb-read
 
 OPTIONS
-  -h, --hash=hash  Hash representing P2WDB entry
+  -h, --hash=hash  Hash CID representing P2WDB entry
 ```
 
 _See code: [src/commands/p2wdb-read.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-read.js)_
 
-## `psf-bch-wallet p2wdb-service`
-
-List and/or select a P2WDB service provider.
-
-```
-USAGE
-  $ psf-bch-wallet p2wdb-service
-
-OPTIONS
-  -s, --select=select  Switch to a given IPFS ID for P2WDB service.
-```
-
-_See code: [src/commands/p2wdb-service.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-service.js)_
-
 ## `psf-bch-wallet p2wdb-write`
 
-Burn a specific quantity of SLP tokens.
+Write an entry to the pay-to-write database (P2WDB)
 
 ```
 USAGE
@@ -221,9 +253,12 @@ USAGE
 
 OPTIONS
   -a, --appId=appId  appId string to categorize data
-  -c, --centralized  Use centralized mode to connect to P2WDB.
   -d, --data=data    String of data to write to the P2WDB
   -n, --name=name    Name of wallet
+
+DESCRIPTION
+  In order to execute this command, the wallet must contain some BCH and some PSF
+  token, in order to pay for the write to the P2WDB.
 ```
 
 _See code: [src/commands/p2wdb-write.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/p2wdb-write.js)_
@@ -271,11 +306,171 @@ USAGE
 
 OPTIONS
   -n, --name=name        Name of wallet
-  -q, --qty=qty          Quantity of tokens to burn
+  -q, --qty=qty          Quantity of tokens to burn. If quantity is 0, all tokens will be burned.
   -t, --tokenId=tokenId  tokenId of token to burn
 ```
 
 _See code: [src/commands/token-burn.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-burn.js)_
+
+## `psf-bch-wallet token-create-fungible`
+
+Create a new SLP Type1 fugible token.
+
+```
+USAGE
+  $ psf-bch-wallet token-create-fungible
+
+OPTIONS
+  -b, --baton                  (optional) create a minting baton
+  -d, --decimals=decimals      Decimals used by the token
+  -h, --hash=hash              (optional) Document hash of the group
+  -m, --tokenName=tokenName    Name of token
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+  -q, --qty=qty                Quantity of tokens to create
+  -t, --ticker=ticker          Ticker of the group
+  -u, --url=url                (optional) Document URL of the group
+
+DESCRIPTION
+  Creating a minting baton is optional. If a baton address is not specified, then the
+  baton is burned and makes the it a 'fixed supply' token.
+```
+
+_See code: [src/commands/token-create-fungible.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-fungible.js)_
+
+## `psf-bch-wallet token-create-group`
+
+Create a new SLP Group token.
+
+```
+USAGE
+  $ psf-bch-wallet token-create-group
+
+OPTIONS
+  -h, --hash=hash              (optional) Document hash of the group
+  -m, --tokenName=tokenName    Name of token
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+  -q, --qty=qty                (optional) Quantity of tokens to create. Defaults to 1
+  -t, --ticker=ticker          Ticker of the group
+  -u, --url=url                (optional) Document URL of the group
+
+DESCRIPTION
+  Group tokens are used to generate NFTs. Read more about the relationship:
+  https://github.com/Permissionless-Software-Foundation/bch-js-examples/tree/master/bch/applications/slp/nft
+```
+
+_See code: [src/commands/token-create-group.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-group.js)_
+
+## `psf-bch-wallet token-create-nft`
+
+Create a new SLP Group token.
+
+```
+USAGE
+  $ psf-bch-wallet token-create-nft
+
+OPTIONS
+  -h, --hash=hash              (optional) Document hash of the group
+  -i, --tokenId=tokenId        Token ID of Group token to burn, to generate the NFT
+  -m, --tokenName=tokenName    Name of token
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+  -t, --ticker=ticker          Ticker of the group
+  -u, --url=url                (optional) Document URL of the group
+
+DESCRIPTION
+  Group tokens are used to generate NFTs. Read more about the relationship:
+  https://github.com/Permissionless-Software-Foundation/bch-js-examples/tree/master/bch/applications/slp/nft
+```
+
+_See code: [src/commands/token-create-nft.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-create-nft.js)_
+
+## `psf-bch-wallet token-info`
+
+Get information on a token
+
+```
+USAGE
+  $ psf-bch-wallet token-info
+
+OPTIONS
+  -t, --tokenId=tokenId  The ID of the token to lookup
+
+DESCRIPTION
+  Retrieves the Genesis data for a token. If PS002 mutable and immutable data is
+  attached to the token, it is retrieved from IPFS.
+```
+
+_See code: [src/commands/token-info.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-info.js)_
+
+## `psf-bch-wallet token-mda-tx`
+
+Create TXID for token mutable data
+
+```
+USAGE
+  $ psf-bch-wallet token-mda-tx
+
+OPTIONS
+  -a, --mda=mda                Mutable data address
+  -n, --walletName=walletName  Name of wallet to pay for transaction
+
+DESCRIPTION
+  MDA is an acrynym for 'Mutable Data Address'
+
+  This command is used to generate a TXID for attaching mutable data to a token.
+  Given a BCH address, it generates a transaction to turn that address into
+  the controller of mutable data for a token. This generates a TXID which is
+  used in the tokens 'documentHash' field when creating the token.
+
+  PS002 specification for mutable data:
+  https://github.com/Permissionless-Software-Foundation/specifications/blob/master/ps002-slp-mutable-data.md
+```
+
+_See code: [src/commands/token-mda-tx.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-mda-tx.js)_
+
+## `psf-bch-wallet token-mint`
+
+Mint new Fungible (Type 1) or Group tokens
+
+```
+USAGE
+  $ psf-bch-wallet token-mint
+
+OPTIONS
+  -n, --name=name          Name of wallet to pay for transaction
+  -q, --qty=qty            Quantity of tokens to create
+  -r, --receiver=receiver  (optional) Receiver of new baton. Defaults to same wallet. null burns baton.
+  -t, --tokenId=tokenId    Token ID
+
+DESCRIPTION
+  If the wallet contains a minting baton from creating a Fungible or Group token,
+  this command can be used to mint new tokens into existence.
+
+  The '-r' flag is optional. By default the minting baton will be sent back to the
+  origionating wallet. A different address can be specified by the -r flag. Passing
+  a value of 'null' will burn the minting baton, removing the ability to mint
+  new tokens.
+```
+
+_See code: [src/commands/token-mint.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-mint.js)_
+
+## `psf-bch-wallet token-tx-history`
+
+Get transaction history for a token
+
+```
+USAGE
+  $ psf-bch-wallet token-tx-history
+
+OPTIONS
+  -t, --tokenId=tokenId  The ID of the token to lookup
+
+DESCRIPTION
+  Retrieves the transaction history for a token. This is every transaction that
+  has involved the token. The data is more informative for an NFT than it is for
+  a fungible token.
+```
+
+_See code: [src/commands/token-tx-history.js](https://github.com/Permissionless-Software-Foundation/psf-bch-wallet/blob/vv2.14.2/src/commands/token-tx-history.js)_
 
 ## `psf-bch-wallet wallet-addrs`
 
