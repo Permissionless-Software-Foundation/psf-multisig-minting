@@ -2,8 +2,6 @@
   List and/or select a wallet service provider.
 */
 
-// const SERVER = 'http://localhost:5001/bch'
-
 // Public NPM libraries
 const axios = require('axios')
 const Conf = require('conf')
@@ -30,8 +28,8 @@ class WalletService extends Command {
       const server = this.walletUtil.getRestServer()
 
       // Get a list of the IPFS peers this node is connected to.
-      const result = await this.axios.get(`${server}/bch`)
-      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`);
+      const result = await this.axios.get(`${server.restURL}/bch`)
+      // console.log(`result.data: ${JSON.stringify(result.data, null, 2)}`)
 
       const providers = result.data.status.serviceProviders
       // const selectedProvider = result.data.status.selectedProvider
@@ -73,8 +71,8 @@ class WalletService extends Command {
       const body = {
         provider: chosenPeer
       }
-      const request = await this.axios.post(`${server}/bch/provider`, body)
-      const result = await this.axios.get(`${server}/bch`)
+      const request = await this.axios.post(`${server.restURL}/bch/provider`, body)
+      const result = await this.axios.get(`${server.restURL}/bch`)
 
       const chosenProv = request.config.data.slice(13, -2)
       const providers = result.data.status.serviceProviders

@@ -61,16 +61,9 @@ class WalletCreate extends Command {
 
       if (!desc) desc = ''
 
-      const restServer = this.conf.get('restServer')
-      // console.log(`restServer: ${restServer}`)
-
       // Configure the minimal-slp-wallet library to use the JSON RPC over IPFS.
-      // const walletService = new WalletService()
-      const advancedConfig = {
-        interface: 'consumer-api',
-        bchWalletApi: restServer,
-        noUpdate: true
-      }
+      const advancedConfig = this.walletUtil.getRestServer()
+      advancedConfig.noUpdate = true
 
       // Wait for the wallet to be created.
       this.bchWallet = new this.BchWallet(undefined, advancedConfig)

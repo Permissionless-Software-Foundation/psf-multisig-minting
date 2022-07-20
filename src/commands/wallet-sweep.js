@@ -10,6 +10,9 @@ const Conf = require('conf')
 const BchTokenSweep = require('bch-token-sweep/index')
 const { Command, flags } = require('@oclif/command')
 
+// Local libraries
+const WalletUtil = require('../lib/wallet-util')
+
 // Constants
 // const EMTPY_ADDR_CUTOFF = 3
 
@@ -21,6 +24,7 @@ class WalletSweep extends Command {
     this.BchWallet = BchWallet
     this.conf = new Conf()
     this.BchTokenSweep = BchTokenSweep
+    this.walletUtil = new WalletUtil()
 
     // Gap limit. BIP standard is 20
     this.GAP = 20
@@ -50,7 +54,7 @@ class WalletSweep extends Command {
     } catch (err) {
       // console.log(err.message)
       // if (err.message) console.log(err.message)
-      console.log('Error in run(): ', err)
+      console.log('Error in run(): ', err.message)
       // console.log('Error in scan-funds.js/run: ', err)
       throw err
     }
@@ -188,15 +192,8 @@ class WalletSweep extends Command {
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
-      // Get the currently selected REST server from the config.
-      const restServer = this.conf.get('restServer')
-      console.log(`restServer: ${restServer}`)
-
       // Configure and instantiate the minimal-slp-wallet library.
-      const advancedConfig = {
-        interface: 'consumer-api',
-        restURL: restServer
-      }
+      const advancedConfig = this.walletUtil.getRestServer()
       this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
 
       // Wait for the wallet to initialize and retrieve UTXO data from the

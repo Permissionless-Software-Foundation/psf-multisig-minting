@@ -67,15 +67,7 @@ class WalletBalances extends Command {
       const walletJSON = require(filename)
       const walletData = walletJSON.wallet
 
-      // Get the currently selected REST server from the config.
-      const restServer = this.conf.get('restServer')
-      console.log(`restServer: ${restServer}`)
-
-      // Configure the minimal-slp-wallet library.
-      const advancedConfig = {
-        interface: 'consumer-api',
-        restURL: restServer
-      }
+      const advancedConfig = this.walletUtil.getRestServer()
       this.bchWallet = new this.BchWallet(walletData.mnemonic, advancedConfig)
       // console.log('bchWallet: ', this.bchWallet)
 
@@ -144,16 +136,42 @@ class WalletBalances extends Command {
       //   walletData.utxos.utxoStore.slpUtxos.type1.tokens
       // )
 
+      // Combine token UTXOs
+      const tokenUtxos = walletData.utxos.utxoStore.slpUtxos.type1.tokens.concat(
+        walletData.utxos.utxoStore.slpUtxos.group.tokens,
+        walletData.utxos.utxoStore.slpUtxos.nft.tokens
+      )
+
       // Print out SLP Type1 tokens
       console.log('\nTokens:')
       const tokens = this.getTokenBalances(
-        walletData.utxos.utxoStore.slpUtxos.type1.tokens
+        // walletData.utxos.utxoStore.slpUtxos.type1.tokens
+        tokenUtxos
       )
       for (let i = 0; i < tokens.length; i++) {
         const thisToken = tokens[i]
         console.log(`${thisToken.ticker} ${thisToken.qty} ${thisToken.tokenId}`)
       }
 
+      // Print out minting batons
+      const mintBatons = walletData.utxos.utxoStore.slpUtxos.type1.mintBatons.concat(
+        walletData.utxos.utxoStore.slpUtxos.group.mintBatons
+      )
+      if (mintBatons.length > 0) {
+        console.log('\nMinting Batons: ')
+        // console.log(`walletData.utxos.utxoStore: ${JSON.stringify(walletData.utxos.utxoStore, null, 2)}`)
+
+        for (let i = 0; i < mintBatons.length; i++) {
+          const thisBaton = mintBatons[i]
+
+          let type = 'Fungible'
+          if (thisBaton.tokenType === 129) type = 'Group'
+
+          console.log(`${thisBaton.ticker} (${type}) ${thisBaton.tokenId}`)
+        }
+      }
+
+      // If verbose flag is set, display UTXO information.
       if (flags.verbose) {
         console.log(
           `\nUTXO information:\n${JSON.stringify(

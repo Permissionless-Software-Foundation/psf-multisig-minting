@@ -59,14 +59,14 @@ class P2WDBWrite extends Command {
       const p2wdbServer = this.walletUtil.getP2wdbServer()
 
       // Get the REST URL
-      const restURL = this.walletUtil.getRestServer()
+      const server = this.walletUtil.getRestServer()
 
       // Instantiate the Write library.
       this.write = new this.Write({
         wif: wallet.walletInfo.privateKey,
         serverURL: p2wdbServer,
-        interface: 'consumer-api',
-        restURL
+        interface: server.interface,
+        restURL: server.restURL
       })
 
       return true

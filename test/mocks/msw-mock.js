@@ -103,9 +103,11 @@ class BchWallet {
               ]
             },
             nft: {
-              groupMintBatons: [],
-              groupTokens: [],
               tokens: []
+            },
+            group: {
+              tokens: [],
+              mintBatons: []
             }
           }
         }

@@ -71,6 +71,51 @@ describe('wallet-balances', () => {
         assert.include(err.message, 'Cannot read prop')
       }
     })
+
+    it('should display minting batons', () => {
+      const mockWallet = new BchWalletMock()
+      // console.log('mockWallet: ', mockWallet)
+
+      // Force UTXOs
+      mockWallet.utxos.utxoStore = {
+        bchUtxos: [{
+          height: 744046,
+          tx_hash: '227354c9827f4e3c9ce24dd9197b314f7da8a2224f4874ca11104c8fdc58f684',
+          tx_pos: 3,
+          value: 577646,
+          txid: '227354c9827f4e3c9ce24dd9197b314f7da8a2224f4874ca11104c8fdc58f684',
+          vout: 3,
+          address: 'bitcoincash:qr2u4f2dmva6yvf3npkd5lquryp09qk7gs5vxl423h',
+          isSlp: false,
+          satoshis: 577646
+        }],
+        slpUtxos: {
+          type1: {
+            tokens: [],
+            mintBatons: []
+          },
+          group: {
+            tokens: [],
+            mintBatons: [{
+              tokenId: '227354c9827f4e3c9ce24dd9197b314f7da8a2224f4874ca11104c8fdc58f684',
+              tx_hash: '227354c9827f4e3c9ce24dd9197b314f7da8a2224f4874ca11104c8fdc58f684',
+              tx_pos: 4,
+              value: 546,
+              tokenType: 129,
+              utxoType: 'group',
+              decimals: 0
+            }]
+          },
+          nft: {
+            tokens: []
+          }
+        }
+      }
+
+      const result = uut.displayBalance(mockWallet)
+
+      assert.equal(result, true)
+    })
   })
 
   describe('#getBalances', () => {
